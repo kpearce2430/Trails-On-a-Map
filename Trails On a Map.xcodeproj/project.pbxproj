@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD26E2F8181B002D0021BEE2 /* TOMTrackView.m in Sources */ = {isa = PBXBuildFile; fileRef = AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */; };
+		AD26E2FB181B129A0021BEE2 /* TOMImageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */; };
+		AD45010C181191AE00E76DE0 /* TOMPointOnAMap.m in Sources */ = {isa = PBXBuildFile; fileRef = AD45010B181191AE00E76DE0 /* TOMPointOnAMap.m */; };
+		AD45010F1811A77800E76DE0 /* TOMPomSet.m in Sources */ = {isa = PBXBuildFile; fileRef = AD45010E1811A77800E76DE0 /* TOMPomSet.m */; };
+		AD4501131812E74100E76DE0 /* TOMPropertyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */; };
+		AD4501141812E74100E76DE0 /* TOMPropertyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */; };
+		AD778D38181454A3008E1D06 /* TOMMapSet.m in Sources */ = {isa = PBXBuildFile; fileRef = AD778D37181454A3008E1D06 /* TOMMapSet.m */; };
 		AD7BEC7E180E22910003187D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC7D180E22910003187D /* Foundation.framework */; };
 		AD7BEC80180E22910003187D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC7F180E22910003187D /* CoreGraphics.framework */; };
 		AD7BEC82180E22910003187D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC81180E22910003187D /* UIKit.framework */; };
@@ -22,6 +29,17 @@
 		AD7BEC9F180E22910003187D /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC83180E22910003187D /* CoreData.framework */; };
 		AD7BECA7180E22910003187D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AD7BECA5180E22910003187D /* InfoPlist.strings */; };
 		AD7BECA9180E22910003187D /* Trails_On_a_MapTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AD7BECA8180E22910003187D /* Trails_On_a_MapTests.m */; };
+		AD7BECB3180E22E30003187D /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BECB2180E22E30003187D /* MapKit.framework */; };
+		AD7BECB5180E22EE0003187D /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BECB4180E22ED0003187D /* CoreLocation.framework */; };
+		AD7BECB9180E23220003187D /* TOMRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD7BECB7180E23220003187D /* TOMRootViewController.m */; };
+		AD7BECBA180E23220003187D /* TOMRootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD7BECB8180E23220003187D /* TOMRootViewController.xib */; };
+		AD7BECBE180E9CDB0003187D /* TOMProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = AD7BECBD180E9CDB0003187D /* TOMProperties.m */; };
+		AD7BECC0180F1AC10003187D /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = AD7BECBF180F1AC10003187D /* settings.png */; };
+		ADA795DE18205AD1004E383D /* TOMOrganizerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */; };
+		ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */; };
+		ADA795E31820988D004E383D /* pt57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E01820988D004E383D /* pt57x57.png */; };
+		ADA795E41820988D004E383D /* pt114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E11820988D004E383D /* pt114x114.png */; };
+		ADA795E51820988D004E383D /* pt120x120.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E21820988D004E383D /* pt120x120.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +53,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AD26E2F6181B002D0021BEE2 /* TOMTrackView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TOMTrackView.h; path = ../TOMTrackView.h; sourceTree = "<group>"; };
+		AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TOMTrackView.m; path = ../TOMTrackView.m; sourceTree = "<group>"; };
+		AD26E2F9181B129A0021BEE2 /* TOMImageStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMImageStore.h; sourceTree = "<group>"; };
+		AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMImageStore.m; sourceTree = "<group>"; };
+		AD45010A181191AE00E76DE0 /* TOMPointOnAMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPointOnAMap.h; sourceTree = "<group>"; };
+		AD45010B181191AE00E76DE0 /* TOMPointOnAMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMPointOnAMap.m; sourceTree = "<group>"; };
+		AD45010D1811A77800E76DE0 /* TOMPomSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPomSet.h; sourceTree = "<group>"; };
+		AD45010E1811A77800E76DE0 /* TOMPomSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMPomSet.m; sourceTree = "<group>"; };
+		AD4501101812E74100E76DE0 /* TOMPropertyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPropertyViewController.h; sourceTree = "<group>"; };
+		AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMPropertyViewController.m; sourceTree = "<group>"; };
+		AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMPropertyViewController.xib; sourceTree = "<group>"; };
+		AD778D3518141F0A008E1D06 /* Trails On a Map.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Trails On a Map.entitlements"; sourceTree = "<group>"; };
+		AD778D36181454A3008E1D06 /* TOMMapSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMMapSet.h; sourceTree = "<group>"; };
+		AD778D37181454A3008E1D06 /* TOMMapSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMMapSet.m; sourceTree = "<group>"; };
 		AD7BEC7A180E22910003187D /* Trails On a Map.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Trails On a Map.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD7BEC7D180E22910003187D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		AD7BEC7F180E22910003187D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -53,6 +85,21 @@
 		AD7BECA4180E22910003187D /* Trails On a MapTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Trails On a MapTests-Info.plist"; sourceTree = "<group>"; };
 		AD7BECA6180E22910003187D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		AD7BECA8180E22910003187D /* Trails_On_a_MapTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Trails_On_a_MapTests.m; sourceTree = "<group>"; };
+		AD7BECB2180E22E30003187D /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		AD7BECB4180E22ED0003187D /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		AD7BECB6180E23210003187D /* TOMRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TOMRootViewController.h; path = ../TOMRootViewController.h; sourceTree = "<group>"; };
+		AD7BECB7180E23220003187D /* TOMRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TOMRootViewController.m; path = ../TOMRootViewController.m; sourceTree = "<group>"; };
+		AD7BECB8180E23220003187D /* TOMRootViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TOMRootViewController.xib; path = ../TOMRootViewController.xib; sourceTree = "<group>"; };
+		AD7BECBB180E239E0003187D /* TOM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TOM.h; sourceTree = "<group>"; };
+		AD7BECBC180E9CDB0003187D /* TOMProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMProperties.h; sourceTree = "<group>"; };
+		AD7BECBD180E9CDB0003187D /* TOMProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMProperties.m; sourceTree = "<group>"; };
+		AD7BECBF180F1AC10003187D /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settings.png; sourceTree = "<group>"; };
+		ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMOrganizerViewController.h; sourceTree = "<group>"; };
+		ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMOrganizerViewController.m; sourceTree = "<group>"; };
+		ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMOrganizerViewController.xib; sourceTree = "<group>"; };
+		ADA795E01820988D004E383D /* pt57x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt57x57.png; sourceTree = "<group>"; };
+		ADA795E11820988D004E383D /* pt114x114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt114x114.png; sourceTree = "<group>"; };
+		ADA795E21820988D004E383D /* pt120x120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt120x120.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +107,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD7BECB5180E22EE0003187D /* CoreLocation.framework in Frameworks */,
+				AD7BECB3180E22E30003187D /* MapKit.framework in Frameworks */,
 				AD7BEC80180E22910003187D /* CoreGraphics.framework in Frameworks */,
 				AD7BEC84180E22910003187D /* CoreData.framework in Frameworks */,
 				AD7BEC82180E22910003187D /* UIKit.framework in Frameworks */,
@@ -103,6 +152,8 @@
 		AD7BEC7C180E22910003187D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AD7BECB4180E22ED0003187D /* CoreLocation.framework */,
+				AD7BECB2180E22E30003187D /* MapKit.framework */,
 				AD7BEC7D180E22910003187D /* Foundation.framework */,
 				AD7BEC7F180E22910003187D /* CoreGraphics.framework */,
 				AD7BEC81180E22910003187D /* UIKit.framework */,
@@ -115,11 +166,31 @@
 		AD7BEC85180E22910003187D /* Trails On a Map */ = {
 			isa = PBXGroup;
 			children = (
+				AD778D3518141F0A008E1D06 /* Trails On a Map.entitlements */,
 				AD7BEC8E180E22910003187D /* TOMAppDelegate.h */,
 				AD7BEC8F180E22910003187D /* TOMAppDelegate.m */,
+				ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */,
+				ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */,
+				AD4501101812E74100E76DE0 /* TOMPropertyViewController.h */,
+				AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */,
+				AD7BECB6180E23210003187D /* TOMRootViewController.h */,
+				AD7BECB7180E23220003187D /* TOMRootViewController.m */,
+				AD26E2F9181B129A0021BEE2 /* TOMImageStore.h */,
+				AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */,
+				AD7BECBC180E9CDB0003187D /* TOMProperties.h */,
+				AD7BECBD180E9CDB0003187D /* TOMProperties.m */,
+				AD26E2F6181B002D0021BEE2 /* TOMTrackView.h */,
+				AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */,
+				AD778D36181454A3008E1D06 /* TOMMapSet.h */,
+				AD778D37181454A3008E1D06 /* TOMMapSet.m */,
+				AD45010D1811A77800E76DE0 /* TOMPomSet.h */,
+				AD45010E1811A77800E76DE0 /* TOMPomSet.m */,
+				AD45010A181191AE00E76DE0 /* TOMPointOnAMap.h */,
+				AD45010B181191AE00E76DE0 /* TOMPointOnAMap.m */,
 				AD7BEC94180E22910003187D /* Images.xcassets */,
 				AD7BEC91180E22910003187D /* Trails_On_a_Map.xcdatamodeld */,
 				AD7BEC86180E22910003187D /* Supporting Files */,
+				AD7BECBB180E239E0003187D /* TOM.h */,
 			);
 			path = "Trails On a Map";
 			sourceTree = "<group>";
@@ -127,10 +198,17 @@
 		AD7BEC86180E22910003187D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				ADA795E01820988D004E383D /* pt57x57.png */,
+				ADA795E11820988D004E383D /* pt114x114.png */,
+				ADA795E21820988D004E383D /* pt120x120.png */,
+				ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */,
+				AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */,
+				AD7BECB8180E23220003187D /* TOMRootViewController.xib */,
 				AD7BEC87180E22910003187D /* Trails On a Map-Info.plist */,
 				AD7BEC88180E22910003187D /* InfoPlist.strings */,
 				AD7BEC8B180E22910003187D /* main.m */,
 				AD7BEC8D180E22910003187D /* Trails On a Map-Prefix.pch */,
+				AD7BECBF180F1AC10003187D /* settings.png */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -201,6 +279,20 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Pearce Software Solutions";
 				TargetAttributes = {
+					AD7BEC79180E22910003187D = {
+						DevelopmentTeam = HV9L49AFR8;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Keychain = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
+					};
 					AD7BEC99180E22910003187D = {
 						TestTargetID = AD7BEC79180E22910003187D;
 					};
@@ -229,8 +321,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ADA795E41820988D004E383D /* pt114x114.png in Resources */,
+				ADA795E31820988D004E383D /* pt57x57.png in Resources */,
+				AD7BECC0180F1AC10003187D /* settings.png in Resources */,
 				AD7BEC8A180E22910003187D /* InfoPlist.strings in Resources */,
+				ADA795E51820988D004E383D /* pt120x120.png in Resources */,
+				AD7BECBA180E23220003187D /* TOMRootViewController.xib in Resources */,
+				ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */,
 				AD7BEC95180E22910003187D /* Images.xcassets in Resources */,
+				AD4501141812E74100E76DE0 /* TOMPropertyViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,9 +348,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD45010F1811A77800E76DE0 /* TOMPomSet.m in Sources */,
 				AD7BEC8C180E22910003187D /* main.m in Sources */,
+				AD778D38181454A3008E1D06 /* TOMMapSet.m in Sources */,
+				AD4501131812E74100E76DE0 /* TOMPropertyViewController.m in Sources */,
+				AD45010C181191AE00E76DE0 /* TOMPointOnAMap.m in Sources */,
+				AD7BECB9180E23220003187D /* TOMRootViewController.m in Sources */,
+				AD26E2FB181B129A0021BEE2 /* TOMImageStore.m in Sources */,
 				AD7BEC90180E22910003187D /* TOMAppDelegate.m in Sources */,
+				AD26E2F8181B002D0021BEE2 /* TOMTrackView.m in Sources */,
+				AD7BECBE180E9CDB0003187D /* TOMProperties.m in Sources */,
 				AD7BEC93180E22910003187D /* Trails_On_a_Map.xcdatamodeld in Sources */,
+				ADA795DE18205AD1004E383D /* TOMOrganizerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -372,6 +480,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trails On a Map/Trails On a Map-Prefix.pch";
 				INFOPLIST_FILE = "Trails On a Map/Trails On a Map-Info.plist";
@@ -385,6 +494,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trails On a Map/Trails On a Map-Prefix.pch";
 				INFOPLIST_FILE = "Trails On a Map/Trails On a Map-Info.plist";
@@ -454,6 +564,7 @@
 				AD7BECAE180E22910003187D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AD7BECAF180E22910003187D /* Build configuration list for PBXNativeTarget "Trails On a MapTests" */ = {
 			isa = XCConfigurationList;
@@ -462,6 +573,7 @@
 				AD7BECB1180E22910003187D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
