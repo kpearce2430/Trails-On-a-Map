@@ -96,14 +96,22 @@
 {
     // Acquire the write lock because we are going to be changing the list of points
     pthread_rwlock_wrlock(&rwLock);
+    MKMapRect updateRect = MKMapRectNull;
     
+    if (pointCount == 0 ) {
+        if (![self initWithCenterCoordinate:coord]) {
+            NSLog(@"ERROR: Something went wrong");
+        }
+        return updateRect;
+    }
+
     // Convert a CLLocationCoordinate2D to an MKMapPoint
     MKMapPoint newPoint = MKMapPointForCoordinate(coord);
     MKMapPoint prevPoint = points[pointCount - 1];
     
     // Get the distance between this new point and the previous point.
     CLLocationDistance metersApart = MKMetersBetweenMapPoints(newPoint, prevPoint);
-    MKMapRect updateRect = MKMapRectNull;
+
     
     if (metersApart > MINIMUM_DELTA_METERS)
     {
@@ -176,6 +184,35 @@
 
 - (void) clearPoms {
     pointCount = 0;
+}
+
+- (MKMapRect)getMyMapRect:(CLLocationCoordinate2D)coord
+{
+    MKMapRect updateRect = MKMapRectNull;
+    
+    if (pointCount == 0 ) {
+        NSLog(@"ERROR: Something went wrong");
+        return updateRect;
+    }
+    
+    // Convert a CLLocationCoordinate2D to an MKMapPoint
+    MKMapPoint newPoint = MKMapPointForCoordinate(coord);
+    MKMapPoint prevPoint = points[pointCount - 1];
+    // Get the distance between this new point and the previous point.
+    CLLocationDistance metersApart = MKMetersBetweenMapPoints(newPoint, prevPoint);
+    
+    
+    if (metersApart > MINIMUM_DELTA_METERS)
+    {
+        // Compute MKMapRect bounding prevPoint and newPoint
+        double minX = MIN(newPoint.x, prevPoint.x);
+        double minY = MIN(newPoint.y, prevPoint.y);
+        double maxX = MAX(newPoint.x, prevPoint.x);
+        double maxY = MAX(newPoint.y, prevPoint.y);
+        
+        updateRect = MKMapRectMake(minX , minY , (maxX - minX) , (maxY - minY) );
+    }
+    return updateRect;
 }
 
 @end

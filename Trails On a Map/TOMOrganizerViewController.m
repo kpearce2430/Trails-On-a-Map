@@ -5,11 +5,9 @@
 //  Created by KEITH PEARCE on 10/29/13.
 //  Copyright (c) 2013 Pearce Software Solutions. All rights reserved.
 //
-
-#import "TOMOrganizerViewController.h"
 #import "TOM.h"
-// #import "TOMPomSet.h"
-
+#import "TOMOrganizerViewController.h"
+#import "TOMDetailViewController.h"
 
 @interface TOMOrganizerViewController ()
 
@@ -125,6 +123,7 @@
 
     NSString *myLabel = [[self.fileList objectAtIndex:indexPath.row] stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
     //6
+    cell.accessoryType = UITableViewCellAccessoryDetailButton;
     [cell.textLabel setText:myLabel];
     [cell.detailTextLabel setText:dateStr];
 
@@ -140,8 +139,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSLog(@"Index Path:%@",indexPath);
-    NSLog(@"Selected: %@",[self.fileList objectAtIndex:indexPath.row]);
+    // NSLog(@"Index Path:%@",indexPath);
+    // NSLog(@"Selected: %@",[self.fileList objectAtIndex:indexPath.row]);
     NSString *myTitle = [[self.fileList objectAtIndex:indexPath.row] stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
     self.title = myTitle;
     // set the new value to the cloud and synchronize
@@ -150,6 +149,26 @@
     [kvStore setString:myTitle forKey:@KEY_NAME];
     
     return;
+}
+
+
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+{
+    NSLog(@"Picked %@",indexPath);
+    NSLog(@"Selected: %@",[self.fileList objectAtIndex:indexPath.row]);
+    NSString *myTitle = [[self.fileList objectAtIndex:indexPath.row] stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
+    
+    UIViewController *ptController = [[TOMDetailViewController alloc] initWithNibName:@"TOMDetailViewController" bundle:nil title:myTitle];
+    
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
+                                   initWithTitle: @"Back"
+                                   style: UIBarButtonItemStyleBordered
+                                   target: nil action: nil];
+    
+    [self.navigationItem setBackBarButtonItem: backButton];
+    
+    [[self navigationController] pushViewController:ptController animated:YES];
+    
 }
 
 @end

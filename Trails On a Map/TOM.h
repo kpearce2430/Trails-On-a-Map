@@ -9,6 +9,9 @@
 #ifndef Trails_On_a_Map_TOM_h
 #define Trails_On_a_Map_TOM_h
 
+typedef enum  { tomDSError = -1, tomDSUnknown, tomDSMilesPerHour, tomDSKmPerHour, tomDSMinutesPerMile, tomDSMetersPerSecond } TOMDisplaySpeedType;
+typedef enum  { tomDDError = -1, tomDDUnknown, tomDDMiles, tomDDKilometers, tomDDMeters, tomDDFeet } TOMDisplayDistanceType ;
+
 #define KEY_NAME                 "ptName"
 #define KEY_MAP_TYPE             "ptMapType"
 #define KEY_USER_TRACKING_MODE   "ptUserTrackingMode"
@@ -21,7 +24,8 @@
 #define KEY_SHOW_SOUNDS          "ptShowSounds"
 #define KEY_SHOW_SPEED_LABEL     "ptShowSpeedLabel"
 #define KEY_SHOW_INFO_LABEL      "ptShowInfoLabel"
-#define KEY_MPH_KPH              "ptMPHorKPH"
+#define KEY_SPEED_UNITS          "ptDisplaySpeed"
+#define KEY_DISTANCE_UNITS       "ptDisplayDistance"
 
 // Defaults
 #define TRAILS_ON_A_MAP             "Trails On A Map"
@@ -35,7 +39,7 @@
 #define ptLabelHeight               20.0
 #define ptLeftMargin                20.0
 #define ptLabelHeight               20.0
-#define ptRightMargin               60.0
+#define ptRightMargin               20.0
 #define ptTweenMargin               5.0
 #define ptTweenMarginMultiplier     1.0
 #define ptSegmentedControlHeight    40.0
@@ -75,5 +79,14 @@
 
 #define INITIAL_POINT_SPACE 1000
 #define MINIMUM_DELTA_METERS 1.0
+
+//
+// Slider defines
+#define TOM_SLIDER_MIN_Y    20
+#define TOM_SLIDER_MAX_Y    120
+
+#define TOM_SLIDER_NUM_PTS  61
+#define TOM_FONT            "Helvetica-Bold"
+#define TOM_PVC_EXTRA       400
 
 #endif

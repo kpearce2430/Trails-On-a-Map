@@ -50,5 +50,7 @@
 - (void) loadFromPoms:(TOMPomSet *)pt;
 - (BOOL) initWithCoord:(CLLocationCoordinate2D) coord;
 - (void) clearPoms;
+- (MKMapRect)boundingMapRect;
+- (MKMapRect)getMyMapRect:(CLLocationCoordinate2D)coord;
 
 @end

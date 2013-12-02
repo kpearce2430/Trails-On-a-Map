@@ -359,7 +359,7 @@
     else
         myTimeString = [[NSString alloc] initWithFormat:@"%d",seconds];
     
-    NSLog(@"%s %@",__func__, myTimeString);
+    // NSLog(@"%s %@",__func__, myTimeString);
     return myTimeString;
 }
 //

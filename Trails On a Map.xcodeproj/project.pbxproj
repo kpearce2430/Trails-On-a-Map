@@ -9,10 +9,13 @@
 /* Begin PBXBuildFile section */
 		AD26E2F8181B002D0021BEE2 /* TOMTrackView.m in Sources */ = {isa = PBXBuildFile; fileRef = AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */; };
 		AD26E2FB181B129A0021BEE2 /* TOMImageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */; };
+		AD31BFA7182EED5800BCEE96 /* TOMViewSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = AD31BFA6182EED5800BCEE96 /* TOMViewSlider.m */; };
 		AD45010C181191AE00E76DE0 /* TOMPointOnAMap.m in Sources */ = {isa = PBXBuildFile; fileRef = AD45010B181191AE00E76DE0 /* TOMPointOnAMap.m */; };
 		AD45010F1811A77800E76DE0 /* TOMPomSet.m in Sources */ = {isa = PBXBuildFile; fileRef = AD45010E1811A77800E76DE0 /* TOMPomSet.m */; };
 		AD4501131812E74100E76DE0 /* TOMPropertyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */; };
 		AD4501141812E74100E76DE0 /* TOMPropertyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */; };
+		AD6CD7E818244814005A0699 /* TOMDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD6CD7E618244814005A0699 /* TOMDetailViewController.m */; };
+		AD6CD7E918244814005A0699 /* TOMDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD6CD7E718244814005A0699 /* TOMDetailViewController.xib */; };
 		AD778D38181454A3008E1D06 /* TOMMapSet.m in Sources */ = {isa = PBXBuildFile; fileRef = AD778D37181454A3008E1D06 /* TOMMapSet.m */; };
 		AD7BEC7E180E22910003187D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC7D180E22910003187D /* Foundation.framework */; };
 		AD7BEC80180E22910003187D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC7F180E22910003187D /* CoreGraphics.framework */; };
@@ -40,6 +43,8 @@
 		ADA795E31820988D004E383D /* pt57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E01820988D004E383D /* pt57x57.png */; };
 		ADA795E41820988D004E383D /* pt114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E11820988D004E383D /* pt114x114.png */; };
 		ADA795E51820988D004E383D /* pt120x120.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E21820988D004E383D /* pt120x120.png */; };
+		ADDE2927184A456F00CBB238 /* TOMSpeed.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDE2926184A456F00CBB238 /* TOMSpeed.m */; };
+		ADDE292A184A4C2000CBB238 /* TOMDistance.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDE2929184A4C2000CBB238 /* TOMDistance.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +62,8 @@
 		AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TOMTrackView.m; path = ../TOMTrackView.m; sourceTree = "<group>"; };
 		AD26E2F9181B129A0021BEE2 /* TOMImageStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMImageStore.h; sourceTree = "<group>"; };
 		AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMImageStore.m; sourceTree = "<group>"; };
+		AD31BFA5182EED5800BCEE96 /* TOMViewSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMViewSlider.h; sourceTree = "<group>"; };
+		AD31BFA6182EED5800BCEE96 /* TOMViewSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMViewSlider.m; sourceTree = "<group>"; };
 		AD45010A181191AE00E76DE0 /* TOMPointOnAMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPointOnAMap.h; sourceTree = "<group>"; };
 		AD45010B181191AE00E76DE0 /* TOMPointOnAMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMPointOnAMap.m; sourceTree = "<group>"; };
 		AD45010D1811A77800E76DE0 /* TOMPomSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPomSet.h; sourceTree = "<group>"; };
@@ -64,6 +71,9 @@
 		AD4501101812E74100E76DE0 /* TOMPropertyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPropertyViewController.h; sourceTree = "<group>"; };
 		AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMPropertyViewController.m; sourceTree = "<group>"; };
 		AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMPropertyViewController.xib; sourceTree = "<group>"; };
+		AD6CD7E518244814005A0699 /* TOMDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDetailViewController.h; sourceTree = "<group>"; };
+		AD6CD7E618244814005A0699 /* TOMDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMDetailViewController.m; sourceTree = "<group>"; };
+		AD6CD7E718244814005A0699 /* TOMDetailViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMDetailViewController.xib; sourceTree = "<group>"; };
 		AD778D3518141F0A008E1D06 /* Trails On a Map.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Trails On a Map.entitlements"; sourceTree = "<group>"; };
 		AD778D36181454A3008E1D06 /* TOMMapSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMMapSet.h; sourceTree = "<group>"; };
 		AD778D37181454A3008E1D06 /* TOMMapSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMMapSet.m; sourceTree = "<group>"; };
@@ -100,6 +110,10 @@
 		ADA795E01820988D004E383D /* pt57x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt57x57.png; sourceTree = "<group>"; };
 		ADA795E11820988D004E383D /* pt114x114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt114x114.png; sourceTree = "<group>"; };
 		ADA795E21820988D004E383D /* pt120x120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt120x120.png; sourceTree = "<group>"; };
+		ADDE2925184A456F00CBB238 /* TOMSpeed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMSpeed.h; sourceTree = "<group>"; };
+		ADDE2926184A456F00CBB238 /* TOMSpeed.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSpeed.m; sourceTree = "<group>"; };
+		ADDE2928184A4C2000CBB238 /* TOMDistance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDistance.h; sourceTree = "<group>"; };
+		ADDE2929184A4C2000CBB238 /* TOMDistance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMDistance.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,8 +181,11 @@
 			isa = PBXGroup;
 			children = (
 				AD778D3518141F0A008E1D06 /* Trails On a Map.entitlements */,
+				AD7BECBB180E239E0003187D /* TOM.h */,
 				AD7BEC8E180E22910003187D /* TOMAppDelegate.h */,
 				AD7BEC8F180E22910003187D /* TOMAppDelegate.m */,
+				AD6CD7E518244814005A0699 /* TOMDetailViewController.h */,
+				AD6CD7E618244814005A0699 /* TOMDetailViewController.m */,
 				ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */,
 				ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */,
 				AD4501101812E74100E76DE0 /* TOMPropertyViewController.h */,
@@ -185,12 +202,17 @@
 				AD778D37181454A3008E1D06 /* TOMMapSet.m */,
 				AD45010D1811A77800E76DE0 /* TOMPomSet.h */,
 				AD45010E1811A77800E76DE0 /* TOMPomSet.m */,
+				AD31BFA5182EED5800BCEE96 /* TOMViewSlider.h */,
+				AD31BFA6182EED5800BCEE96 /* TOMViewSlider.m */,
 				AD45010A181191AE00E76DE0 /* TOMPointOnAMap.h */,
 				AD45010B181191AE00E76DE0 /* TOMPointOnAMap.m */,
+				ADDE2925184A456F00CBB238 /* TOMSpeed.h */,
+				ADDE2926184A456F00CBB238 /* TOMSpeed.m */,
+				ADDE2928184A4C2000CBB238 /* TOMDistance.h */,
+				ADDE2929184A4C2000CBB238 /* TOMDistance.m */,
 				AD7BEC94180E22910003187D /* Images.xcassets */,
 				AD7BEC91180E22910003187D /* Trails_On_a_Map.xcdatamodeld */,
 				AD7BEC86180E22910003187D /* Supporting Files */,
-				AD7BECBB180E239E0003187D /* TOM.h */,
 			);
 			path = "Trails On a Map";
 			sourceTree = "<group>";
@@ -201,6 +223,7 @@
 				ADA795E01820988D004E383D /* pt57x57.png */,
 				ADA795E11820988D004E383D /* pt114x114.png */,
 				ADA795E21820988D004E383D /* pt120x120.png */,
+				AD6CD7E718244814005A0699 /* TOMDetailViewController.xib */,
 				ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */,
 				AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */,
 				AD7BECB8180E23220003187D /* TOMRootViewController.xib */,
@@ -323,6 +346,7 @@
 			files = (
 				ADA795E41820988D004E383D /* pt114x114.png in Resources */,
 				ADA795E31820988D004E383D /* pt57x57.png in Resources */,
+				AD6CD7E918244814005A0699 /* TOMDetailViewController.xib in Resources */,
 				AD7BECC0180F1AC10003187D /* settings.png in Resources */,
 				AD7BEC8A180E22910003187D /* InfoPlist.strings in Resources */,
 				ADA795E51820988D004E383D /* pt120x120.png in Resources */,
@@ -351,7 +375,10 @@
 				AD45010F1811A77800E76DE0 /* TOMPomSet.m in Sources */,
 				AD7BEC8C180E22910003187D /* main.m in Sources */,
 				AD778D38181454A3008E1D06 /* TOMMapSet.m in Sources */,
+				ADDE292A184A4C2000CBB238 /* TOMDistance.m in Sources */,
 				AD4501131812E74100E76DE0 /* TOMPropertyViewController.m in Sources */,
+				ADDE2927184A456F00CBB238 /* TOMSpeed.m in Sources */,
+				AD31BFA7182EED5800BCEE96 /* TOMViewSlider.m in Sources */,
 				AD45010C181191AE00E76DE0 /* TOMPointOnAMap.m in Sources */,
 				AD7BECB9180E23220003187D /* TOMRootViewController.m in Sources */,
 				AD26E2FB181B129A0021BEE2 /* TOMImageStore.m in Sources */,
@@ -359,6 +386,7 @@
 				AD26E2F8181B002D0021BEE2 /* TOMTrackView.m in Sources */,
 				AD7BECBE180E9CDB0003187D /* TOMProperties.m in Sources */,
 				AD7BEC93180E22910003187D /* Trails_On_a_Map.xcdatamodeld in Sources */,
+				AD6CD7E818244814005A0699 /* TOMDetailViewController.m in Sources */,
 				ADA795DE18205AD1004E383D /* TOMOrganizerViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

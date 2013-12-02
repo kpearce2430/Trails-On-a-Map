@@ -7,10 +7,11 @@
 //
 
 #import "TOMProperties.h"
+#import "TOM.h"
 
 @implementation TOMProperties
 
-@synthesize ptMapType, ptName, ptUserTrackingMode,ptDistanceFilter,ptLocationAccuracy, showLocations, showPictures, showStops, showNotes, showSounds, showInfoBar, showSpeedBar;
+@synthesize ptMapType, ptName, ptUserTrackingMode,ptDistanceFilter,ptLocationAccuracy, showLocations, showPictures, showStops, showNotes, showSounds, showInfoBar, showSpeedBar,ptDisplaySpeedType;
 
 -(id) initWithTitle: (NSString *) title
 {
@@ -30,6 +31,7 @@
         [self setShowSounds:YES];
         [self setShowInfoBar:YES];
         [self setShowSpeedBar:YES];
+        [self setPtDisplaySpeedType:tomDSUnknown];
     }
     return self;
 }

@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 #import <MapKit/MapKit.h>
+#import "TOM.h"
 
 @interface TOMProperties : NSObject
 
@@ -24,6 +25,7 @@
 @property (nonatomic, readwrite) BOOL showSounds;
 @property (nonatomic, readwrite) BOOL showInfoBar;
 @property (nonatomic, readwrite) BOOL showSpeedBar;
+@property (nonatomic, readwrite) TOMDisplaySpeedType ptDisplaySpeedType;
 
 
 -(id) initWithTitle: (NSString *) title;

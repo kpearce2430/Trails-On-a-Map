@@ -16,6 +16,8 @@
 #import "TOMProperties.h"
 #import "TOMTrackView.h"
 #import "TOMImageStore.h"
+#import "TOMViewSlider.h"
+
 
 @interface TOMRootViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate >
 
@@ -23,11 +25,18 @@
 @private
     CLLocationManager *locationManager;
     IBOutlet MKMapView *worldView;
-    
+    UIToolbar *toolbar;
+    TOMViewSlider *mySlider;
+
 @public
     IBOutlet UIActivityIndicatorView *activityIndicator;
-    IBOutlet UILabel *speedBar;
-    IBOutlet UILabel *infoBar;
+    IBOutlet UILabel *speedTimeBar;
+    IBOutlet UILabel *distanceInfoBar;
+    UIBarButtonItem *flexItem;
+    UIBarButtonItem *cameraItem;
+    UIBarButtonItem *startStopItem;
+    UIBarButtonItem *organizerItem;
+    
     NSTimer *ptTimer;
     
     TOMTrackView  *trailView;
@@ -54,7 +63,8 @@
 - (IBAction)takePicture:(id)sender;
 - (IBAction)organizeTrails:(id)sender;
 - (void) processMyLocation:(CLLocation *)newLocation type: (POMType) pt;
-- (BOOL) loadPoms:(NSString *) title;
-- (BOOL) savePoms:(NSString *) title;
+- (BOOL) loadTrails:(NSString *) title;
+- (BOOL) saveTrails:(NSString *) title;
+// - (CLLocationSpeed) displaySpeed: (CLLocationSpeed) s;
 
 @end

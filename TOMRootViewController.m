@@ -9,6 +9,8 @@
 #import "TOMRootViewController.h"
 #import "TOMPropertyViewController.h"
 #import "TOMOrganizerViewController.h"
+#import "TOMSpeed.h"
+#import "TOMDistance.h"
 
 @interface TOMRootViewController ()
 
@@ -56,34 +58,49 @@
         CGFloat screenHeight = screenRect.size.height;
         CGFloat screenWidth = screenRect.size.width;
         
+        //
+        // Create location manager object
+        //
+        locationManager = [[ CLLocationManager alloc] init ];
+        [locationManager setDelegate:self];
+        
+        // Build up the MKMapView
+        CGRect mapRect = CGRectMake( 0.0, 0.0, screenWidth, (screenHeight - TOM_TOOL_BAR_HEIGHT ));
+        worldView = [[MKMapView alloc] initWithFrame:mapRect];
+        [self.view addSubview:worldView];
+        
+        CGRect mySliderRect = CGRectMake( 0.0f , (screenHeight - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MIN_Y), screenWidth, TOM_SLIDER_MIN_Y );
+        mySlider = [[TOMViewSlider alloc] initWithFrame:mySliderRect];
+        [self.view addSubview:mySlider];
+        
         CGRect toolbarRect;
         toolbarRect.origin.y = screenHeight - TOM_TOOL_BAR_HEIGHT;
         toolbarRect.origin.x = 0;
         toolbarRect.size.height = TOM_TOOL_BAR_HEIGHT;
         toolbarRect.size.width = screenRect.size.width;
         
-        UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:toolbarRect ];
+        toolbar = [[UIToolbar alloc] initWithFrame:toolbarRect ];
         toolbar.barStyle = UIBarStyleDefault;
 
         [toolbar setBackgroundImage:nil forToolbarPosition:UIBarPositionBottom barMetrics:UIBarMetricsDefault];
         
-        UIBarButtonItem *flexItem = [[UIBarButtonItem alloc]
+        flexItem = [[UIBarButtonItem alloc]
                                      initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
                                      target:nil
                                      action:nil];
 
-        UIBarButtonItem *cameraItem = [[UIBarButtonItem alloc]
+        cameraItem = [[UIBarButtonItem alloc]
                                        initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
                                        target:self
                                        action:@selector(takePicture:)];
 
-        UIBarButtonItem *startStopItem = [[UIBarButtonItem alloc]
+        startStopItem = [[UIBarButtonItem alloc]
                                           initWithTitle:@TOM_OFF_TEXT
                                           style:UIBarButtonItemStylePlain
                                           target:self
                                           action:@selector(startStop:)];
 
-        UIBarButtonItem *organizerItem = [[UIBarButtonItem alloc]
+        organizerItem = [[UIBarButtonItem alloc]
                                           initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize
                                           target:self
                                           action:@selector(organizeTrails:)];
@@ -92,46 +109,30 @@
         [toolbar setItems:items];
         [self.view addSubview:toolbar];
 
-        //
-        // Create location manager object
-        //
-        locationManager = [[ CLLocationManager alloc] init ];
-        [locationManager setDelegate:self];
-        
-        //
-        // Don't start updating the location just yet...
-        // [locationManager startUpdatingLocation];
-        // [locationManager startUpdatingHeading];
-
-        // Build up the MKMapView
-        CGRect mapRect = CGRectMake( 0.0, 0.0, screenWidth, (screenHeight - TOM_TOOL_BAR_HEIGHT));
-        worldView = [[MKMapView alloc] initWithFrame:mapRect];
-        [self.view addSubview:worldView];
-
         //  Create the speedBar
         CGRect speedBarFrame = CGRectMake( ((screenWidth / 2) - (TOM_LABEL_WIDTH/2)), ptTopMargin + 50 , TOM_LABEL_WIDTH, ptLabelHeight );
-        speedBar = [[UILabel alloc] initWithFrame:speedBarFrame ];
-        speedBar.layer.borderColor = TOM_LABEL_BORDER_COLOR;
-        speedBar.layer.borderWidth = TOM_LABEL_BORDER_WIDTH;
-        speedBar.layer.cornerRadius  = TOM_LABEL_BORDER_CORNER_RADIUS;
-        speedBar.backgroundColor = TOM_LABEL_BACKGROUND_COLOR;
-        speedBar.textColor = TOM_LABEL_TEXT_COLOR;
-        speedBar.textAlignment = NSTextAlignmentNatural;
-        [speedBar setFont:[UIFont fontWithName:@"Helvetica-Bold" size:11.0]];
-        speedBar.text = @TRAILS_ON_A_MAP;
-        [self.view addSubview:speedBar];
+        speedTimeBar = [[UILabel alloc] initWithFrame:speedBarFrame ];
+        speedTimeBar.layer.borderColor = TOM_LABEL_BORDER_COLOR;
+        speedTimeBar.layer.borderWidth = TOM_LABEL_BORDER_WIDTH;
+        speedTimeBar.layer.cornerRadius  = TOM_LABEL_BORDER_CORNER_RADIUS;
+        speedTimeBar.backgroundColor = TOM_LABEL_BACKGROUND_COLOR;
+        speedTimeBar.textColor = TOM_LABEL_TEXT_COLOR;
+        speedTimeBar.textAlignment = NSTextAlignmentCenter;
+        [speedTimeBar setFont:[UIFont fontWithName:@TOM_FONT size:11.0]];
+        speedTimeBar.text = @TRAILS_ON_A_MAP;
+        [self.view addSubview:speedTimeBar];
         
         //  Create the infoBar
         CGRect infoBarFrame = CGRectMake(((screenWidth / 2) - (TOM_LABEL_WIDTH/2)), ptTopMargin +50  + ptLabelHeight + 10, TOM_LABEL_WIDTH, ptLabelHeight );
-        infoBar = [[UILabel alloc] initWithFrame:infoBarFrame];
-        infoBar.layer.borderColor = TOM_LABEL_BORDER_COLOR;
-        infoBar.layer.borderWidth = TOM_LABEL_BORDER_WIDTH;
-        infoBar.layer.cornerRadius  = TOM_LABEL_BORDER_CORNER_RADIUS;
-        infoBar.backgroundColor = TOM_LABEL_BACKGROUND_COLOR;
-        infoBar.textColor = TOM_LABEL_TEXT_COLOR;
-        infoBar.textAlignment = NSTextAlignmentNatural;
-        [infoBar setFont:[UIFont fontWithName:@"Helvetica-Bold" size:11.0]];
-        [self.view addSubview:infoBar];
+        distanceInfoBar = [[UILabel alloc] initWithFrame:infoBarFrame];
+        distanceInfoBar.layer.borderColor = TOM_LABEL_BORDER_COLOR;
+        distanceInfoBar.layer.borderWidth = TOM_LABEL_BORDER_WIDTH;
+        distanceInfoBar.layer.cornerRadius  = TOM_LABEL_BORDER_CORNER_RADIUS;
+        distanceInfoBar.backgroundColor = TOM_LABEL_BACKGROUND_COLOR;
+        distanceInfoBar.textColor = TOM_LABEL_TEXT_COLOR;
+        distanceInfoBar.textAlignment = NSTextAlignmentCenter;
+        [distanceInfoBar setFont:[UIFont fontWithName:@TOM_FONT size:11.0]];
+        [self.view addSubview:distanceInfoBar];
         //
         // Initialize the variables
         //
@@ -154,8 +155,21 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    [worldView setShowsUserLocation:YES];
+    // [worldView setShowsUserLocation:YES];
+    // Request to turn on accelerometer and begin receiving accelerometer events
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
     
+    
+}
+
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
+-(void) viewDidDisappear {
+    // Request to stop receiving accelerometer events and turn off accelerometer
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
 
 //
@@ -164,7 +178,12 @@
 
 - (void) viewDidAppear:(BOOL)animated
 {
-    // [worldView setShowsUserLocation:YES];
+    //
+    //  This will center the world view on my current location.
+    CLLocation *userCoordinate = locationManager.location;
+    [worldView setCenterCoordinate:userCoordinate.coordinate animated:YES];
+    [worldView setShowsUserLocation:YES];
+    
     //
     // Name
     //
@@ -176,92 +195,100 @@
         // It's not the default name and it's not the same as the old name,
         // Let's load up the new name and start up.
         //
-        if ([newTitle isEqualToString:@TRAILS_DEFAULT_NAME]) {
+        if ([newTitle isEqualToString:self.title]) {
+            // Do nothing
+            NSLog(@"Did not change title[%@]",newTitle);
+        }
+        else if ([self.title isEqualToString:@TRAILS_DEFAULT_NAME]) {
             //
             // What to do if the name is the Deafult.
             // NSLog(@"Still Default[%@], let's go on",newTitle);
-            
-            if (![newTitle isEqualToString:self.title]) {
+            //
+            if ((newPath = [theTrail tomArchivePathWithTitle:newTitle]) &&
+                 [[NSFileManager defaultManager] fileExistsAtPath:newPath]) {
                 //
-                // User deleted / cleared a track and reset it back to the
-                // default name.  Clear everything:
+                // User picked to load an existing trail from the default name
+                // Clear everything:
+                //
                 amiUpdatingLocation = NO;
-                
-                [locationManager stopUpdatingLocation];
-                [locationManager stopUpdatingHeading];
-                
-                [worldView removeAnnotations:theTrail.ptTrack];
-                theTrail = [[TOMPomSet alloc] initWithTitle:@TRAILS_DEFAULT_NAME];
-                
-                [worldView removeAnnotations:theTrail.ptTrack];
-                [worldView removeOverlay:(id <MKOverlay>)mapPoms];
-                
-                for (id<MKAnnotation> currentAnnotation in worldView.annotations) {
-                    [worldView removeAnnotation:currentAnnotation];
-                }
-                
-                [self setTitle:newTitle];
-            }
-        }
-        else if ([newTitle isEqualToString:self.title]) {
-            NSLog(@"Did not change title[%@]",newTitle);
-        }
-        //
-        //  Let's check to see if a pt exists and load it.
-        //
-        else {
-            //
-            //  Save off the old track if it's not the initial name or the
-            //  Default name.
-            //
-            if  (![self.title isEqualToString:@TRAILS_DEFAULT_NAME])
-            {
-                NSLog(@"Saving[%@]",self.title);
-                amiUpdatingLocation = NO;
-
+                startStopItem.title = @TOM_OFF_TEXT;
                 [locationManager stopUpdatingLocation];
                 [locationManager stopUpdatingHeading];
                 [ptTimer invalidate]; // Stop the timer
-                [self savePoms:self.title];
+                
                 [worldView removeAnnotations:theTrail.ptTrack];
                 for (id<MKAnnotation> currentAnnotation in worldView.annotations) {
                     [worldView removeAnnotation:currentAnnotation];
                 }
                 [worldView removeOverlay:(id <MKOverlay>)mapPoms];
-            }
 
-            [self setTitle:newTitle];
-            [self.myProperties setPtName:newTitle];
-            
-            if ((newPath = [theTrail tomArchivePathWithTitle:newTitle]) &&
-                [[NSFileManager defaultManager] fileExistsAtPath:newPath]) {
-                NSLog(@"%@ Exists",newPath);
-                amiUpdatingLocation = NO;
-                
-                [locationManager stopUpdatingLocation];
-                [locationManager stopUpdatingHeading];
-                
-                [worldView removeAnnotations:theTrail.ptTrack];
-                theTrail = [[TOMPomSet alloc] initWithTitle:newTitle];
-                
-                [worldView removeOverlay:(id <MKOverlay>)mapPoms];
-                
+                theTrail = [[TOMPomSet alloc] initWithTitle:@TRAILS_DEFAULT_NAME];
                 if (!mapPoms) {
                     mapPoms = [[TOMMapSet alloc] init];
                 }
                 else
                     [mapPoms clearPoms];
-                [self loadPoms:newTitle];
-                
-                // These two are in loadPoms:
-                // [mapPoms loadFromPoms:theTrail];
-                // [self->worldView addOverlay:(id <MKOverlay>)mapPoms];
+                [self setTitle:newTitle];
+                [myProperties setPtName:newTitle];
+                [self->worldView addOverlay:(id <MKOverlay>)mapPoms];
+                // and load the new trail
+                [self loadTrails:newTitle];
+                [self processMyLocation:userCoordinate type:ptUnknown];
+            }
+            else {
+                //    the points of the trail will be kept as the new name
+                //    no action required.
+                [self setTitle:newTitle];
+                [myProperties setPtName:newTitle];
+            }
+
+            //
+        } // end if old title is default
+        else { // old title was not the default name
+            //
+            //  Save off the old track             //
+            if (amiUpdatingLocation == YES) {
+                NSLog(@"Saving[%@]",self.title);
+                [self saveTrails:self.title];
+                amiUpdatingLocation = NO;
+                startStopItem.title = @TOM_OFF_TEXT;
+                [locationManager stopUpdatingLocation];
+                [locationManager stopUpdatingHeading];
+                [ptTimer invalidate]; // Stop the timer
+            }
+            
+            //
+            // Clean it up
+            //
+            [worldView removeAnnotations:theTrail.ptTrack];
+            for (id<MKAnnotation> currentAnnotation in worldView.annotations) {
+                [worldView removeAnnotation:currentAnnotation];
+            }
+            [worldView removeOverlay:(id <MKOverlay>)mapPoms];
+            
+            if (!mapPoms) {
+                mapPoms = [[TOMMapSet alloc] init];
+            }
+            else
+                [mapPoms clearPoms];
+            
+            [self->worldView addOverlay:(id <MKOverlay>)mapPoms];
+            
+            //  Load in the new one.
+            [self setTitle:newTitle];
+            [myProperties setPtName:newTitle];
+            theTrail = [[TOMPomSet alloc] initWithTitle:newTitle];
+            
+            if ((newPath = [theTrail tomArchivePathWithTitle:newTitle]) &&
+                [[NSFileManager defaultManager] fileExistsAtPath:newPath]) {
+                // NSLog(@"%@ Exists",newPath);
+                [self loadTrails:newTitle];
             }
         }
     }
     else
-    {
-        // we don't have a pebble track stored,
+    {   //
+        // we don't have a name stored,
         // set up up the default.
         //
         [self.myProperties setPtName:@TRAILS_DEFAULT_NAME];  // default
@@ -319,6 +346,7 @@
     //
     // Distance Filter
     //
+#ifdef __NUA__
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_DISTANCE_FILTER] != nil)
     {
         [self.myProperties setPtDistanceFilter:[[NSUserDefaults standardUserDefaults] floatForKey:@KEY_DISTANCE_FILTER]];
@@ -331,8 +359,10 @@
         [self.myProperties setPtDistanceFilter:50.0];  // default
     }
     [locationManager setDistanceFilter:[self.myProperties ptDistanceFilter]];
+#else
+    [locationManager setDistanceFilter:1.0];
+#endif
 
-#ifndef __NUA__
     // Hoping to improve performance here ...
     if ((myProperties.ptLocationAccuracy == kCLLocationAccuracyBest) ||
         (myProperties.ptLocationAccuracy == kCLLocationAccuracyBestForNavigation)) {
@@ -340,7 +370,6 @@
         [locationManager allowDeferredLocationUpdatesUntilTraveled:[myProperties ptDistanceFilter] timeout:myTimeout];
     }
     else
-#endif
         [locationManager disallowDeferredLocationUpdates];
     
     //
@@ -425,13 +454,13 @@
     }
     // Trigger the display
     if ([self.myProperties showSpeedBar]) {
-        [speedBar setHidden:NO];
-        speedBar.layer.borderColor = TOM_LABEL_BORDER_COLOR;
-        speedBar.layer.borderWidth = TOM_LABEL_BORDER_WIDTH;
-        speedBar.layer.cornerRadius = TOM_LABEL_BORDER_CORNER_RADIUS;
+        [speedTimeBar setHidden:NO];
+        // speedBar.layer.borderColor = TOM_LABEL_BORDER_COLOR;
+        // speedBar.layer.borderWidth = TOM_LABEL_BORDER_WIDTH;
+        // speedBar.layer.cornerRadius = TOM_LABEL_BORDER_CORNER_RADIUS;
     }
     else
-        [speedBar setHidden:YES];
+        [speedTimeBar setHidden:YES];
     
     
     // KEY_PT_SHOW_SPEED_LABEL
@@ -449,13 +478,13 @@
     
     // Trigger the display
     if ([self.myProperties showInfoBar]) {
-        [infoBar setHidden:NO];
-        infoBar.layer.borderColor  = TOM_LABEL_BORDER_COLOR;
-        infoBar.layer.borderWidth  = TOM_LABEL_BORDER_WIDTH;
-        infoBar.layer.cornerRadius = TOM_LABEL_BORDER_CORNER_RADIUS;
+        [distanceInfoBar setHidden:NO];
+        // infoBar.layer.borderColor  = TOM_LABEL_BORDER_COLOR;
+        // infoBar.layer.borderWidth  = TOM_LABEL_BORDER_WIDTH;
+        // infoBar.layer.cornerRadius = TOM_LABEL_BORDER_CORNER_RADIUS;
     }
     else {
-        [infoBar setHidden:YES];
+        [distanceInfoBar setHidden:YES];
     }
     // Update all the pins
     [self updateAnnotations];
@@ -471,6 +500,7 @@
     // Dispose of any resources that can be recreated.
 }
 
+
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //
@@ -479,18 +509,41 @@
 //
 -(void) processMyLocation: (CLLocation *)newLocation type: (POMType) pt
 {
-    
-    CLLocationCoordinate2D coord = [ newLocation coordinate ];
 
+    CLLocationCoordinate2D coord = [ newLocation coordinate ];
+    MKMapRect updateRect;
+    MKCoordinateRegion region;
+    
+    
+    if (pt != ptUnknown &&
+        pt != ptError ) {
+        TOMPointOnAMap *mp = [[TOMPointOnAMap alloc] initWithLocationHeadingType:newLocation heading:currentHeading type:pt];
+        [ theTrail addPointOnMap:mp ];
+        // [ mySlider addSpeed:[newLocation speed] ];
+        [ mySlider setNeedsDisplay ];
+        if ((pt == ptLocation && [self.myProperties showLocations]) ||
+            (pt == ptStop && [self.myProperties showStops]) ||
+            (pt == ptPicture && [self.myProperties showPictures])) {
+            [worldView addAnnotation:(id)mp];
+        }
+    }
+    
     if (!mapPoms) {
         mapPoms = [[TOMMapSet alloc] initWithCenterCoordinate:coord];
-        [worldView setDelegate:self]; // ARE YOU FUCKING KIDDING ME ???
+        [worldView setDelegate:self]; // This is key...
         [self->worldView addOverlay:(id <MKOverlay>)mapPoms];
     }
     else {
         // [mapPebbles addCoordinate:[newLocation coordinate]];
-        MKMapRect updateRect = [mapPoms addCoordinate:coord];
-        
+
+        if (pt != ptUnknown &&
+            pt != ptError ) {
+            updateRect = [mapPoms addCoordinate:coord];
+        }
+        else {
+            updateRect = [mapPoms getMyMapRect:coord];
+        }
+
         if (!MKMapRectIsNull(updateRect))
         {
             // There is a non null update rect.
@@ -505,48 +558,48 @@
         }
     }
 
-    TOMPointOnAMap *mp = [[TOMPointOnAMap alloc] initWithLocationHeadingType:newLocation heading:currentHeading type:pt];
-    
-    [ theTrail addPointOnMap:mp];
-    
-    // NSLog(@"Straight Line Distance %.2f" ,[pebbleTrack distanceStraightLine]);
-    // NSLog(@"Total Distance %.2f", [pebbleTrack distanceTotalMeters]);
-    
-    if ([myProperties showSpeedBar]) {
-        NSString *speedDistance = [[NSString alloc] initWithFormat:@"SP: %.2f Dist:%.2f m StrLin:%.2f m",[mp speed] *2.23694,
-                                   ([theTrail distanceTotalMeters]/1000)*.62137,
-                                   ([theTrail distanceStraightLine]/1000)*.62137];
-        [speedBar setText:speedDistance];
-    }
-    
-    if ([myProperties showInfoBar]) {
-        NSString *infoBarText = [[NSString alloc] initWithFormat:@"X:%.4f Y:%.4f T:%@", coord.latitude, coord.longitude,[theTrail elapseTimeString]];
-        [infoBar setText:infoBarText];
-    }
-    
     // Zoom the region to this location
-    if ([self.myProperties showLocations])
-        [worldView addAnnotation:(id)mp];
 
     if ([self.myProperties ptUserTrackingMode] == MKUserTrackingModeNone)
     {
-        
-        // MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(coord, 1000, 1000);
-        MKMapRect myMapRect = [theTrail updateMapRect];
-        if (MKMapRectIsEmpty(myMapRect)) {
+        //
+        // MKMapRect myMapRect = [theTrail updateMapRect];
+        if (MKMapRectIsEmpty(updateRect)) {
             NSLog(@"Still Empty");
+            region = MKCoordinateRegionMakeWithDistance(coord, 1000, 1000);
         }
         else  {
             // NSLog(@"Now We're talking");
-            MKCoordinateRegion region = [theTrail ptMakeRegion];
-            [worldView setRegion:region animated:YES];
-            
+            region = [theTrail ptMakeRegion];
+            // [worldView setRegion:region animated:YES];
         }
     }
+    else {
+        region = MKCoordinateRegionMakeWithDistance(coord, 1000, 1000);
+    }
     
-    MKCoordinateRegion region = [theTrail ptMakeRegion];
+    // MKCoordinateRegion region = [theTrail ptMakeRegion];
     [worldView setRegion:region animated:YES];
 
+    
+    // NSLog(@"Straight Line Distance %.2f" ,[pebbleTrack distanceStraightLine]);
+    // NSLog(@"Total Distance %.2f", [pebbleTrack distanceTotalMeters]);
+    if ([myProperties showSpeedBar]) {
+        NSString *speedDistance = [[NSString alloc] initWithFormat:@"SP: %.1f%@  T:%@",
+                                    [TOMSpeed    displaySpeed:[newLocation speed]],[TOMSpeed displaySpeedUnits],
+                                    [theTrail elapseTimeString]];
+
+        [speedTimeBar setText:speedDistance];
+    }
+    
+    if ([myProperties showInfoBar]) {
+        // NSString *infoBarText = [[NSString alloc] initWithFormat:@"X:%.4f Y:%.4f T:%@ C:%lu", coord.latitude, coord.longitude,[theTrail elapseTimeString],(unsigned long)[theTrail.ptTrack count]];
+        NSString *infoBarText = [[NSString alloc] initWithFormat:@"C:%lu Tot:%.1f%@ StrLine:%.1f%@",
+                                  (unsigned long)[theTrail.ptTrack count],
+                                  [TOMDistance displayDistance:[theTrail distanceTotalMeters]],[TOMDistance displayDistanceUnits],
+                                  [TOMDistance displayDistance:[theTrail distanceStraightLine]],[TOMDistance displayDistanceUnits]];
+        [distanceInfoBar setText:infoBarText];
+    }
 }
 
 //
@@ -568,16 +621,34 @@
     
     // NSLog(@"Did recieve %d locations",[locations count]);
     // NSLog(@"Location %@", [loc description]);
-    // NSLog(@"Speed: %.2f",[loc speed]);
+    [worldView setShowsUserLocation:YES];
+    
     NSTimeInterval t = [[ loc timestamp ] timeIntervalSinceNow];
-    if ( t < -1.00 ) {
+    
+    // NSLog(@"Speed: %.2f",[loc speed]);
+    // NSLog(@"Time: %f", t);
+    if (loc.speed < 0.00) {
+        NSLog(@"Speed[%.2f] less than 0",loc.speed);
+        return;
+    }
+    else if ( t < -0.05 ) {
         // This is cached data, dont want it, keep looking
-        // NSLog(@"Cached Loc %@@",loc);
+        NSLog(@"Cached Loc %@@",loc);
         return;
     }
     else {
         // NSLog(@"Using Loc %@@",loc);
-        [self processMyLocation: loc type:ptLocation];
+        TOMPointOnAMap *lastPoint = [theTrail lastPom];
+        CLLocationDistance myDistance = [lastPoint distanceFromLocation:loc];
+        if (myDistance >= [TOMDistance distanceFilter] ||
+            myDistance == 0.00) {
+            [self processMyLocation: loc type:ptLocation];
+        }
+#ifdef __DEBUG__
+        else {
+            NSLog(@"Distance %.2f",myDistance);
+        }
+#endif
     }
 }
 
@@ -656,20 +727,22 @@
         return;
     
     CLLocation *stopLoc = [locationManager location];
-    
+    [ mySlider addSpeed:[stopLoc speed] ];
+    [ mySlider setNeedsDisplay];
+
     // Still Moving...
     if  ([stopLoc speed] > 0.0) {
-        // NSLog(@"Moving");
+        // NSLog(@"Moving %.2f",[stopLoc speed]);
         return;
     }
     
     CLLocationCoordinate2D coord = [stopLoc coordinate];
     if ([myProperties showInfoBar]) {
-        NSString *infoBarText = [[NSString alloc] initWithFormat:@"X:%.4f Y:%.4f S:%@", coord.latitude, coord.longitude, [theTrail elapseTimeString]];
-        [infoBar setText:infoBarText];
+        NSString *infoBarText = [[NSString alloc] initWithFormat:@"X:%.4f Y:%.4f S:%@ C:%lu", coord.latitude, coord.longitude, [theTrail elapseTimeString],(unsigned long)[theTrail.ptTrack count]];
+        [distanceInfoBar setText:infoBarText];
     }
-    
-    NSLog(@"Stopped?");
+
+    // NSLog(@"Stopped?");
     
     //
     // Figure out how far since the last location
@@ -681,8 +754,8 @@
     if ([lastOne type] != ptStop )
     {
         CLLocationDistance myDist = [lastOne distanceFromLocation:stopLoc];
-        NSLog(@"Distance: %.2f",myDist);
-        if (myDist > 2.0) {
+        // NSLog(@"Distance: %.2f",myDist);
+        if (myDist > 0.0) {
             [self processMyLocation:stopLoc type:ptStop];
         }
     }
@@ -729,11 +802,11 @@
         
         if (![self.title isEqual: @TRAILS_DEFAULT_NAME]   ) {
             //
-            // There was some pebbles if loadPebbles returns YES
+            // If there was some POMs, loadPOMs returns YES
             //
             if ( [theTrail loadPoms:NULL] == YES)
             {
-                [self loadPoms:NULL];
+                [self loadTrails:NULL];
             }
         }
         
@@ -750,10 +823,17 @@
         // Stop updating the location
         
         // add this last location:
-        CLLocation *stopLoc = [locationManager location];
-        [self processMyLocation:stopLoc type:ptStop];
-        
-        NSLog(@TOM_OFF_TEXT);
+        //
+        CLLocation     *stopLoc = [locationManager location];
+        TOMPointOnAMap *lastOne = [theTrail lastPom];
+        if (!lastOne) { // or the first location:
+            [self processMyLocation:stopLoc type:ptStop];
+        }
+        else if ([lastOne type] != ptStop ) {
+            [self processMyLocation:stopLoc type:ptStop];
+        }
+
+        // NSLog(@TOM_OFF_TEXT);
         amiUpdatingLocation = NO;;
         startStopBarButton.title = @TOM_ON_TEXT;
         [ptTimer invalidate]; // Stop the timer
@@ -761,11 +841,10 @@
         [locationManager stopUpdatingLocation];
         [locationManager stopUpdatingHeading];
         
-        [self savePoms:NULL];
+        [self saveTrails:NULL];
     }
     return;
 }
-
 //
 // Camera code.........................................................................
 //
@@ -837,7 +916,7 @@
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //  Wrapper functions to load and save the data.
 //
-- (BOOL) loadPoms:(NSString *) title
+- (BOOL) loadTrails:(NSString *) title
 {
     //
     // There was some pebbles if loadPebbles returns YES
@@ -886,7 +965,7 @@
 
 //  * * * * * * * *
 
--(BOOL) savePoms:(NSString *)title
+-(BOOL) saveTrails:(NSString *)title
 {
     // NSLog(@"savePebbleTracks:[%@]",title);
     
@@ -967,6 +1046,83 @@
     return;
 }
 
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
+- (void)orientationChanged:(NSNotification *)notification {
+    // Respond to changes in device orientation
+    //  NSLog(@"Orientation Changed!");
+    static UIDeviceOrientation currentOrientation = UIDeviceOrientationUnknown;
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    
+    if (orientation == UIDeviceOrientationFaceUp ||
+        orientation == UIDeviceOrientationFaceDown ||
+        orientation == UIDeviceOrientationUnknown ||
+        orientation == UIDeviceOrientationPortraitUpsideDown ||
+        currentOrientation == orientation) {
+        return;
+    }
+    
+    if ((UIDeviceOrientationIsPortrait(currentOrientation) && UIDeviceOrientationIsPortrait(orientation)) ||
+        (UIDeviceOrientationIsLandscape(currentOrientation) && UIDeviceOrientationIsLandscape(orientation))) {
+        //still saving the current orientation
+        currentOrientation = orientation;
+        return;
+    }
 
+    currentOrientation = orientation;
+    
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGFloat screenHeight = screenRect.size.height;
+    CGFloat screenWidth = screenRect.size.width;
+
+    if (UIDeviceOrientationIsLandscape(currentOrientation) ||
+        currentOrientation == UIDeviceOrientationPortraitUpsideDown) {
+        screenHeight = screenRect.size.width;
+        screenWidth = screenRect.size.height;
+    }
+    // else {
+    //     NSLog(@"Not Landscape");
+    // }
+    //
+    // NSLog(@"Screen Rect: x:%f y:%f w:%f h:%f",screenRect.origin.x,screenRect.origin.y,screenWidth,screenHeight);
+
+    [self.view setFrame:screenRect];
+    
+    CGRect mapRect = CGRectMake( 0.0, 0.0, screenWidth, (screenHeight - TOM_TOOL_BAR_HEIGHT ));
+    [worldView setFrame:mapRect];
+    
+    CGFloat myHieght = 0.0;
+    if ([mySlider displayup]) {
+        myHieght = 100.0;
+    }
+    else
+        myHieght = TOM_SLIDER_MIN_Y;
+        
+    CGRect sliderRect = CGRectMake(0.0f, (screenHeight - TOM_TOOL_BAR_HEIGHT - myHieght), screenWidth, myHieght);
+    [mySlider setFrame:sliderRect];
+    [mySlider setNeedsDisplay];
+    
+    CGRect toolbarRect;
+    toolbarRect.origin.x = 0;
+    toolbarRect.origin.y = screenHeight - TOM_TOOL_BAR_HEIGHT;
+    toolbarRect.size.height = TOM_TOOL_BAR_HEIGHT;
+    toolbarRect.size.width = screenWidth;
+    [toolbar setFrame:toolbarRect];
+
+    CGRect speedBarRect;
+    speedBarRect.origin.x = ((screenWidth / 2) - (TOM_LABEL_WIDTH/2));
+    speedBarRect.origin.y = ptTopMargin + 50;
+    speedBarRect.size.height = ptLabelHeight;
+    speedBarRect.size.width = TOM_LABEL_WIDTH;
+    [speedTimeBar setFrame:speedBarRect];
+    
+    CGRect infoBarRect;
+    infoBarRect.origin.x = ((screenWidth / 2) - (TOM_LABEL_WIDTH/2));
+    infoBarRect.origin.y = ptTopMargin +50  + ptLabelHeight + 10;
+    infoBarRect.size.height = ptLabelHeight;
+    infoBarRect.size.width = TOM_LABEL_WIDTH;
+    [distanceInfoBar setFrame:infoBarRect];
+}
 
 @end

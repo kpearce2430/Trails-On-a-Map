@@ -10,6 +10,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import <MapKit/MapKit.h>
 #import "TOM.h"
+#import "TOMSpeed.h"
 
 // Optional
 //  - Pic
