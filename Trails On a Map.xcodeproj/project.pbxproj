@@ -16,6 +16,12 @@
 		AD4501141812E74100E76DE0 /* TOMPropertyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */; };
 		AD6CD7E818244814005A0699 /* TOMDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD6CD7E618244814005A0699 /* TOMDetailViewController.m */; };
 		AD6CD7E918244814005A0699 /* TOMDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD6CD7E718244814005A0699 /* TOMDetailViewController.xib */; };
+		AD6F03571857DCC700753144 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD6F03561857DCC700753144 /* ImageIO.framework */; };
+		AD6F03611858074F00753144 /* TOMPhotoAlbumViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD6F035F1858074F00753144 /* TOMPhotoAlbumViewController.m */; };
+		AD6F03621858074F00753144 /* TOMPhotoAlbumViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD6F03601858074F00753144 /* TOMPhotoAlbumViewController.xib */; };
+		AD6F03661858A88900753144 /* TOMPhotoGroupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD6F03641858A88900753144 /* TOMPhotoGroupViewController.m */; };
+		AD6F03671858A88900753144 /* TOMPhotoGroupViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD6F03651858A88900753144 /* TOMPhotoGroupViewController.xib */; };
+		AD6F036C1858ADBA00753144 /* TOMPhotoGroupCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AD6F036B1858ADBA00753144 /* TOMPhotoGroupCell.m */; };
 		AD778D38181454A3008E1D06 /* TOMMapSet.m in Sources */ = {isa = PBXBuildFile; fileRef = AD778D37181454A3008E1D06 /* TOMMapSet.m */; };
 		AD7BEC7E180E22910003187D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC7D180E22910003187D /* Foundation.framework */; };
 		AD7BEC80180E22910003187D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC7F180E22910003187D /* CoreGraphics.framework */; };
@@ -45,6 +51,7 @@
 		ADA795E51820988D004E383D /* pt120x120.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E21820988D004E383D /* pt120x120.png */; };
 		ADDE2927184A456F00CBB238 /* TOMSpeed.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDE2926184A456F00CBB238 /* TOMSpeed.m */; };
 		ADDE292A184A4C2000CBB238 /* TOMDistance.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDE2929184A4C2000CBB238 /* TOMDistance.m */; };
+		ADDE292C184D29F500CBB238 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADDE292B184D29F500CBB238 /* AssetsLibrary.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +81,15 @@
 		AD6CD7E518244814005A0699 /* TOMDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDetailViewController.h; sourceTree = "<group>"; };
 		AD6CD7E618244814005A0699 /* TOMDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMDetailViewController.m; sourceTree = "<group>"; };
 		AD6CD7E718244814005A0699 /* TOMDetailViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMDetailViewController.xib; sourceTree = "<group>"; };
+		AD6F03561857DCC700753144 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		AD6F035E1858074F00753144 /* TOMPhotoAlbumViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TOMPhotoAlbumViewController.h; path = ../TOMPhotoAlbumViewController.h; sourceTree = "<group>"; };
+		AD6F035F1858074F00753144 /* TOMPhotoAlbumViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TOMPhotoAlbumViewController.m; path = ../TOMPhotoAlbumViewController.m; sourceTree = "<group>"; };
+		AD6F03601858074F00753144 /* TOMPhotoAlbumViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TOMPhotoAlbumViewController.xib; path = ../TOMPhotoAlbumViewController.xib; sourceTree = "<group>"; };
+		AD6F03631858A88800753144 /* TOMPhotoGroupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPhotoGroupViewController.h; sourceTree = "<group>"; };
+		AD6F03641858A88900753144 /* TOMPhotoGroupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMPhotoGroupViewController.m; sourceTree = "<group>"; };
+		AD6F03651858A88900753144 /* TOMPhotoGroupViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMPhotoGroupViewController.xib; sourceTree = "<group>"; };
+		AD6F036A1858ADBA00753144 /* TOMPhotoGroupCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPhotoGroupCell.h; sourceTree = "<group>"; };
+		AD6F036B1858ADBA00753144 /* TOMPhotoGroupCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMPhotoGroupCell.m; sourceTree = "<group>"; };
 		AD778D3518141F0A008E1D06 /* Trails On a Map.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Trails On a Map.entitlements"; sourceTree = "<group>"; };
 		AD778D36181454A3008E1D06 /* TOMMapSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMMapSet.h; sourceTree = "<group>"; };
 		AD778D37181454A3008E1D06 /* TOMMapSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMMapSet.m; sourceTree = "<group>"; };
@@ -114,6 +130,7 @@
 		ADDE2926184A456F00CBB238 /* TOMSpeed.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSpeed.m; sourceTree = "<group>"; };
 		ADDE2928184A4C2000CBB238 /* TOMDistance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDistance.h; sourceTree = "<group>"; };
 		ADDE2929184A4C2000CBB238 /* TOMDistance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMDistance.m; sourceTree = "<group>"; };
+		ADDE292B184D29F500CBB238 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +138,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD6F03571857DCC700753144 /* ImageIO.framework in Frameworks */,
+				ADDE292C184D29F500CBB238 /* AssetsLibrary.framework in Frameworks */,
 				AD7BECB5180E22EE0003187D /* CoreLocation.framework in Frameworks */,
 				AD7BECB3180E22E30003187D /* MapKit.framework in Frameworks */,
 				AD7BEC80180E22910003187D /* CoreGraphics.framework in Frameworks */,
@@ -166,6 +185,8 @@
 		AD7BEC7C180E22910003187D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AD6F03561857DCC700753144 /* ImageIO.framework */,
+				ADDE292B184D29F500CBB238 /* AssetsLibrary.framework */,
 				AD7BECB4180E22ED0003187D /* CoreLocation.framework */,
 				AD7BECB2180E22E30003187D /* MapKit.framework */,
 				AD7BEC7D180E22910003187D /* Foundation.framework */,
@@ -186,16 +207,22 @@
 				AD7BEC8F180E22910003187D /* TOMAppDelegate.m */,
 				AD6CD7E518244814005A0699 /* TOMDetailViewController.h */,
 				AD6CD7E618244814005A0699 /* TOMDetailViewController.m */,
+				AD26E2F9181B129A0021BEE2 /* TOMImageStore.h */,
+				AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */,
 				ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */,
 				ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */,
+				AD6F035E1858074F00753144 /* TOMPhotoAlbumViewController.h */,
+				AD6F035F1858074F00753144 /* TOMPhotoAlbumViewController.m */,
+				AD6F036A1858ADBA00753144 /* TOMPhotoGroupCell.h */,
+				AD6F036B1858ADBA00753144 /* TOMPhotoGroupCell.m */,
+				AD6F03631858A88800753144 /* TOMPhotoGroupViewController.h */,
+				AD6F03641858A88900753144 /* TOMPhotoGroupViewController.m */,
+				AD7BECBC180E9CDB0003187D /* TOMProperties.h */,
+				AD7BECBD180E9CDB0003187D /* TOMProperties.m */,
 				AD4501101812E74100E76DE0 /* TOMPropertyViewController.h */,
 				AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */,
 				AD7BECB6180E23210003187D /* TOMRootViewController.h */,
 				AD7BECB7180E23220003187D /* TOMRootViewController.m */,
-				AD26E2F9181B129A0021BEE2 /* TOMImageStore.h */,
-				AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */,
-				AD7BECBC180E9CDB0003187D /* TOMProperties.h */,
-				AD7BECBD180E9CDB0003187D /* TOMProperties.m */,
 				AD26E2F6181B002D0021BEE2 /* TOMTrackView.h */,
 				AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */,
 				AD778D36181454A3008E1D06 /* TOMMapSet.h */,
@@ -225,6 +252,8 @@
 				ADA795E21820988D004E383D /* pt120x120.png */,
 				AD6CD7E718244814005A0699 /* TOMDetailViewController.xib */,
 				ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */,
+				AD6F03601858074F00753144 /* TOMPhotoAlbumViewController.xib */,
+				AD6F03651858A88900753144 /* TOMPhotoGroupViewController.xib */,
 				AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */,
 				AD7BECB8180E23220003187D /* TOMRootViewController.xib */,
 				AD7BEC87180E22910003187D /* Trails On a Map-Info.plist */,
@@ -346,6 +375,7 @@
 			files = (
 				ADA795E41820988D004E383D /* pt114x114.png in Resources */,
 				ADA795E31820988D004E383D /* pt57x57.png in Resources */,
+				AD6F03671858A88900753144 /* TOMPhotoGroupViewController.xib in Resources */,
 				AD6CD7E918244814005A0699 /* TOMDetailViewController.xib in Resources */,
 				AD7BECC0180F1AC10003187D /* settings.png in Resources */,
 				AD7BEC8A180E22910003187D /* InfoPlist.strings in Resources */,
@@ -353,6 +383,7 @@
 				AD7BECBA180E23220003187D /* TOMRootViewController.xib in Resources */,
 				ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */,
 				AD7BEC95180E22910003187D /* Images.xcassets in Resources */,
+				AD6F03621858074F00753144 /* TOMPhotoAlbumViewController.xib in Resources */,
 				AD4501141812E74100E76DE0 /* TOMPropertyViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -374,6 +405,7 @@
 			files = (
 				AD45010F1811A77800E76DE0 /* TOMPomSet.m in Sources */,
 				AD7BEC8C180E22910003187D /* main.m in Sources */,
+				AD6F036C1858ADBA00753144 /* TOMPhotoGroupCell.m in Sources */,
 				AD778D38181454A3008E1D06 /* TOMMapSet.m in Sources */,
 				ADDE292A184A4C2000CBB238 /* TOMDistance.m in Sources */,
 				AD4501131812E74100E76DE0 /* TOMPropertyViewController.m in Sources */,
@@ -381,10 +413,12 @@
 				AD31BFA7182EED5800BCEE96 /* TOMViewSlider.m in Sources */,
 				AD45010C181191AE00E76DE0 /* TOMPointOnAMap.m in Sources */,
 				AD7BECB9180E23220003187D /* TOMRootViewController.m in Sources */,
+				AD6F03611858074F00753144 /* TOMPhotoAlbumViewController.m in Sources */,
 				AD26E2FB181B129A0021BEE2 /* TOMImageStore.m in Sources */,
 				AD7BEC90180E22910003187D /* TOMAppDelegate.m in Sources */,
 				AD26E2F8181B002D0021BEE2 /* TOMTrackView.m in Sources */,
 				AD7BECBE180E9CDB0003187D /* TOMProperties.m in Sources */,
+				AD6F03661858A88900753144 /* TOMPhotoGroupViewController.m in Sources */,
 				AD7BEC93180E22910003187D /* Trails_On_a_Map.xcdatamodeld in Sources */,
 				AD6CD7E818244814005A0699 /* TOMDetailViewController.m in Sources */,
 				ADA795DE18205AD1004E383D /* TOMOrganizerViewController.m in Sources */,
@@ -509,10 +543,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trails On a Map/Trails On a Map-Prefix.pch";
 				INFOPLIST_FILE = "Trails On a Map/Trails On a Map-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -523,10 +560,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trails On a Map/Trails On a Map-Prefix.pch";
 				INFOPLIST_FILE = "Trails On a Map/Trails On a Map-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

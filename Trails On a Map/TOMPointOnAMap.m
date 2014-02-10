@@ -10,7 +10,7 @@
 
 @implementation TOMPointOnAMap
 
-@synthesize altitude, coordinate, heading, horizontal, key, speed, subtitle, title, timestamp, type, vertical;
+@synthesize altitude, coordinate, heading, horizontal, image, key, speed, subtitle, title, timestamp, type, vertical;
 
 //
 //
@@ -104,7 +104,8 @@
         [self copyLocation:loc];
         [self setHeading:hdng];
         [self setType:ptPicture];
-        // [self setImage:myImage];
+        [self generateMyKey:0];
+        // self setImage:myImage];
         title = [NSString stringWithFormat:@"%@: %.4f %.4f", @POM_TYPE_PICTURE, self.coordinate.latitude, self.coordinate.longitude ];
     }
     return self;

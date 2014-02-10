@@ -5,8 +5,9 @@
 //  Created by KEITH PEARCE on 10/15/13.
 //  Copyright (c) 2013 Pearce Software Solutions. All rights reserved.
 //
-
+// #import <AssetsLibrary/AssetsLibrary.h>
 #import "TOMRootViewController.h"
+#import "TOMPhotoAlbumViewController.h"
 #import "TOMPropertyViewController.h"
 #import "TOMOrganizerViewController.h"
 #import "TOMSpeed.h"
@@ -18,7 +19,7 @@
 
 @implementation TOMRootViewController
 
-@synthesize amiUpdatingLocation,locationManager, worldView, theTrail, currentHeading, myProperties;
+@synthesize amiUpdatingLocation,locationManager, worldView, theTrail, currentHeading, myProperties, imagePicker;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -35,7 +36,9 @@
                                                  selector:@selector(updateCloudItems:)
                                                      name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification
                                                    object:defaultStore];
-        [defaultStore synchronize];
+        
+        [[NSUbiquitousKeyValueStore defaultStore] synchronize];
+        // [defaultStore synchronize];
         
         //
         //
@@ -144,6 +147,9 @@
 
         //  Wait for the user to start updating location
         amiUpdatingLocation = NO;
+        
+        // Create the image store
+        imageStore = [[TOMImageStore alloc] init];
     }
     return self;
 }
@@ -851,36 +857,137 @@
 -(IBAction)takePicture:(id)sender
 {
     // NSLog(@"In takePicture");
-    UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
-    
+#ifdef __FFU__
+    if (!imagePicker)
+        imagePicker = [[UIImagePickerController alloc] init];
+
+
+    // NOTE:  I need more time with picking photos out
+    // of the photo library.   It's going to have to be a future
+    // release becuase I want to get this out.  The following code will be used later
+    // to allow the user to pick from the photo libraries.  Until then, only allow the user to
+    // take pictures with the camera
+    //
     //
     // If our device has a camera, we want to take a picture, otherwise, we
     // just pick from the photo library
     //
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
+    if ( [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera] &&
+        [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary] )
     {
-        [imagePicker setSourceType:UIImagePickerControllerSourceTypeCamera];
+        // Let the user decide which they want
+        UIActionSheet *cameraActions  = [[UIActionSheet alloc]
+                                      initWithTitle:@"Pick Source"
+                                      delegate:self
+                                      cancelButtonTitle:@"Cancel"
+                                      destructiveButtonTitle:nil
+                                      otherButtonTitles:@"Camera", @"Photo Library", nil];
+        [cameraActions showFromToolbar:toolbar];
+        [cameraActions showInView:self.view];
+
     }
-    else
+    else if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
     {
-        [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+        [self launchCamera];
     }
+    else if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary])
+    {
+        [self launchPhotoLibrary]; // [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary  ];
+    }
+    else if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum])
+    {
+        [self launchPhotoLibrary]; // [imagePicker setSourceType:UIImagePickerControllerSourceTypeSavedPhotosAlbum];
+    }
+    else {
+        NSLog(@"ERROR: No Image Source Available");
+        return;
+    }
+#else 
+    if ( [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera] ) {
+        imagePicker = [[UIImagePickerController alloc] init];
+        [self launchCamera];
+    }
+#endif
     
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSLog(@"Button Index:%ld",(long)buttonIndex);
+    switch (buttonIndex)
+    {
+        case 0: // Launch Camera
+            [self launchCamera];
+            break;
+        case 1: // Launch Photo Library
+        // FFU: case 2: // Saved Photos Album
+            [self launchPhotoLibrary];
+            break;
+    }
+}
+
+- (void) launchCamera
+{
+    if  (!imagePicker)
+        imagePicker = [[UIImagePickerController alloc] init];
+    
+    [imagePicker setSourceType:UIImagePickerControllerSourceTypeCamera];
+    [imagePicker setShowsCameraControls:YES];
+    [imagePicker setAllowsEditing:YES];
     [imagePicker setDelegate:self];
     [self presentViewController:imagePicker animated:YES completion:nil];
     
 }
 
+- (void) launchPhotoLibrary
+{
+    UIViewController *ptController = [[TOMPhotoAlbumViewController alloc] initWithNibName:@"TOMPhotoAlbumViewController" bundle:nil ];
+    
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
+                                   initWithTitle: @"Back"
+                                   style: UIBarButtonItemStyleBordered
+                                   target: nil action: nil];
+    
+    [self.navigationItem setBackBarButtonItem: backButton];
+    
+    [[self navigationController] pushViewController:ptController animated:YES];
+}
+
+// * * * * * *
 - (void) imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
     UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
+    
     CLLocation *imageloc = [locationManager location];
     CLHeading *imagehdng = [locationManager heading];
     
     TOMPointOnAMap *imagePebble = [[TOMPointOnAMap alloc] initWithImage: image location:imageloc heading: imagehdng];
     [theTrail addPointOnMap:imagePebble];
-    [imageStore setImage:image forKey:[imagePebble key] save:YES];
     
+    NSString *myKey = [imagePebble key];
+    
+    [imageStore setImage:image forKey:myKey save:YES];
+
+
+    
+    // UIImage *originalImage = ...
+    // Save off an icon - the last pic taken will the trails icon
+    // Future:  Let the user pic the picture for the icon.
+    CGSize destinationSize = CGSizeMake(90.0f, 90.0f);
+    UIGraphicsBeginImageContext(destinationSize);
+    [image drawInRect:CGRectMake(0,0,destinationSize.width,destinationSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    if (![self.title isEqual: @TRAILS_DEFAULT_NAME]   ) {
+        NSString *tomIcon = [[NSString alloc] initWithFormat:@"%@.icon",self.title];
+        // NSString *tomIcon = [NSString initWithFormat:@"%s.icon",[self.title]];
+        [imageStore saveImage:newImage forKey:tomIcon];
+    }
+    
+#ifdef __FFU__
+    imagePebble.image = newImage;
+#endif
+
     // add a parameter to save to album or
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
         UIImageWriteToSavedPhotosAlbum( image, nil, nil, nil );
@@ -898,6 +1005,8 @@
 -(IBAction)organizeTrails:(id)sender
 {
     
+    [self saveTrails:NULL];
+
     UIViewController *ptController = [[TOMOrganizerViewController alloc] initWithNibName:@"TOMOrganizerViewController" bundle:nil ];
     
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
@@ -919,9 +1028,9 @@
 - (BOOL) loadTrails:(NSString *) title
 {
     //
-    // There was some pebbles if loadPebbles returns YES
+    // There was some pebbles if loadPoms returns YES
     //
-    NSLog(@"loading[%@]",title);
+    // NSLog(@"loading[%@]",title);
     if ( [theTrail loadPoms:title] == YES)
     {
         //
@@ -938,7 +1047,7 @@
                     // If we load an image, great!
                     // otherwise delete the pebble.
                     //
-                    if ((img = [imageStore loadImage:key]) != NULL)
+                    if ((img = [imageStore loadImage:key warn:YES]) != NULL)
                         [imageStore saveImage:img forKey:key];
                     else // delete the point
                         [theTrail.ptTrack removeObjectAtIndex:i];
@@ -996,6 +1105,8 @@
     //  NSUbiquitousKeyValueStoreChangeReasonKey or NSUbiquitousKeyValueStoreChangedKeysKey constants
     // against the notification's useInfo.
 	//
+    NSString *tmp = nil;
+    
     NSDictionary *userInfo = [notification userInfo];
     // get the reason (initial download, external change or quota violation change)
     
@@ -1005,7 +1116,7 @@
         // reason was deduced, go ahead and check for the change
         //
         NSInteger reason = [[userInfo objectForKey:NSUbiquitousKeyValueStoreChangeReasonKey] integerValue];
-        
+        //---> NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
         // the value changed from the remote server
         // initial syncs happen the first time the device is synced
         if (reason == NSUbiquitousKeyValueStoreServerChange ||
@@ -1019,35 +1130,36 @@
             //
             for (NSString *changedKey in changedKeys)
             {
-#ifdef __FFU__
-                // TODO: CHECK ALL THE KEYS
-                if ([changedKey isEqualToString:@KEY_MAP_TYPE])
+                //
+                tmp = [[NSUbiquitousKeyValueStore defaultStore] objectForKey:changedKey];
+                NSLog(@"%s: %@:%@",__func__,changedKey,tmp);
+                // These are all stored as numbers
+                if ([changedKey isEqualToString:@KEY_MAP_TYPE]              ||
+                    [changedKey isEqualToString:@KEY_USER_TRACKING_MODE]    ||
+                    [changedKey isEqualToString:@KEY_LOCATION_ACCURACY]     ||
+                    [changedKey isEqualToString:@KEY_DISTANCE_FILTER]       ||
+                    [changedKey isEqualToString:@KEY_DISTANCE_UNITS]        ||
+                    [changedKey isEqualToString:@KEY_SPEED_UNITS]          )
                 {
-                    
-                    // note that the key used in the cloud match the key used locally
-                    
-                    // replace our "selectedColor" with the value from the cloud
-                    NSString *tmp = [[NSUbiquitousKeyValueStore defaultStore] objectForKey:@KEY_MAP_TYPE];
-                    NSLog(@"%@:%@",@KEY_PT_MAP_TYPE,tmp);
-                    MKMapType tmpMT = [tmp integerValue];
-                    // TODO: [self.myProperties setPtMapType: tmpMT];
-                    // This updates the maps
-                    // TODO: [worldView setMapType:[self.myProperties ptMapType]];
-                    
-                    // reset the preferred color in NSUserDefaults to keep a local value
-                    // TODO: [[NSUserDefaults standardUserDefaults] setInteger:[self.myProperties ptMapType]
-                    //                                            forKey:@KEY_PT_MAP_TYPE];
+                    NSInteger i = [tmp integerValue];
+                    [[NSUserDefaults standardUserDefaults] setInteger:i forKey:changedKey];
                 }
-#endif
+                //
+                // The remaining are YES/NO
+                else {
+                    if ([tmp isEqualToString:@"YES"])
+                        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:changedKey];
+                    else
+                        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:changedKey];
+                }
             }
         }
     }
-    
     return;
 }
 
 //
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// * * * * * * * * * * * * * * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * * *
 //
 - (void)orientationChanged:(NSNotification *)notification {
     // Respond to changes in device orientation

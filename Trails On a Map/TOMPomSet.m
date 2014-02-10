@@ -152,7 +152,7 @@
         path = [ self tomArchivePath ];
     
     //
-    // If there is a track and there is one or more pebbles
+    // If there is a track and there is one or more poms
     //
     if  (ptTrack && [ptTrack count] > 0)
         [self.ptTrack removeAllObjects];
@@ -180,11 +180,11 @@
     if (title)
         path = [self tomArchivePathWithTitle:title];
     else
-        path = [ self tomArchivePath ];
+        path = [self tomArchivePath];
     
     NSError *error;
     [[NSFileManager defaultManager] removeItemAtPath: path error: &error];
-    
+
     if (error)
     {
         NSLog(@"%@",error );
@@ -195,7 +195,7 @@
 }
 
 //
-// Check to see if there is a pebble track.
+// Check to see if there is a track.
 //
 - (BOOL) areTherePoms
 {
@@ -396,5 +396,21 @@
     // NSLog(@"  End:%@",myend);
     return [myend timeIntervalSinceDate:mystart];
 }
+
+
+// * * * * * * * * *
+
+- (NSInteger) numPics
+{
+    NSInteger count = 0;
+    for (int i = 0 ; i < [ptTrack count]; i++ ) {
+        TOMPointOnAMap *p = [ptTrack objectAtIndex:i];
+        if ([p type] == ptPicture)
+            count++;
+    }
+    return count;
+}
+
+
 
 @end

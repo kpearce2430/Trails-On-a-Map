@@ -20,7 +20,7 @@
             displaySpeedLabel, displaySpeedSegmentedControl,displayDistanceLabel, displayDistanceSegmentedControl, distanceFilterLabel,
             distanceFilterSliderCtl, accuracyFilterLabel, accuracyFilterSegmentedControl,
             toggleLabel, locationLabel, locationSwitch, pictureLabel, pictureSwitch, stopLabel, stopSwitch, infoBarLabel, infoBarSwitch, speedBarSwitch, speedBarLabel,
-            resetButton;
+            syncLabel, syncSwitch, resetButton;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -59,16 +59,35 @@
 
 
 //
+//
 -(void) viewDidDisappear {
     // Request to stop receiving accelerometer events and turn off accelerometer
+    BOOL yn = YES;
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+
+    // Syncronize all the changes here.
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_PROPERTIES_SYNC] != nil)
+    {
+        yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_PROPERTIES_SYNC];
+    }
+    else {
+        yn = YES;
+    }
+    
+    if (yn == YES) {
+        NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
+        if(![kvStore synchronize]) {
+            NSLog(@"ERROR:  %s syncronize Failed",__func__);
+        }
+    }
 }
 
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //
-
+//
 + (UILabel *)labelWithFrame:(CGRect)frame title:(NSString *)title
 {
     UILabel *label = [[UILabel alloc] initWithFrame:frame];
@@ -93,10 +112,12 @@
     mytext = [mytext stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSLog(@"my title: [%@]",mytext);
     [[NSUserDefaults standardUserDefaults] setValue:mytext forKey:@KEY_NAME];
-    
-    // set the new value to the cloud and synchronize
-    NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
-    [kvStore setString:mytext forKey:@KEY_NAME];
+    //
+    // The title does not need to go to the cloud.
+    //
+    // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
+    // NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
+    // [kvStore setString:mytext forKey:@KEY_NAME];
     
     [self setTitle:mytext];
     
@@ -107,18 +128,22 @@
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //
-//
 // User Tracking Mode
+//
 - (void)segmentUserTypeAction:(id)sender
 {
     [[NSUserDefaults standardUserDefaults] setInteger:[sender selectedSegmentIndex] forKey:@KEY_USER_TRACKING_MODE];
     
-    // set the new value to the cloud and synchronize
+    // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
     NSString *tmp = [[NSString alloc] initWithFormat:@"%ld", (long)[sender selectedSegmentIndex]];
     NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
     [kvStore setString:tmp forKey:@KEY_USER_TRACKING_MODE];
 }
 
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
+// Map Type
 //
 - (void)segmentAction:(id)sender
 {
@@ -137,17 +162,21 @@
         default:
             break;
     }
+
     [[NSUserDefaults standardUserDefaults] setInteger:myMapType forKey:@KEY_MAP_TYPE];
     
-    // set the new value to the cloud and synchronize
+    // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
     int i = (int) myMapType;
     NSString *tmp = [[NSString alloc] initWithFormat:@"%d", i];
     NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
     [kvStore setString:tmp forKey:@KEY_MAP_TYPE];
-    // NSLog(@"%@:%@",@KEY_PT_MAP_TYPE,tmp);
-    
 }
 
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
+//  Distance Filter
+//
 - (void)sliderAction:(id)sender
 {
     UISlider *slider = (UISlider *)sender;
@@ -167,12 +196,16 @@
     
     [[NSUserDefaults standardUserDefaults] setFloat:myDist forKey:@KEY_DISTANCE_FILTER];
     
-    // set the new value to the cloud and synchronize
+    // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
     NSString *tmp = [[NSString alloc] initWithFormat:@"%f", myDist];
     NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
     [kvStore setString:tmp forKey:@KEY_DISTANCE_FILTER];
 }
 
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
+// Speed Units (Miles Per Hour, Kilometers per Hour, Minutes per Mile,  Meters Per Second
 //
 - (void)segmentDisplaySpeedAction:(id)sender
 {
@@ -198,12 +231,16 @@
     
     [[NSUserDefaults standardUserDefaults] setInteger: myDisplaySpeedUnit forKey:@KEY_SPEED_UNITS];
     
-    // set the new value to the cloud and synchronize
+    // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
     NSString *tmp = [[NSString alloc] initWithFormat:@"%d", myDisplaySpeedUnit];
     NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
     [kvStore setString:tmp forKey:@KEY_SPEED_UNITS];
 }
 
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
+// Display Distance Units (Miles, Kilometers, Meters, Feet)
 //
 - (void)segmentDisplayDistanceAction:(id)sender
 {
@@ -229,13 +266,17 @@
     
     [[NSUserDefaults standardUserDefaults] setInteger: myDisplaySpeedUnit forKey:@KEY_DISTANCE_UNITS];
     
-    // set the new value to the cloud and synchronize
+    // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
     NSString *tmp = [[NSString alloc] initWithFormat:@"%d", myDisplaySpeedUnit];
     NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
     [kvStore setString:tmp forKey:@KEY_DISTANCE_UNITS];
 }
-//
 
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
+//  Location Accuracy
+//
 - (void)segmentAccuracyAction:(id)sender
 {
 	// NSLog(@"segmentAction: selected segment = %d", [sender selectedSegmentIndex]);
@@ -267,13 +308,17 @@
     
     [[NSUserDefaults standardUserDefaults] setFloat:myLocationAccuracy forKey:@KEY_LOCATION_ACCURACY];
     
-    // set the new value to the cloud and synchronize
+    // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
     NSString *tmp = [[NSString alloc] initWithFormat:@"%f", myLocationAccuracy];
     NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
     [kvStore setString:tmp forKey:@KEY_LOCATION_ACCURACY];
     // NSLog(@"%@:%@",@KEY_PT_LOCATION_ACCURACY,tmp);
 }
 
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
+//  Common selector for switches (Show Locations, Pictures, stops, Speed Label, Info Label)
 //
 -(void) ptSwitchSelector:(id)sender
 {
@@ -298,43 +343,59 @@
             break;
             
         case ptNote:
-            keyvalue = @KEY_SHOW_SPEED_LABEL;
+            keyvalue = @KEY_SHOW_NOTES;
             break;
             
         case ptSound:
-            keyvalue = @KEY_SHOW_INFO_LABEL;
+            keyvalue = @KEY_SHOW_SOUNDS;
+            break;
+        
+        case 6:
+            keyvalue = @KEY_SHOW_SPEED_LABEL;
             break;
             
+        case 7:
+            keyvalue = @KEY_SHOW_INFO_LABEL;
+            break;
+    
+        case 8:
+            keyvalue = @KEY_PROPERTIES_SYNC;
+            break;
+
         default:
-            NSLog(@"ERROR: Unknown Sender Tag for pt types");
+            NSLog(@"ERROR: %s Unknown Sender Tag for pt types",__func__);
             break;
     }
     
     if (keyvalue) {
+        
         [[NSUserDefaults standardUserDefaults] setBool:yn forKey:keyvalue];
         
-        // set the new value to the cloud and synchronize
+        // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
         
         NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
         if (yn)
             [kvStore setString:@"YES" forKey:keyvalue];
         else
             [kvStore setString:@"NO" forKey:keyvalue];
-        
-        // NSLog(@"%@:%c",keyvalue,yn);
     }
 }
 
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+//
+//  Reset Button Actions...
+//
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
 	// the user clicked one of the OK/Cancel buttons
 	if (buttonIndex == 0)
 	{
-        NSLog(@"Yes");
+        // NSLog(@"Yes");
         NSString *mytext = @TRAILS_ON_A_MAP;
-        NSLog(@"my title: [%@]",mytext);
+        // NSLog(@"my title: [%@]",mytext);
         [[NSUserDefaults standardUserDefaults] setValue:mytext forKey:@KEY_NAME];
-        
+
         // set the new value to the cloud and synchronize
         NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
         [kvStore setString:mytext forKey:@KEY_NAME];
@@ -379,7 +440,7 @@
     NSArray *segmentMapTypeContent  = [NSArray arrayWithObjects: @"Standard", @"Satellite", @"Hybrid", nil];
     NSArray *segmentUserTracking = [NSArray arrayWithObjects: @"None", @"Follow", @"Heading", nil];
     NSArray *accuracyTextContent = [NSArray arrayWithObjects: @"Nav", @"Best", @"10m", @"100m", @"1km", @"3km" , nil];
-    NSArray *pebbleTypeText = [NSArray arrayWithObjects: @"Locations:",@"Pictures:", @"Stops:",@"Speed Time:",@"Distance Info:", nil];
+    NSArray *pebbleTypeText = [NSArray arrayWithObjects: @"Locations:",@"Pictures:", @"Stops:", @"Notes", @"Sounds", @"Speed Time:",@"Distance Info:", @"Sync Properties:", nil];
     NSArray *displaySpeedText = [NSArray arrayWithObjects:@"M P H",@"K P H",@"M P M",@"M P S", nil]; // Miles per Hour, KM per Hour, Min / Mile, Meters / Sec
     NSArray *displayDistanceText = [NSArray arrayWithObjects:@"Miles",@"Kilometers", @"Meters", @"Feet", nil];
     
@@ -623,10 +684,19 @@
     yPlacement += (ptTweenMargin * ptTweenMarginMultiplier) + ptSegmentedControlHeight;
     frame = CGRectMake(	ptLeftMargin, yPlacement, objectWidth, ptSegmentedControlHeight);
     
-    CLLocationDistance myLocationDistace;
     // Had to get the value now so it can be displayed in the distance filter title.
     CLLocationDistance myDistanceFilter = [TOMDistance distanceFilter];
-    
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_LOCATION_ACCURACY] != nil)
+    {
+        myDistanceFilter = [[NSUserDefaults standardUserDefaults] floatForKey:@KEY_DISTANCE_FILTER];
+    }
+    else
+    {   //
+        // we don't have a preference stored on this device,use the kCLLocationAccuracyBest as default.
+        //
+        myDistanceFilter = 100.0;  // default
+    }
+
 	// label.textAlignment = UITextAlignmentLeft;
     NSString *title = [[NSString alloc] initWithFormat:@"Distance Filter: %.1f",myDistanceFilter] ;
     distanceFilterLabel = [TOMPropertyViewController labelWithFrame:frame title:title];
@@ -648,7 +718,7 @@
     distanceFilterSliderCtl.maximumValue = 1000.0;
     distanceFilterSliderCtl.continuous = YES;
     
-    distanceFilterSliderCtl.value = myLocationDistace;
+    distanceFilterSliderCtl.value = myDistanceFilter;
     
     // Add an accessibility label that describes the slider.
     [distanceFilterSliderCtl setAccessibilityLabel:NSLocalizedString(@"Distance Filter", @"")];
@@ -680,7 +750,7 @@
     CLLocationAccuracy myLocationAccuracy;
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_LOCATION_ACCURACY] != nil)
     {
-        myLocationAccuracy = [[NSUserDefaults standardUserDefaults] floatForKey:@KEY_LOCATION_ACCURACY];
+        myLocationAccuracy = [[NSUserDefaults standardUserDefaults] integerForKey:@KEY_LOCATION_ACCURACY];
     }
     else
     {   //
@@ -729,8 +799,12 @@
     [toggleLabel setTextAlignment:NSTextAlignmentRight];
     [scrollView addSubview:toggleLabel];
     
-    for (POMType pt = ptLocation; pt <= ptSound; pt++ )
+    // for (POMType pt = ptLocation; pt <= ptSound; pt++ )
+    for (NSInteger pt = 1; pt <=8 ; pt++)
     {
+        if (pt == ptNote || pt == ptSound) {
+            continue;
+        }
         BOOL yn;
         yPlacement += (ptTweenMargin * ptTweenMarginMultiplier) + ptSegmentedControlHeight - 10;
         frame = CGRectMake(	ptLeftMargin, yPlacement, objectWidth, ptSegmentedControlHeight);
@@ -798,6 +872,11 @@
                 break;
                 
             case ptNote:
+            case ptSound:
+                continue;
+                break;
+            
+            case 6: // SpeedBar
                 speedBarSwitch = ptSwitch;
                 if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_SPEED_LABEL] != nil)
                 {
@@ -816,7 +895,7 @@
                 [scrollView addSubview:speedBarLabel];
                 break;
                 
-            case ptSound:
+            case 7:
                 infoBarSwitch = ptSwitch;
                 if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_INFO_LABEL] != nil)
                 {
@@ -834,6 +913,22 @@
                 [infoBarLabel setTextAlignment:NSTextAlignmentRight];
                 [scrollView addSubview:infoBarLabel];
                 break;
+            
+            case 8:
+                syncSwitch = ptSwitch;
+                if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_PROPERTIES_SYNC] != nil)
+                {
+                    yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_PROPERTIES_SYNC];
+                }
+                else {
+                    yn = YES;
+                }
+                frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
+                syncLabel = [TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]];
+                [syncLabel setFont:myLabelFont];
+                [syncLabel setTextAlignment:NSTextAlignmentRight];
+                [scrollView addSubview:syncLabel];
+                break;
                 
             default:
                 yn = NO;  // default
@@ -847,6 +942,8 @@
         // frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
         // [scrollView addSubview:[TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]]];
     }
+    //
+    // Sync the properties via iCloud
     
     frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
     
@@ -857,12 +954,11 @@
                action:@selector(resetTOM:)
      forControlEvents:UIControlEventTouchDown];
     [resetButton.layer setBorderColor:TOM_LABEL_BORDER_COLOR];
-    [resetButton.layer setBorderWidth:1.0];
-    [resetButton.layer setShadowOffset:CGSizeMake(5, 5)];
-    [resetButton.layer setShadowColor:TOM_LABEL_BORDER_COLOR];
-    [resetButton.layer setShadowOpacity:0.5];
-    resetButton.layer.borderWidth  = TOM_LABEL_BORDER_WIDTH;
-    resetButton.layer.cornerRadius = TOM_LABEL_BORDER_CORNER_RADIUS;
+    [resetButton.layer setBorderWidth:TOM_LABEL_BORDER_WIDTH];
+    // [resetButton.layer setShadowOffset:CGSizeMake(5, 5)];
+    // [resetButton.layer setShadowColor:TOM_LABEL_BORDER_COLOR];
+    // [resetButton.layer setShadowOpacity:0.5];
+    [resetButton.layer setCornerRadius:TOM_LABEL_BORDER_CORNER_RADIUS];
     
     [scrollView addSubview:resetButton];
 
@@ -874,30 +970,12 @@
 - (void)orientationPropertiesChanged:(NSNotification *)notification
 {
     // Respond to changes in device orientation
-    if (notification)
-        NSLog(@"Orientation Changed! %@",notification);
-    else
-        NSLog(@"Orientation Changed! (nil)");
+    // if (notification)
+    //    NSLog(@"Orientation Changed! %@",notification);
+    // else
+    //    NSLog(@"Orientation Changed! (nil)");
 
     UIInterfaceOrientation uiOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-
-#ifdef __NUA__
-    //
-    // I found device orientation in this case unreliagle where UI Orientation worked like I wanted.
-    //
-    UIDeviceOrientation devOrientation = [[UIDevice currentDevice] orientation];
-
-    currentDeviceOrientation = devOrientation;
-    
-
-    if (devOrientation == UIDeviceOrientationFaceUp ||
-        devOrientation == UIDeviceOrientationFaceDown ||
-        /* devOrientation == UIDeviceOrientationUnknown || */
-        devOrientation == UIDeviceOrientationPortraitUpsideDown ||  // having issues understanding why i cant get upside down to work ?
-        currentDeviceOrientation == devOrientation) {
-        return;
-    }
-#endif
 
     if ((UIInterfaceOrientationIsLandscape(currentInterfaceOrientation) && UIInterfaceOrientationIsLandscape(uiOrientation)) ||
         (UIInterfaceOrientationIsPortrait(currentInterfaceOrientation) && UIInterfaceOrientationIsPortrait(uiOrientation))) {
@@ -906,9 +984,6 @@
         return;
     }
  
-    // currentOrientation = orientation;
-
-    
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     CGFloat screenHeight = screenRect.size.height;
     CGFloat screenWidth = screenRect.size.width;
@@ -1048,6 +1123,15 @@
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [infoBarSwitch setFrame:myrect];
         
+        // Info Bar Switch Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [syncLabel setFrame:myrect];
+        
+        // Info Bar Switch
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [syncSwitch setFrame:myrect];
+        
         // Reset Button
         CGFloat buttonX = (screenWidth - (myX + ptRightMargin + 100.0)) / 2.0;
         myY += ptSegmentedControlHeight + SPACING;
@@ -1177,6 +1261,15 @@
         // Info Bar Switch
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [infoBarSwitch setFrame:myrect];
+        
+        // Info Bar Switch Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [syncLabel setFrame:myrect];
+        
+        // Info Bar Switch
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [syncSwitch setFrame:myrect];
         
         // Reset Button
         CGFloat buttonX = (screenWidth - (myX + ptRightMargin + 100.0)) / 2.0;

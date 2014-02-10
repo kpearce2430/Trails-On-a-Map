@@ -7,11 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TOMImageStore.h"
 
 @interface TOMOrganizerViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 {
+@private
 	NSMutableArray *fileList;
     NSMutableArray *dateList;
+    TOMImageStore *imageStore;
+
+@public
+    UITableView *organizerTable;
+    BOOL amIediting;
 }
 
 @property (nonatomic, retain) NSMutableArray *fileList;

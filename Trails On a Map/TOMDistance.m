@@ -26,7 +26,7 @@
             break;
             
         case tomDDKilometers:
-            return d/10000.000f;
+            return d/1000.000f;
             break;
             
         case tomDDMeters:

@@ -26,6 +26,7 @@ typedef enum  { tomDDError = -1, tomDDUnknown, tomDDMiles, tomDDKilometers, tomD
 #define KEY_SHOW_INFO_LABEL      "ptShowInfoLabel"
 #define KEY_SPEED_UNITS          "ptDisplaySpeed"
 #define KEY_DISTANCE_UNITS       "ptDisplayDistance"
+#define KEY_PROPERTIES_SYNC      "ptPropertiesSync"  // Yes/No if properties are synced on iCloud.
 
 // Defaults
 #define TRAILS_ON_A_MAP             "Trails On A Map"

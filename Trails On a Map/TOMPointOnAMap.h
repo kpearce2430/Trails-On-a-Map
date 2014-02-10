@@ -31,6 +31,8 @@ typedef enum  { ptError = -1, ptUnknown, ptLocation, ptPicture, ptStop, ptNote, 
 @property (nonatomic, copy) NSString *key;
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *subtitle;
+@property (nonatomic, copy) UIImage *image; // thumb nail for annotation
+
 @property (nonatomic, readwrite) POMType type;
 //
 // These are other properties used throught pt

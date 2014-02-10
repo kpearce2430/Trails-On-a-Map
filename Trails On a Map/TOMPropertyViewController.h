@@ -73,6 +73,10 @@
 @property (nonatomic, readwrite) UILabel *infoBarLabel;
 @property (nonatomic, readwrite) UISwitch *infoBarSwitch;
 
+// Properties Sync Switch
+@property (nonatomic, readwrite) UILabel *syncLabel;
+@property (nonatomic, readwrite) UISwitch *syncSwitch;
+
 @property (nonatomic, readwrite) UIButton *resetButton;
 
 - (BOOL) textFieldShouldReturn:(UITextField *)textField;

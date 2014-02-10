@@ -19,7 +19,7 @@
 #import "TOMViewSlider.h"
 
 
-@interface TOMRootViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate >
+@interface TOMRootViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIActionSheetDelegate >
 
 {
 @private
@@ -46,15 +46,16 @@
 
 // These would be the current properties
 @property (nonatomic, strong)    CLLocationManager  *locationManager;
+@property (nonatomic, readwrite) CLHeading *currentHeading;
 @property (nonatomic, strong)    IBOutlet MKMapView *worldView;
 
 @property (nonatomic, strong) TOMProperties *myProperties;
 @property (nonatomic, strong) TOMPomSet     *theTrail;
 
 @property (nonatomic, readwrite) BOOL amiUpdatingLocation;
-
-@property (nonatomic, readwrite) CLHeading *currentHeading;
 @property (nonatomic, readwrite) BOOL hidden;
+
+@property (nonatomic, strong) UIImagePickerController *imagePicker;
 
 // Methods:
 - (void)updateCloudItems:(NSNotification *)notification;
@@ -65,6 +66,8 @@
 - (void) processMyLocation:(CLLocation *)newLocation type: (POMType) pt;
 - (BOOL) loadTrails:(NSString *) title;
 - (BOOL) saveTrails:(NSString *) title;
+- (void) launchCamera;
+- (void) launchPhotoLibrary;
 // - (CLLocationSpeed) displaySpeed: (CLLocationSpeed) s;
 
 @end

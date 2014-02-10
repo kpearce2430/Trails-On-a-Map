@@ -18,6 +18,47 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
+
+#ifdef __FFU__
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    NSString *teamID = @"HV9L49AFR8.com.pearcesoftwaresolutions.trailsonamap";
+    NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
+    NSString *rootFolderIndentifer = [NSString stringWithFormat:@"%@:%@",teamID,bundleID];
+    
+    NSURL *containerURL = [fileManager URLForUbiquityContainerIdentifier:rootFolderIndentifer];
+    
+    NSString *documentsDirecotry = [[containerURL path] stringByAppendingPathComponent:@"Documents"];
+    
+    BOOL isDirectory = NO;
+    BOOL mustCreateDirectory = NO;
+    
+    if ([fileManager fileExistsAtPath:documentsDirecotry isDirectory:&isDirectory]) {
+        
+        if (isDirectory == NO ) {
+            mustCreateDirectory = YES;
+        }
+    }
+    else {
+        mustCreateDirectory = YES;
+    }
+    
+    if (mustCreateDirectory) {
+        NSLog(@"%s: Must create the directory.",__func__);
+        NSError *err = nil;
+        
+        if ([fileManager createDirectoryAtPath:documentsDirecotry withIntermediateDirectories:YES attributes:nil error:&err]) {
+            NSLog(@"%s : Successfully created the folder %@",__func__,documentsDirecotry);
+        }
+        else {
+            NSLog(@"%s : Failed ot created the foldler %@ with err %@",__func__,documentsDirecotry,err);
+        }
+    }
+    else {
+        NSLog(@"%s:  %@ already exists",__func__,documentsDirecotry);
+    }
+    
+#endif
+
     TOMRootViewController *rootController = [[TOMRootViewController alloc] initWithNibName:@"TOMRootViewController" bundle:nil];
     self.navController = [[UINavigationController alloc] initWithRootViewController:rootController];
     self.window.rootViewController = self.navController;

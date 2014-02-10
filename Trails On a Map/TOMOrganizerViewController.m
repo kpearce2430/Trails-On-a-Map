@@ -9,6 +9,7 @@
 #import "TOMOrganizerViewController.h"
 #import "TOMDetailViewController.h"
 
+
 @interface TOMOrganizerViewController ()
 
 @end
@@ -43,16 +44,46 @@
     
     self.fileList = [NSMutableArray array];
     self.dateList = [NSMutableArray array];
-    
-    // CGFloat screenWidth = screenRect.size.width;
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    // CGFloat screenHeight = screenRect.size.height;
-    // CGFloat screenWidth = screenRect.size.width;
-    UITableView *organizerTable = [[UITableView alloc] initWithFrame:screenRect];
+    imageStore = [[TOMImageStore alloc] init];
+
+    organizerTable = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStylePlain];
 
     [organizerTable setDataSource:self];
     [organizerTable setDelegate:self];
     [self.view addSubview:organizerTable];
+
+    [self orientationChanged:NULL]; // orientationChanged
+    
+    //
+
+    // [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
+
+    UIBarButtonItem *anotherButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
+    self.navigationItem.rightBarButtonItem = anotherButton;
+    amIediting = NO;
+}
+
+
+-(void) viewDidAppear:(BOOL)animated {
+
+    [super viewDidAppear:animated];
+
+    // Set up notification for
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    
+    
+}
+
+
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
+-(void) viewDidDisappear {
+    // Request to stop receiving accelerometer events and turn off accelerometer
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
 
 - (void)didReceiveMemoryWarning
@@ -127,7 +158,14 @@
     [cell.textLabel setText:myLabel];
     [cell.detailTextLabel setText:dateStr];
 
-    UIImage *theImage = [UIImage imageNamed:@"pt114x114.png"];
+
+    NSString *iconName = [[NSString alloc] initWithFormat:@"%@.icon",myLabel];
+    
+    UIImage *theImage = [imageStore loadImage:iconName warn:NO];
+    if (!theImage) {
+        theImage = [UIImage imageNamed:@"pt114x114.png"];
+    }
+    
     cell.imageView.image = theImage;
     cell.imageView.backgroundColor    = TOM_LABEL_BACKGROUND_COLOR;
     cell.imageView.layer.borderColor  = TOM_LABEL_BORDER_COLOR;
@@ -154,8 +192,8 @@
 
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"Picked %@",indexPath);
-    NSLog(@"Selected: %@",[self.fileList objectAtIndex:indexPath.row]);
+    // NSLog(@"Picked %@",indexPath);
+    // NSLog(@"Selected: %@",[self.fileList objectAtIndex:indexPath.row]);
     NSString *myTitle = [[self.fileList objectAtIndex:indexPath.row] stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
     
     UIViewController *ptController = [[TOMDetailViewController alloc] initWithNibName:@"TOMDetailViewController" bundle:nil title:myTitle];
@@ -169,6 +207,118 @@
     
     [[self navigationController] pushViewController:ptController animated:YES];
     
+}
+
+
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    [organizerTable beginUpdates];
+    [organizerTable endUpdates];
+}
+
+
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
+- (void)orientationChanged:(NSNotification *)notification {
+    // Respond to changes in device orientation
+    //  NSLog(@"Orientation Changed!");
+
+    static UIDeviceOrientation currentOrientation = UIDeviceOrientationUnknown;
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    
+    if (orientation == UIDeviceOrientationFaceUp ||
+        orientation == UIDeviceOrientationFaceDown ||
+        orientation == UIDeviceOrientationUnknown ||
+        orientation == UIDeviceOrientationPortraitUpsideDown ||
+        currentOrientation == orientation) {
+        return;
+    }
+    
+    if ((UIDeviceOrientationIsPortrait(currentOrientation) && UIDeviceOrientationIsPortrait(orientation)) ||
+        (UIDeviceOrientationIsLandscape(currentOrientation) && UIDeviceOrientationIsLandscape(orientation))) {
+        //still saving the current orientation
+        currentOrientation = orientation;
+        return;
+    }
+    
+    currentOrientation = orientation;
+    
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGFloat screenHeight = screenRect.size.height;
+    CGFloat screenWidth = screenRect.size.width;
+    
+    if (UIDeviceOrientationIsLandscape(currentOrientation) ||
+        currentOrientation == UIDeviceOrientationPortraitUpsideDown) {
+        screenHeight = screenRect.size.width;
+        screenWidth = screenRect.size.height;
+    }
+
+    screenRect = CGRectMake(0.0, 0.0, screenWidth, screenHeight);
+    [self.view setFrame:screenRect];
+    
+    CGRect tableRect = CGRectMake( 0.0, 0.0, screenWidth, screenHeight );
+    [organizerTable setFrame:tableRect];
+
+    [organizerTable beginUpdates];
+    [organizerTable endUpdates];
+    
+    return;
+}
+
+- (IBAction)editClicked:(id)sender {
+    
+    // NSLog(@"In %s",__func__);
+    
+    if (amIediting == YES) {
+        amIediting = NO;
+        [self setEditing:NO animated:YES];
+    }
+    else {
+        amIediting = YES;
+        [self setEditing:YES animated:YES];
+    }
+}
+
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    // NSLog(@"In %s",__func__);
+    return UITableViewCellEditingStyleDelete;
+
+}
+
+- (void) setEditing:(BOOL)editing animated:(BOOL)animated {
+    
+    [super setEditing:editing animated:animated];
+    [organizerTable setEditing:editing animated:animated];
+    // NSLog(@"In %s",__func__);
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    // NSLog(@"In %s (%@)",__func__,indexPath);
+   
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        // Delete the row from the data source
+        NSString *filename = [[self.fileList objectAtIndex:indexPath.row] stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
+        NSLog(@"Filename: %@",filename);
+        
+        TOMPomSet *theTrail = [[TOMPomSet alloc] initWithTitle:filename];
+        [theTrail loadPoms:filename];
+        
+        TOMImageStore *imagesSet = [[TOMImageStore alloc] init];
+        
+        for (int i = 0 ; i < [theTrail.ptTrack count]; i++ ) {
+            TOMPointOnAMap *p = [theTrail.ptTrack objectAtIndex:i];
+            if ([p type] == ptPicture) {
+                [imagesSet deleteImageForKey:[p key] remove:YES];
+                
+            }
+        }
+
+        [theTrail deletePoms:filename];
+        [organizerTable reloadData];
+    }
 }
 
 @end

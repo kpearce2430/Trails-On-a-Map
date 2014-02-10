@@ -8,18 +8,30 @@
 
 #import <UIKit/UIKit.h>
 #import "TOMPomSet.h"
+#import "TOMImageStore.h"
 
-@interface TOMDetailViewController : UIViewController <UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,UIActionSheetDelegate>
+static NSString *detailViewCellIdentifier = @"detaiViewCells";
+
+@interface TOMDetailViewController :  UIViewController <UITableViewDataSource, UITableViewDelegate>
 {
+    @public
+    // UITableView *detailTable;
     TOMPomSet *theTrail;
+    
 }
 
 @property (nonatomic, strong) TOMPomSet *theTrail;
-@property (nonatomic, strong) UICollectionView *trailCollectionView;
-@property (nonatomic, strong) NSMutableArray *trailCollectionList;
+@property (nonatomic, strong) UITableView *detailTable;
+@property (nonatomic, strong) NSString *myName;
+@property (nonatomic, strong) NSMutableArray *imagesSet;
+@property (nonatomic, readwrite) NSInteger picCount;
+@property (nonatomic, readwrite) UISwitch *iCloudSwitch;
 
-- (void) processDoubleTap:(UITapGestureRecognizer *)sender;
+@property (nonatomic, readonly) UIFont *headerLabelFont;
+@property (nonatomic, readonly) UIFont *footerLabelFont;
+@property (nonatomic, strong) TOMImageStore *imageStore;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil title:(NSString *) t;
+- (UILabel *) newLabelWithTitle:(NSString *)paramTitle;
 
 @end

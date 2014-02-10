@@ -1,3 +1,4 @@
+
 //
 //  TOMImageStore.m
 //  Trails On a Map
@@ -65,7 +66,7 @@
 //
 - (BOOL) deleteImageForKey:(NSString *)s remove:(BOOL)yn
 {
-    [self deleteImageForKey:s ];
+    // [self deleteImageForKey:s ];
     if (yn == YES)
         return [self removeImage:s];
     else
@@ -73,7 +74,8 @@
 }
 
 //
-
+//
+//
 - (void) deleteImageForKey:(NSString *)s
 {
     if (!s)
@@ -81,6 +83,7 @@
     else
         [dictionary removeObjectForKey:s];
 }
+
 //
 // Functions for save and loading images
 //
@@ -89,14 +92,15 @@
     NSArray *documentDirectories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *fileName = [ key stringByAppendingString:@".jpg"]; // future property
     
-    NSLog( @"Image Filename:%@", fileName );
-    
+    // NSLog( @"%s %s %d Image Filename:%@", __FUNCTION__, __func__ , __LINE__, fileName );
     // Get one and only one document directory
+    
     NSString *documentDirectory = [ documentDirectories objectAtIndex:0];
     
     return [documentDirectory stringByAppendingPathComponent:fileName];
     
 }
+
 
 - (BOOL) saveImage:(UIImage *)i forKey:(NSString *)s
 {
@@ -113,8 +117,14 @@
     // return YES;
 }
 
-- (UIImage *) loadImage: (NSString *) s
+- (UIImage *) loadImage: (NSString *) s warn:(BOOL) yn
 {
+    
+    if (!s) {
+        NSLog(@"ERROR: %s %d No Key Provided to Load Image",__FUNCTION__,__LINE__);
+        return NULL;
+    }
+    
     NSError *err = nil;
     // Identify the path
     NSString  *jpgPath = [self pathForImage: s];
@@ -124,7 +134,9 @@
                                             error:&err];
     
     if (err) {
-        NSLog(@"%@",err);
+        if (yn == YES)
+            NSLog(@"%s: %@",__func__,err);
+        
         return nil;
     }
     else {
@@ -135,12 +147,20 @@
 
 - (BOOL) removeImage: (NSString *) s
 {
+    BOOL removeSuccess = NO;
+    
+    if (!s) {
+
+        NSLog(@"ERROR: %s %d No Key Provided to Load Image",__FUNCTION__,__LINE__);
+        return removeSuccess;
+    }
+    
     // Identify the path
     NSError *err = nil;
     NSString  *jpgPath = [self pathForImage: s];
     NSFileManager *fileMgr = [[NSFileManager alloc] init];
     
-    BOOL removeSuccess = [fileMgr removeItemAtPath:jpgPath error:&err];
+    removeSuccess = [fileMgr removeItemAtPath:jpgPath error:&err];
     
     if (err)
     {

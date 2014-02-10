@@ -25,7 +25,7 @@
 
 - (NSString *) pathForImage:(NSString *)key;
 - (BOOL) saveImage:(UIImage *)i forKey:(NSString *)s;
-- (UIImage *) loadImage: (NSString *) s;
+- (UIImage *) loadImage: (NSString *) s  warn:(BOOL) yn;
 - (BOOL) removeImage: (NSString *) s;
 
 @end

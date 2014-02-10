@@ -37,6 +37,10 @@
 
 - (NSTimeInterval) elapseTime;
 - (NSString *) elapseTimeString;
+- (NSInteger) numPics;
+
+// - (NSMutableArray *) pictureSet;
+// - (NSInteger) numStops;
 
 
 @end
