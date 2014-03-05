@@ -16,7 +16,7 @@
 
 @implementation TOMOrganizerViewController
 
-@synthesize fileList,dateList;
+@synthesize cells,query;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -42,8 +42,8 @@
         [self setTitle:@TRAILS_DEFAULT_NAME]; // default
     }
     
-    self.fileList = [NSMutableArray array];
-    self.dateList = [NSMutableArray array];
+    self.cells = [NSMutableArray array];
+    
     imageStore = [[TOMImageStore alloc] init];
 
     organizerTable = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStylePlain];
@@ -55,16 +55,21 @@
     [self orientationChanged:NULL]; // orientationChanged
     
     //
-
     // [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
-
+    //
     UIBarButtonItem *anotherButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
     self.navigationItem.rightBarButtonItem = anotherButton;
     amIediting = NO;
+    [self prepareFiles];
+    
+
+    
 }
 
-
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
 -(void) viewDidAppear:(BOOL)animated {
 
     [super viewDidAppear:animated];
@@ -73,6 +78,7 @@
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
     
+
     
 }
 
@@ -86,6 +92,9 @@
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
 
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -95,49 +104,15 @@
 //3</pre>
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     
-    NSArray *documentDirectories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [documentDirectories objectAtIndex:0];
-    NSError * error;
-    NSArray * directoryContents = [[NSArray alloc] init];
-    
-    // NSLog(@"Removing all objects") ;
-    [fileList removeAllObjects];
-    [dateList removeAllObjects];
-    
-    NSFileManager* fm = [NSFileManager defaultManager];
-    directoryContents =  [fm contentsOfDirectoryAtPath:documentsDirectory error:&error];
-    
-    for (int i = 0; i < [directoryContents count]; i++) {
-        NSString *aFile = [directoryContents objectAtIndex:i];
-        // NSLog(@"File:%@", aFile);
-        if ([aFile hasSuffix:@TOM_FILE_EXT]) {
-            // NSLog(@"is an archive");
-
-            NSString *fullDirPath = [documentsDirectory stringByAppendingString:@"/"];
-            NSString *fullFilePath = [fullDirPath stringByAppendingString:aFile];
-            
-            // NSLog(@"FULL PATH:%@",fullFilePath);
-            
-            NSDictionary* attrs = [fm attributesOfItemAtPath:fullFilePath error:&error];
-            if (!error) {
-                NSDate *fileDate = [attrs objectForKey: NSFileModificationDate] ;
-                [dateList addObject:fileDate];
-                [fileList addObject:aFile];
-            }
-            else {
-                NSLog(@"ERROR: %@ : %@",aFile, error);
-            }
-        }
-    }
-    // NSLog(@"directory archive Contents ====== %@",archiveList);
-    return [self.fileList count];
+    return [self.cells count];
 }
 
 //4
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     //5
     static NSString *cellIdentifier = @"tomCell";
-    NSDate *fileDate = [self.dateList objectAtIndex:indexPath.row];
+    TOMOrganizerViewCell *thisCell = [self.cells objectAtIndex:indexPath.row];
+    NSDate *fileDate = thisCell.date;
     static NSDateFormatter *dateFormatter;
     
     if (!dateFormatter) {
@@ -152,16 +127,23 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
     }
 
-    NSString *myLabel = [[self.fileList objectAtIndex:indexPath.row] stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
+    NSString *myLabel = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
     //6
-    cell.accessoryType = UITableViewCellAccessoryDetailButton;
+    
+    NSURL *myUrl = thisCell.url;
+    
+    if (myUrl)
+        cell.accessoryType = UITableViewCellAccessoryDetailButton;
+    else
+        cell.accessoryType = UITableViewCellAccessoryNone;
+
     [cell.textLabel setText:myLabel];
     [cell.detailTextLabel setText:dateStr];
 
 
     NSString *iconName = [[NSString alloc] initWithFormat:@"%@.icon",myLabel];
     
-    UIImage *theImage = [imageStore loadImage:iconName warn:NO];
+    UIImage *theImage = [TOMImageStore loadImage:iconName warn:NO];
     if (!theImage) {
         theImage = [UIImage imageNamed:@"pt114x114.png"];
     }
@@ -176,11 +158,11 @@
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    // NSLog(@"Index Path:%@",indexPath);
-    // NSLog(@"Selected: %@",[self.fileList objectAtIndex:indexPath.row]);
-    NSString *myTitle = [[self.fileList objectAtIndex:indexPath.row] stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
+
+    TOMOrganizerViewCell *thisCell = [self.cells objectAtIndex:indexPath.row];
+    NSString *myTitle = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
     self.title = myTitle;
+    
     // set the new value to the cloud and synchronize
     [[NSUserDefaults standardUserDefaults] setValue:myTitle forKey:@KEY_NAME];
     NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
@@ -194,7 +176,9 @@
 {
     // NSLog(@"Picked %@",indexPath);
     // NSLog(@"Selected: %@",[self.fileList objectAtIndex:indexPath.row]);
-    NSString *myTitle = [[self.fileList objectAtIndex:indexPath.row] stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
+    TOMOrganizerViewCell *thisCell = [self.cells objectAtIndex:indexPath.row];
+    
+    NSString *myTitle = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
     
     UIViewController *ptController = [[TOMDetailViewController alloc] initWithNibName:@"TOMDetailViewController" bundle:nil title:myTitle];
     
@@ -296,29 +280,201 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    // NSLog(@"In %s (%@)",__func__,indexPath);
-   
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
+    if  (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
-        NSString *filename = [[self.fileList objectAtIndex:indexPath.row] stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
-        NSLog(@"Filename: %@",filename);
         
-        TOMPomSet *theTrail = [[TOMPomSet alloc] initWithTitle:filename];
-        [theTrail loadPoms:filename];
+        TOMOrganizerViewCell *thisCell = [self.cells objectAtIndex:indexPath.row];
+        NSURL *theURL = thisCell.url;
         
-        TOMImageStore *imagesSet = [[TOMImageStore alloc] init];
-        
-        for (int i = 0 ; i < [theTrail.ptTrack count]; i++ ) {
-            TOMPointOnAMap *p = [theTrail.ptTrack objectAtIndex:i];
-            if ([p type] == ptPicture) {
-                [imagesSet deleteImageForKey:[p key] remove:YES];
-                
+        TOMPomSet *theTrail = [[TOMPomSet alloc] initWithFileURL:theURL];
+
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_NAME] != nil)
+        {
+            NSString *currentTitle = [[NSUserDefaults standardUserDefaults] stringForKey:@KEY_NAME];
+            NSString *myTitle = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
+            if ([currentTitle isEqualToString:myTitle]) {
+                // set the new value to the cloud and synchronize
+                [[NSUserDefaults standardUserDefaults] setValue:@TRAILS_ON_A_MAP forKey:@KEY_NAME];
+                NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
+                [kvStore setString:@TRAILS_ON_A_MAP forKey:@KEY_NAME];
+                [self setTitle:@TRAILS_DEFAULT_NAME];
             }
         }
 
-        [theTrail deletePoms:filename];
-        [organizerTable reloadData];
+        [self deleteDocument:theTrail withCompletionBlock:^{
+            // insert code for next action
+            NSLog(@"Deleted Document");
+        }];
+
+        [cells removeObjectAtIndex:indexPath.row];
+        
+        [tableView deleteRowsAtIndexPaths:[[NSArray alloc] initWithObjects:&indexPath count:1] withRowAnimation:UITableViewRowAnimationLeft];
+        
     }
+}
+
+-(void) prepareFiles
+{
+    // NSLog(@"Removing all objects") ;
+    [cells removeAllObjects];
+    
+    BOOL usingIcloud = NO;
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_ICLOUD] != nil)
+    {
+        usingIcloud = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_ICLOUD];
+    }
+    else // If we don't know, we're not.
+        usingIcloud = NO;
+    
+    if (usingIcloud) {
+        self.query = [[NSMetadataQuery alloc] init];
+        [query setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
+        [query setPredicate:[NSPredicate predicateWithFormat:@"%K ENDSWITH %@",NSMetadataItemFSNameKey,@TOM_FILE_EXT]];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(processFiles:)
+                                                     name:NSMetadataQueryDidFinishGatheringNotification
+                                                   object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(processFiles:)
+                                                     name:NSMetadataQueryDidUpdateNotification
+                                                   object:nil];
+        [query startQuery]; // off we go:
+    }
+    else {
+        
+        NSURL *theURL = [TOMUrl urlForDocumentsDirectory];
+        
+        NSLog(@"%s theURL:%@",__func__,theURL);
+        
+        NSFileManager *fileManager = [[NSFileManager alloc]init];
+        
+        NSArray *keys = [NSArray arrayWithObjects:
+                         NSURLIsDirectoryKey, NSURLIsPackageKey, NSURLLocalizedNameKey, nil];
+        
+        NSDirectoryEnumerator *enumerator = [fileManager
+                                             enumeratorAtURL:theURL
+                                             includingPropertiesForKeys:keys
+                                             options:(NSDirectoryEnumerationSkipsPackageDescendants |
+                                                      NSDirectoryEnumerationSkipsHiddenFiles)
+                                             errorHandler:^(NSURL *url, NSError *error) {
+                                                 // Handle the error.
+                                                 // Return YES if the enumeration should continue after the error.
+                                                 return YES;
+                                             }];
+        
+        for (NSURL *url in enumerator) {
+            
+            NSError *err = nil;
+            // NSLog(@"%s URL:%@",__func__,[url path]);
+            NSString *path = [url path];
+            NSArray *parts = [path componentsSeparatedByString:@"/"];
+            NSString *fileName = [parts objectAtIndex:[parts count]-1];
+            
+            if ([fileName hasSuffix:@TOM_FILE_EXT]) {
+                
+                NSDictionary* attrs = [fileManager attributesOfItemAtPath:path error:&err];
+                
+                if (!err) {
+                    NSDate *fileDate = [attrs objectForKey: NSFileModificationDate] ;
+                    
+                    TOMOrganizerViewCell *myCell = [[TOMOrganizerViewCell alloc] init];
+                    [myCell setTitle:fileName];
+                    [myCell setDate:fileDate];
+                    [myCell setUrl:url];
+                    [cells addObject:myCell];
+                }
+                else {
+                    NSLog(@"ERROR: %s %@ : %@",__func__,fileName, err);
+                }
+            }
+        } // for enumerator
+        [self sortCells];
+        
+    } // else (!usingIcloud)
+
+}
+
+-(void) processFiles:(NSNotification *) aNotification
+{
+    // NSMutableArray *files = [NSMutableArray array];
+    
+    [query disableUpdates]; // Disable Updates while processing
+    
+    NSArray *queryResults = [query results];
+    
+    for (NSMetadataItem *result in queryResults) {
+
+        NSURL *fileURL = [result valueForAttribute:NSMetadataItemURLKey];
+        NSString *path = [fileURL path];
+        NSArray *parts = [path componentsSeparatedByString:@"/"];
+        NSString *fileName = [parts objectAtIndex:[parts count]-1];
+        
+        NSString *isDownloaded = [result valueForAttribute:NSMetadataUbiquitousItemDownloadingStatusKey];
+        // NSLog(@"%s %@ is %@",__func__,fileName,isDownloaded);
+        NSDate *fileDate = [result valueForAttribute:NSMetadataItemFSContentChangeDateKey];
+        TOMOrganizerViewCell *myCell = [[TOMOrganizerViewCell alloc] init];
+        
+        if ([isDownloaded isEqualToString:@"NSMetadataUbiquitousItemDownloadingStatusCurrent"] ||
+            [isDownloaded isEqualToString:@"NSMetadataUbiquitousItemDownloadingStatusDownloaded"]) {
+
+            [myCell setTitle:fileName];
+            [myCell setDate:fileDate];
+            [myCell setUrl:fileURL];
+            [cells addObject:myCell];
+        }
+        else {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                NSFileManager *fm = [[NSFileManager alloc] init];
+                [fm startDownloadingUbiquitousItemAtURL:fileURL error:nil];
+            });
+            [myCell setTitle:fileName];
+            [myCell setDate:fileDate];
+            [myCell setUrl:nil];
+            [cells addObject:myCell];
+        }
+    }
+    [self sortCells];
+    [organizerTable reloadData];
+}
+
+- (void)deleteDocument:(UIDocument *)document withCompletionBlock:(void (^)())completionBlock {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+        
+        NSError *fileCoordinatorError = nil;
+        
+        [[[NSFileCoordinator alloc] initWithFilePresenter:nil] coordinateWritingItemAtURL:document.fileURL options:NSFileCoordinatorWritingForDeleting error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
+            
+            // extra check to ensure coordinator is not running on main thread
+            NSAssert(![NSThread isMainThread], @"Must be not be on main thread");
+            
+            // create a fresh instance of NSFileManager since it is not thread-safe
+            NSFileManager *fileManager = [[NSFileManager alloc] init];
+            NSError *error = nil;
+            if (![fileManager removeItemAtURL:newURL error:&error]) {
+                NSLog(@"Error: %@", error);
+                // TODO handle the error
+            }
+            
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+    });
+}
+
+-(void) sortCells {
+
+    
+    [cells sortUsingComparator:^(id obj1, id obj2) {
+        NSDate *date1 = [obj1 date];
+        NSDate *date2 = [obj2 date];
+        // this gives decending (newest to oldest order.
+        return [date2 compare:date1];
+        // to get oldest to newest order, reverse the fields.
+
+    }];
+
 }
 
 @end

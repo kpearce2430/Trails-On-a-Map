@@ -27,13 +27,16 @@ typedef enum  { tomDDError = -1, tomDDUnknown, tomDDMiles, tomDDKilometers, tomD
 #define KEY_SPEED_UNITS          "ptDisplaySpeed"
 #define KEY_DISTANCE_UNITS       "ptDisplayDistance"
 #define KEY_PROPERTIES_SYNC      "ptPropertiesSync"  // Yes/No if properties are synced on iCloud.
+#define KEY_ICLOUD               "ptICloud"
 
 // Defaults
-#define TRAILS_ON_A_MAP             "Trails On A Map"
+#define TRAILS_ON_A_MAP          "Trails On A Map"
 #define TRAILS_DEFAULT_NAME       TRAILS_ON_A_MAP  // Used to be "Default"
-#define TOM_FILE_EXT                 ".tom"
-#define TOM_TOOL_BAR_HEIGHT          30
-#define TOM_LABEL_WIDTH             200
+#define TOM_FILE_EXT             ".tom"
+#define TOM_GPX_EXT              ".gpx"
+#define TOM_KML_EXT              ".kml"
+#define TOM_TOOL_BAR_HEIGHT      35
+#define TOM_LABEL_WIDTH          200
 
 // For the controllers
 #define ptTopMargin                 20.0
@@ -88,6 +91,7 @@ typedef enum  { tomDDError = -1, tomDDUnknown, tomDDMiles, tomDDKilometers, tomD
 
 #define TOM_SLIDER_NUM_PTS  61
 #define TOM_FONT            "Helvetica-Bold"
-#define TOM_PVC_EXTRA       400
+#define TOM_PVC_EXTRA       300
+
 
 #endif

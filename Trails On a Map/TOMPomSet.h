@@ -10,13 +10,17 @@
 #import <MapKit/MapKit.h>
 
 #import "TOMPointOnAMap.h"
+#import "TOMUrl.h"
+#import "TOMImageStore.h"
 
-@interface TOMPomSet : NSObject
-
+@interface TOMPomSet : UIDocument
 
 @property (nonatomic, strong) NSMutableArray *ptTrack;
-
 @property (nonatomic, readwrite) MKMapRect ptMapRect;
+
+@property (nonatomic, strong) UIImage* iconImage;
+@property (nonatomic, strong) NSFileWrapper *fileWrapper;
+
 
 - (id)initWithTitle: (NSString *) t;
 - (void)addPointOnMap:(TOMPointOnAMap *) p;
@@ -38,9 +42,17 @@
 - (NSTimeInterval) elapseTime;
 - (NSString *) elapseTimeString;
 - (NSInteger) numPics;
+- (double) averageSpeed;
+- (double) averageSpeedStraightLine;
 
+// @property (nonatomic, weak) id <TOMPomSetDelegate> delegate;
+
+// + (UIImage *) icon;
 // - (NSMutableArray *) pictureSet;
 // - (NSInteger) numStops;
 
-
 @end
+
+// @protocol TOMPomSetDelegate <NSObject>
+// -(void)noteDocumentContentsUpdated:(TOMPomSetDelegate*)noteDocument;
+// @end

@@ -12,6 +12,7 @@
 #import "TOMOrganizerViewController.h"
 #import "TOMSpeed.h"
 #import "TOMDistance.h"
+#import "TOMUrl.h"
 
 @interface TOMRootViewController ()
 
@@ -32,13 +33,14 @@
         // listen for key-value store changes externally from the cloud
         NSUbiquitousKeyValueStore *defaultStore ;
         //
+        // Set up listening for any updates on the properties.
+        //
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(updateCloudItems:)
                                                      name:NSUbiquitousKeyValueStoreDidChangeExternallyNotification
                                                    object:defaultStore];
         
         [[NSUbiquitousKeyValueStore defaultStore] synchronize];
-        // [defaultStore synchronize];
         
         //
         //
@@ -66,6 +68,10 @@
         //
         locationManager = [[ CLLocationManager alloc] init ];
         [locationManager setDelegate:self];
+        
+        // New for IOS7
+        //  For future, need to allow user to pick.
+        [locationManager setActivityType:CLActivityTypeOtherNavigation];
         
         // Build up the MKMapView
         CGRect mapRect = CGRectMake( 0.0, 0.0, screenWidth, (screenHeight - TOM_TOOL_BAR_HEIGHT ));
@@ -98,7 +104,7 @@
                                        action:@selector(takePicture:)];
 
         startStopItem = [[UIBarButtonItem alloc]
-                                          initWithTitle:@TOM_OFF_TEXT
+                                          initWithTitle:@TOM_ON_TEXT
                                           style:UIBarButtonItemStylePlain
                                           target:self
                                           action:@selector(startStop:)];
@@ -141,7 +147,9 @@
         //
         // Title
         self.title = @TRAILS_ON_A_MAP;
-        theTrail = [[TOMPomSet alloc] initWithTitle:@TRAILS_ON_A_MAP];
+        // Set up a blank document, other was parts of the map will not work.
+        NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+        theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
         myProperties = [[TOMProperties alloc]initWithTitle:@TRAILS_ON_A_MAP];
         [[NSUserDefaults standardUserDefaults] setValue:@TRAILS_ON_A_MAP forKey:@KEY_NAME];
 
@@ -149,7 +157,15 @@
         amiUpdatingLocation = NO;
         
         // Create the image store
-        imageStore = [[TOMImageStore alloc] init];
+        // imageStore = [[TOMImageStore alloc] init];
+        
+        // Please note that I have not created theTrail or the properties.
+        // It's an empty UIDocument until the user turns on the navigation or
+        // Selections a file name.
+        activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+        [activityIndicator setCenter:CGPointMake(screenWidth/2.0, screenHeight/2.0)];
+        [activityIndicator hidesWhenStopped];
+        [self.view addSubview:activityIndicator];
     }
     return self;
 }
@@ -165,8 +181,85 @@
     // Request to turn on accelerometer and begin receiving accelerometer events
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
+
+    BOOL yn = NO;
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_ICLOUD] != nil)
+    {
+        yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_ICLOUD];
+    }
+    else
+        yn = NO;
     
-    
+    if (yn == NO) {
+        //
+        // Previously, the app marked that iCloud was not available.
+        // Let's check to see if it is:
+        //
+        if ([TOMUrl isIcloudAvailable]) {
+            //
+            // It is available,  let see if the user has saved off any documents in the
+            // local directory and copy them to the iCloud.
+            //
+            // NSLog(@"%s : iCloud Document Available",__func__);
+            yn = YES;
+            [[NSUserDefaults standardUserDefaults] setBool:yn forKey:@KEY_ICLOUD];
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+
+            NSURL *icloudURL = [TOMUrl urlForICloudDocuments];
+            
+            // Look for local files on the device's documents directory and copy them
+            // to the iCloud.
+            NSURL *defaultURL = [TOMUrl urlForDefaultDocuments];
+            
+            NSArray *keys = [NSArray arrayWithObjects:
+                             NSURLIsDirectoryKey, NSURLIsPackageKey, NSURLLocalizedNameKey, nil];
+            
+            NSFileManager *fileManager = [[NSFileManager alloc]init];
+            
+            NSDirectoryEnumerator *enumerator = [fileManager
+                                                 enumeratorAtURL:defaultURL
+                                                 includingPropertiesForKeys:keys
+                                                 options:(NSDirectoryEnumerationSkipsPackageDescendants |
+                                                          NSDirectoryEnumerationSkipsHiddenFiles)
+                                                 errorHandler:^(NSURL *url, NSError *error) {
+                                                     // Handle the error.
+                                                     // Return YES if the enumeration should continue after the error.
+                                                     return     YES;
+                                                 }];
+            
+            for (NSURL *url in enumerator) {
+                
+                NSError *err = nil;
+                NSLog(@"%s URL:%@",__func__,[url path]);
+                NSString *path = [url path];
+                NSArray *parts = [path componentsSeparatedByString:@"/"];
+                NSString *fileName = [parts objectAtIndex:[parts count]-1];
+                if ([fileName hasSuffix:@TOM_FILE_EXT]) {
+                    NSURL *destinationURL = [icloudURL URLByAppendingPathComponent:fileName isDirectory:NO];
+                
+                    if (![fileManager fileExistsAtPath:[destinationURL path] isDirectory:NO]) {
+                        [fileManager copyItemAtURL:url toURL:destinationURL error:&err];
+                        if (err) {
+                            NSLog(@"%s : Error copy to icloud: %@",__func__,err);
+                        }
+                    }
+                }
+            }
+            });
+        }
+    }
+    //
+    // iCloud was available, let see if it still is
+    //
+    else if (![TOMUrl isIcloudAvailable]) {
+        //
+        // The user has turned off iCloud.  Mark it in the properties
+        // Any subsequent functions/methods will need to address this too.
+        //
+        yn = NO;
+        [[NSUserDefaults standardUserDefaults] setBool:yn forKey:@KEY_ICLOUD];
+    }
 }
 
 //
@@ -176,14 +269,22 @@
     // Request to stop receiving accelerometer events and turn off accelerometer
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    
+    // Need to close any open documents here:
+    if (![self.title isEqualToString:@TRAILS_DEFAULT_NAME]) {
+        // Save document
+        NSLog(@"%s Saving trails", __func__ );
+        NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+        [self saveTrails:fileURL update:NO]; // we are done?
+    }
 }
 
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //
 
-- (void) viewDidAppear:(BOOL)animated
-{
+- (void) viewDidAppear:(BOOL)animated {
+    
     //
     //  This will center the world view on my current location.
     CLLocation *userCoordinate = locationManager.location;
@@ -195,7 +296,7 @@
     //
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_NAME] != nil)
     {
-        NSString *newPath = NULL;
+        // NSString *newPath = NULL;
         NSString *newTitle = [[NSUserDefaults standardUserDefaults] stringForKey:@KEY_NAME];
         //
         // It's not the default name and it's not the same as the old name,
@@ -203,51 +304,65 @@
         //
         if ([newTitle isEqualToString:self.title]) {
             // Do nothing
-            NSLog(@"Did not change title[%@]",newTitle);
+            NSLog(@"%s Did not change title[%@]",__func__,newTitle);
         }
         else if ([self.title isEqualToString:@TRAILS_DEFAULT_NAME]) {
             //
-            // What to do if the name is the Deafult.
-            // NSLog(@"Still Default[%@], let's go on",newTitle);
+            // What to do if the current name is the Deafult.
+            // and the user has picked a new name either from the
+            // orgainizer viewer or the properties views (or any subsequent
+            // view added in the future.
             //
-            if ((newPath = [theTrail tomArchivePathWithTitle:newTitle]) &&
-                 [[NSFileManager defaultManager] fileExistsAtPath:newPath]) {
+            NSURL *fileURL = [TOMUrl fileUrlForTitle:newTitle];
+            NSFileManager *fm = [NSFileManager new];
+            if ([fm fileExistsAtPath:[fileURL path]]) {
                 //
                 // User picked to load an existing trail from the default name
                 // Clear everything:
                 //
-                amiUpdatingLocation = NO;
-                startStopItem.title = @TOM_OFF_TEXT;
-                [locationManager stopUpdatingLocation];
-                [locationManager stopUpdatingHeading];
-                [ptTimer invalidate]; // Stop the timer
-                
+                if (amiUpdatingLocation == YES) {
+                    amiUpdatingLocation = NO;
+                    startStopItem.title = @TOM_ON_TEXT;
+                    [locationManager stopUpdatingLocation];
+                    [locationManager stopUpdatingHeading];
+                    [ptTimer invalidate]; // Stop the timer
+                }
                 [worldView removeAnnotations:theTrail.ptTrack];
+                
+                // Clear any remaining annotations.
                 for (id<MKAnnotation> currentAnnotation in worldView.annotations) {
                     [worldView removeAnnotation:currentAnnotation];
                 }
-                [worldView removeOverlay:(id <MKOverlay>)mapPoms];
+                
 
-                theTrail = [[TOMPomSet alloc] initWithTitle:@TRAILS_DEFAULT_NAME];
                 if (!mapPoms) {
                     mapPoms = [[TOMMapSet alloc] init];
                 }
-                else
+                else {
+                    [worldView removeOverlay:(id <MKOverlay>)mapPoms];
                     [mapPoms clearPoms];
+                }
+                
+                //
+                [self->worldView addOverlay:(id <MKOverlay>)mapPoms];
+                
                 [self setTitle:newTitle];
                 [myProperties setPtName:newTitle];
-                [self->worldView addOverlay:(id <MKOverlay>)mapPoms];
+                
                 // and load the new trail
-                [self loadTrails:newTitle];
+                theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
+                [self loadTrails:fileURL];
                 [self processMyLocation:userCoordinate type:ptUnknown];
             }
             else {
                 //    the points of the trail will be kept as the new name
                 //    no action required.
+                theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
+                myProperties = [[TOMProperties alloc]initWithTitle:newTitle];
+                
                 [self setTitle:newTitle];
                 [myProperties setPtName:newTitle];
             }
-
             //
         } // end if old title is default
         else { // old title was not the default name
@@ -255,14 +370,15 @@
             //  Save off the old track             //
             if (amiUpdatingLocation == YES) {
                 NSLog(@"Saving[%@]",self.title);
-                [self saveTrails:self.title];
+                NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+                [self saveTrails:fileURL update:NO]; //
                 amiUpdatingLocation = NO;
-                startStopItem.title = @TOM_OFF_TEXT;
+                startStopItem.title = @TOM_ON_TEXT;
                 [locationManager stopUpdatingLocation];
                 [locationManager stopUpdatingHeading];
                 [ptTimer invalidate]; // Stop the timer
             }
-            
+
             //
             // Clean it up
             //
@@ -280,15 +396,18 @@
             
             [self->worldView addOverlay:(id <MKOverlay>)mapPoms];
             
+            
             //  Load in the new one.
+            NSURL *fileURL = [TOMUrl fileUrlForTitle:newTitle];
+            theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
+            myProperties = [[TOMProperties alloc]initWithTitle:newTitle];
+            
             [self setTitle:newTitle];
             [myProperties setPtName:newTitle];
-            theTrail = [[TOMPomSet alloc] initWithTitle:newTitle];
             
-            if ((newPath = [theTrail tomArchivePathWithTitle:newTitle]) &&
-                [[NSFileManager defaultManager] fileExistsAtPath:newPath]) {
-                // NSLog(@"%@ Exists",newPath);
-                [self loadTrails:newTitle];
+            NSFileManager *fm = [NSFileManager new];
+            if ([fm fileExistsAtPath:[fileURL path]]) {
+                    [self loadTrails:fileURL];
             }
         }
     }
@@ -629,7 +748,7 @@
     // NSLog(@"Location %@", [loc description]);
     [worldView setShowsUserLocation:YES];
     
-    NSTimeInterval t = [[ loc timestamp ] timeIntervalSinceNow];
+    // NSTimeInterval t = [[ loc timestamp ] timeIntervalSinceNow];
     
     // NSLog(@"Speed: %.2f",[loc speed]);
     // NSLog(@"Time: %f", t);
@@ -637,11 +756,12 @@
         NSLog(@"Speed[%.2f] less than 0",loc.speed);
         return;
     }
+    /*
     else if ( t < -0.05 ) {
         // This is cached data, dont want it, keep looking
         NSLog(@"Cached Loc %@@",loc);
         return;
-    }
+    } */
     else {
         // NSLog(@"Using Loc %@@",loc);
         TOMPointOnAMap *lastPoint = [theTrail lastPom];
@@ -796,8 +916,9 @@
 //
 - (IBAction)startStop:(id)sender
 {
-    NSLog(@"In startStop");
+    // NSLog(@"In startStop");
     UIBarButtonItem *startStopBarButton = (UIBarButtonItem *)sender;
+    static NSDateFormatter *dateFormatter = nil;
     
     if (amiUpdatingLocation == NO)
     {
@@ -805,15 +926,30 @@
         // NSLog(@TOM_ON_TEXT);
         amiUpdatingLocation = YES;
         startStopBarButton.title = @TOM_OFF_TEXT;
+        // [activityIndicator startAnimating];
         
-        if (![self.title isEqual: @TRAILS_DEFAULT_NAME]   ) {
+        if ([self.title isEqual: @TRAILS_DEFAULT_NAME]) {
             //
-            // If there was some POMs, loadPOMs returns YES
+            // At this point the user has left the default name and
+            // turned on the collection of points.  The new name
+            // will be the default name with the time appended on to it.
             //
-            if ( [theTrail loadPoms:NULL] == YES)
-            {
-                [self loadTrails:NULL];
+            NSDate* now = [NSDate date];
+            
+            if (!dateFormatter) {
+                dateFormatter = [[NSDateFormatter alloc] init];
+                [dateFormatter setDateFormat:@"YYYY-MM-dd HH:mm:ss"];
             }
+            
+            NSString *dateStr = [dateFormatter stringFromDate:now];
+            NSString *nameStr = [NSString stringWithFormat:@"Trail %@",dateStr];
+            self.title = nameStr ;
+            [[NSUserDefaults standardUserDefaults] setValue:nameStr forKey:@KEY_NAME];
+            
+            NSURL *fileURL = [TOMUrl fileUrlForTitle:nameStr];
+
+            theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
+            myProperties = [[TOMProperties alloc]initWithTitle:nameStr];
         }
         
         [worldView setDelegate:self];
@@ -842,15 +978,21 @@
         // NSLog(@TOM_OFF_TEXT);
         amiUpdatingLocation = NO;;
         startStopBarButton.title = @TOM_ON_TEXT;
-        [ptTimer invalidate]; // Stop the timer
+        
+        // Stop the timer
+        [ptTimer invalidate];
         
         [locationManager stopUpdatingLocation];
         [locationManager stopUpdatingHeading];
         
-        [self saveTrails:NULL];
+        //  This will need to be changed to handing the UIDocument Class:
+        NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+        [self saveTrails:fileURL update:NO];
     }
+
     return;
 }
+
 //
 // Camera code.........................................................................
 //
@@ -884,6 +1026,8 @@
                                       otherButtonTitles:@"Camera", @"Photo Library", nil];
         [cameraActions showFromToolbar:toolbar];
         [cameraActions showInView:self.view];
+        [cameraActions setTag:2];
+
 
     }
     else if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
@@ -914,15 +1058,25 @@
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     NSLog(@"Button Index:%ld",(long)buttonIndex);
-    switch (buttonIndex)
-    {
-        case 0: // Launch Camera
-            [self launchCamera];
+    NSInteger myTag = [actionSheet tag];
+    
+    if (myTag == 1) {
+        // This is the actions for the iCloud check
+        NSLog(@"User Selected to go to setting to do iCloud Stuff");
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs:root=CASTLE&path=STORAGE_AND_BACKUP"]];
+        return;
+    }
+    else {
+        switch (buttonIndex)
+        {
+            case 0: // Launch Camera
+                [self launchCamera];
             break;
-        case 1: // Launch Photo Library
-        // FFU: case 2: // Saved Photos Album
-            [self launchPhotoLibrary];
+            case 1: // Launch Photo Library
+                // FFU: case 2: // Saved Photos Album
+                [self launchPhotoLibrary];
             break;
+        }
     }
 }
 
@@ -963,14 +1117,11 @@
     
     TOMPointOnAMap *imagePebble = [[TOMPointOnAMap alloc] initWithImage: image location:imageloc heading: imagehdng];
     [theTrail addPointOnMap:imagePebble];
-    
-    NSString *myKey = [imagePebble key];
-    
-    [imageStore setImage:image forKey:myKey save:YES];
 
-
-    
+    // NSString *myKey = [imagePebble key];
+    // [imageStore setImage:image forKey:myKey save:YES];
     // UIImage *originalImage = ...
+    
     // Save off an icon - the last pic taken will the trails icon
     // Future:  Let the user pic the picture for the icon.
     CGSize destinationSize = CGSizeMake(90.0f, 90.0f);
@@ -980,13 +1131,8 @@
     UIGraphicsEndImageContext();
     if (![self.title isEqual: @TRAILS_DEFAULT_NAME]   ) {
         NSString *tomIcon = [[NSString alloc] initWithFormat:@"%@.icon",self.title];
-        // NSString *tomIcon = [NSString initWithFormat:@"%s.icon",[self.title]];
-        [imageStore saveImage:newImage forKey:tomIcon];
+        [TOMImageStore saveImage:newImage forKey:tomIcon];
     }
-    
-#ifdef __FFU__
-    imagePebble.image = newImage;
-#endif
 
     // add a parameter to save to album or
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
@@ -1004,9 +1150,11 @@
 //
 -(IBAction)organizeTrails:(id)sender
 {
+    if (![self.title isEqual: @TRAILS_DEFAULT_NAME]   ) {
+        NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+        [self saveTrails:fileURL update:NO];
+    }
     
-    [self saveTrails:NULL];
-
     UIViewController *ptController = [[TOMOrganizerViewController alloc] initWithNibName:@"TOMOrganizerViewController" bundle:nil ];
     
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
@@ -1025,17 +1173,19 @@
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //  Wrapper functions to load and save the data.
 //
-- (BOOL) loadTrails:(NSString *) title
+- (BOOL) loadTrails:(NSURL *) fileURL
 {
+    BOOL result = NO;
+    
+    [activityIndicator startAnimating];
     //
-    // There was some pebbles if loadPoms returns YES
     //
-    // NSLog(@"loading[%@]",title);
-    if ( [theTrail loadPoms:title] == YES)
+    if ([theTrail loadFromContents:fileURL ofType:nil error:nil]== YES)
     {
         //
         // Check to see if the other objects like pictures are there
         //
+#ifdef __NUA__
         UIImage *img;
         for (int i = 0 ; i < [theTrail.ptTrack count]; i++)
         {
@@ -1054,6 +1204,7 @@
                 }
             }
         }
+#endif
         
         if (!mapPoms) {
             mapPoms = [[TOMMapSet alloc] init];
@@ -1066,30 +1217,38 @@
              [worldView addOverlay:(id <MKOverlay>)mapPoms];
 
         [worldView setDelegate:self];
-        return YES;
+        
+        result = YES;
     }
-    else
-        return NO;
+    
+    [activityIndicator stopAnimating];
+    
+    return result;
 }
 
 //  * * * * * * * *
 
--(BOOL) saveTrails:(NSString *)title
+-(BOOL) saveTrails:(NSURL *)fileURL update:(BOOL) yn
 {
+    BOOL result = NO;
     // NSLog(@"savePebbleTracks:[%@]",title);
+    [activityIndicator startAnimating];
     
-    if  (title) {
-        return [theTrail savePoms:title];
+    if (yn == YES) {
+        // This is just an update - the user has gone off
+        // to do something else and it's a good time to push
+        // any updates to the file
+        [theTrail updateChangeCount:UIDocumentChangeDone];
+        result = YES;
     }
-    else if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_NAME] != nil)
-    {
-        NSString *Title = [[NSUserDefaults standardUserDefaults] stringForKey:@KEY_NAME];
-        if (![Title isEqualToString:@TRAILS_DEFAULT_NAME])
-        {
-            return [theTrail savePoms:Title];
-        }
+    else {
+        [theTrail saveToURL:fileURL forSaveOperation:UIDocumentSaveForOverwriting completionHandler:nil];
+        result = YES;
     }
-    return NO;
+
+    [activityIndicator stopAnimating];
+    
+    return result;
 }
 
 //

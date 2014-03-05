@@ -77,6 +77,9 @@
 @property (nonatomic, readwrite) UILabel *syncLabel;
 @property (nonatomic, readwrite) UISwitch *syncSwitch;
 
+@property (nonatomic, readwrite) UILabel *iCloudLabel;
+@property (nonatomic, readwrite) UISwitch *iCloudSwitch;
+
 @property (nonatomic, readwrite) UIButton *resetButton;
 
 - (BOOL) textFieldShouldReturn:(UITextField *)textField;

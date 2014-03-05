@@ -11,6 +11,7 @@
 
 @implementation TOMImageStore
 
+#ifdef __NUA__
 + (id) allocWithZone:(NSZone *)zone
 {
     return [self sharedStore];
@@ -31,9 +32,9 @@
 -(id) init
 {
     self = [super init];
-    if (self) {
-        dictionary = [[NSMutableDictionary alloc] init];
-    }
+//    if (self) {
+//       dictionary = [[NSMutableDictionary alloc] init];
+//    }
     return self;
 }
 
@@ -42,7 +43,7 @@
 //
 -(BOOL) setImage:(UIImage *)i forKey:(NSString *)s save:(BOOL)yn
 {
-    [dictionary setObject:i  forKey:s];
+//    [dictionary setObject:i  forKey:s];
     if (yn == YES)
     {
         return [self saveImage:i forKey:s];
@@ -53,12 +54,13 @@
 
 -(void) setImage:(UIImage *)i forKey:(NSString *)s
 {
-    [dictionary setObject:i forKey:s];
+//    [dictionary setObject:i forKey:s];
 }
 
 -(UIImage *) imageForKey:(NSString *)s
 {
-    return [dictionary objectForKey:s];
+//    return [dictionary objectForKey:s];
+    return nil;
 }
 
 //
@@ -78,16 +80,17 @@
 //
 - (void) deleteImageForKey:(NSString *)s
 {
-    if (!s)
+//    if (!s)
         return;
-    else
-        [dictionary removeObjectForKey:s];
+//    else
+//        [dictionary removeObjectForKey:s];
 }
+#endif
 
 //
 // Functions for save and loading images
 //
-- (NSString *) pathForImage:(NSString *)key
++ (NSString *) pathForImage:(NSString *)key
 {
     NSArray *documentDirectories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *fileName = [ key stringByAppendingString:@".jpg"]; // future property
@@ -98,11 +101,10 @@
     NSString *documentDirectory = [ documentDirectories objectAtIndex:0];
     
     return [documentDirectory stringByAppendingPathComponent:fileName];
-    
 }
 
 
-- (BOOL) saveImage:(UIImage *)i forKey:(NSString *)s
++ (BOOL) saveImage:(UIImage *)i forKey:(NSString *)s
 {
     // Here is code to save to the Documents directory on iOS that is from working code.
     
@@ -117,11 +119,11 @@
     // return YES;
 }
 
-- (UIImage *) loadImage: (NSString *) s warn:(BOOL) yn
++ (UIImage *) loadImage: (NSString *) s warn:(BOOL) yn
 {
     
     if (!s) {
-        NSLog(@"ERROR: %s %d No Key Provided to Load Image",__FUNCTION__,__LINE__);
+        NSLog(@"ERROR: %s %d:No Key Provided to Load Image",__FUNCTION__,__LINE__);
         return NULL;
     }
     
@@ -135,7 +137,7 @@
     
     if (err) {
         if (yn == YES)
-            NSLog(@"%s: %@",__func__,err);
+            NSLog(@"%s %@",__func__,err);
         
         return nil;
     }
@@ -145,7 +147,7 @@
     }
 }
 
-- (BOOL) removeImage: (NSString *) s
++ (BOOL) removeImage: (NSString *) s
 {
     BOOL removeSuccess = NO;
     

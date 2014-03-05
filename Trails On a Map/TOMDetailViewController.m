@@ -8,13 +8,14 @@
 
 #import "TOMDetailViewController.h"
 
+
 @interface TOMDetailViewController ()
 
 @end
 
 @implementation TOMDetailViewController
 
-@synthesize theTrail,detailTable, footerLabelFont, headerLabelFont, picCount, imagesSet, imageStore, iCloudSwitch; // trailCollectionList, trailCollectionView;
+@synthesize theTrail,detailTable, footerLabelFont, headerLabelFont, picCount, imagesSet, /* imageStore,*/ gpxSwitch, kmlSwitch; // trailCollectionList, trailCollectionView;
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -77,17 +78,24 @@
     
     //
     // load the selected map
-    theTrail = [[TOMPomSet alloc] initWithTitle:self.title];
-    [self.theTrail loadPoms:self.title];
+    //
+    NSFileManager *fm = [[NSFileManager alloc] init];
+    // NSFileManager *fm = [NSFileManager new];
     
-    imageStore = [[TOMImageStore alloc] init];
+    NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title ];
+    theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
+    if ([fm fileExistsAtPath:[fileURL path]]) {
+        [theTrail loadFromContents:fileURL ofType:nil error:nil];
+    }
+    
+    // imageStore = [[TOMImageStore alloc] init];
     
     imagesSet = [[NSMutableArray alloc] init];
     
     for (int i = 0 ; i < [theTrail.ptTrack count]; i++ ) {
         TOMPointOnAMap *p = [theTrail.ptTrack objectAtIndex:i];
         if ([p type] == ptPicture) {
-            UIImage *myImage = [imageStore loadImage:[p key] warn:NO];
+            UIImage *myImage = [p image];
             if (myImage == NULL) {
                 myImage = [UIImage imageNamed:@"pt114x114.png"];
             }
@@ -152,7 +160,7 @@
 - (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
     
     if ([tableView isEqual:detailTable]) {
-        return 2;
+        return 3;
     }
     else {
         NSLog(@"ERROR: %s:%d Invalid table view passed:%@", __func__, __LINE__ , tableView);
@@ -166,10 +174,10 @@
 
     if ([tableView isEqual:detailTable]) {
         switch (section) {
-            case 0:
-                return 3;
+            case 0: // Trail Flags
+                return 2;
                 break;
-            case 1:
+            case 1: // Trail Pictures;
                 picCount = [theTrail numPics];
                 if (picCount == 0 )
                     return 1;
@@ -177,8 +185,8 @@
                     return picCount;
                 break;
                 
-            case 2:
-                return 1;
+            case 2: // Trail Details
+                return 5;
             default:
                 break;
         }
@@ -203,13 +211,22 @@
             case 0:
                 if (indexPath.row == 0) {
                     CGRect switchFrame = CGRectMake( 0.0f, 0.0f, 150.0f, 25.0f );
-                    cell.textLabel.text = @"iCloud ON/OFF";
-                    iCloudSwitch = [[UISwitch alloc] initWithFrame:switchFrame];
-                    [iCloudSwitch setOn:NO];
-                    cell.accessoryView = iCloudSwitch;
+                    cell.textLabel.text = @"Save Trail as GPX";
+                    gpxSwitch = [[UISwitch alloc] initWithFrame:switchFrame];
+                    [gpxSwitch setOn:NO];
+                    cell.accessoryView = gpxSwitch;
                 }
-                else
+                else if (indexPath.row == 1) {
+                    CGRect switchFrame = CGRectMake( 0.0f, 0.0f, 150.0f, 25.0f );
+                    cell.textLabel.text = @"Save Trail as KML";
+                    kmlSwitch = [[UISwitch alloc] initWithFrame:switchFrame];
+                    [kmlSwitch setOn:NO];
+                    cell.accessoryView = kmlSwitch;
+                }
+                else {
+                    NSLog(@"%s ERROR FFU Cell Reached",__func__);
                     cell.textLabel.text = [ NSString stringWithFormat:@"FFU Section %ld, Cell %ld",(long)indexPath.section,(long)indexPath.row];
+                }
                 break;
             
             case 1:
@@ -218,7 +235,7 @@
                     cell.textLabel.text = @"No Pictures in Trail";
                 }
                 else {
-                    cell.textLabel.text = [ NSString stringWithFormat:@"Picture Cell %ld",(long)indexPath.row];
+                    cell.textLabel.text = [ NSString stringWithFormat:@"Picture %ld",(long)indexPath.row];
                     UIImage *cellImage = [imagesSet objectAtIndex:indexPath.row];
                     // UIImage *originalImage = ...;
                     CGSize destinationSize = CGSizeMake(90.0f, 90.0f);
@@ -233,12 +250,38 @@
                     cell.imageView.layer.cornerRadius = TOM_LABEL_BORDER_CORNER_RADIUS;
                 }
                 break;
-    
+
+            case 2:
+                if (indexPath.row == 0) {
+                    double totalDistance = [TOMDistance displayDistance:[theTrail distanceTotalMeters]];
+                    cell.textLabel.text = [ NSString stringWithFormat:@"Total Distance: %.02f %@",totalDistance,[TOMDistance displayDistanceUnits]];
+                }
+                else if (indexPath.row == 1) {
+                    double straightLineDistance = [TOMDistance displayDistance:[theTrail distanceStraightLine]];
+                    cell.textLabel.text = [ NSString stringWithFormat:@"Straight Line Distance: %.02f %@",straightLineDistance,[TOMDistance displayDistanceUnits]];
+                }
+                else if (indexPath.row == 2) {
+                    cell.textLabel.text = [ NSString stringWithFormat:@"Elapse Time: %@",[theTrail elapseTimeString]];
+                                        cell.textLabel.font = footerLabelFont;
+                }
+                else if (indexPath.row == 3) {
+                    cell.textLabel.text = [ NSString stringWithFormat:@"Avg Speed Total Dist: %.02f %@",[TOMSpeed displaySpeed:[theTrail averageSpeed]],[TOMSpeed displaySpeedUnits]];
+                }
+                else if (indexPath.row == 4) {
+                    cell.textLabel.text = [ NSString stringWithFormat:@"Avg Speed SL Dist: %.02f %@",[TOMSpeed displaySpeed:[theTrail averageSpeedStraightLine]],[TOMSpeed displaySpeedUnits]];
+                }
+                else {
+                    cell.textLabel.text = [ NSString stringWithFormat:@"Detail Cell %ld",(long)indexPath.row];
+                }
+
+                break;
+            
             default:
                 cell.textLabel.text = [ NSString stringWithFormat:@"Section %ld, Cell %ld",(long)indexPath.section,(long)indexPath.row];
                 break;
         }
     }
+    cell.textLabel.font = headerLabelFont;
     return cell;
 }
 //
@@ -260,14 +303,18 @@
     
     switch (section)
     {
-    case 0:
+        case 0:
             text = [[NSString alloc] initWithFormat:@"Trail Properties"];
             break;
-    case 1:
-        text = [[NSString alloc] initWithFormat:@"Photos"];
-        break;
-    default:
-        text = [[NSString alloc] initWithFormat:@"Section %ld Header",(long)section ];
+        case 1:
+            text = [[NSString alloc] initWithFormat:@"Trail Photos"];
+            break;
+        case 2:
+            text = [[NSString alloc] initWithFormat:@"Trail Details"];
+            break;
+        default:
+            text = [[NSString alloc] initWithFormat:@"Section %ld Header",(long)section ];
+            break;
     }
 
     UILabel *label = [self newLabelWithTitle: text];
@@ -277,7 +324,7 @@
     [label setTextAlignment:NSTextAlignmentCenter];
     // Give the container view 10 poionts more in width than our label
     // becuause the lable needs a 10 extra points left-margin
-    CGRect resultFrame = CGRectMake(0.0f, 0.0f, label.frame.size.width+10.0f, label.frame.size.height);
+    CGRect resultFrame = CGRectMake(0.0f, 0.0f, label.frame.size.width+10.0f, label.frame.size.height+20);
     UIView *header = [[UIView alloc] initWithFrame:resultFrame];
     [header addSubview:label];
     return header;
@@ -287,7 +334,7 @@
 #ifdef __FFU__
 - (UIView *) tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
  
-    NSString *text = [[NSString alloc] initWithFormat:@"Section %d Footer",section+1 ];
+    NSString *text = [[NSString alloc] initWithFormat:@"Section %ld Footer",section ];
     UILabel *label = [self newLabelWithTitle: text];
     
     label.frame = CGRectMake(label.frame.origin.x+10.0f, 5.0f, label.frame.size.width, label.frame.size.height);

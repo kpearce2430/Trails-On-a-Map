@@ -89,7 +89,7 @@
         [self setHeading:h];
         [self setType:ptLocation];
         [self generateMyKey:0];
-        
+        [self setImage:nil];
         CLLocationSpeed mySpeed = [TOMSpeed displaySpeed:speed];
         title = [NSString stringWithFormat:@"%@: %.4f %.4f %.2f%@", @POM_TYPE_LOCATION, self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
     }
@@ -105,7 +105,7 @@
         [self setHeading:hdng];
         [self setType:ptPicture];
         [self generateMyKey:0];
-        // self setImage:myImage];
+        [self setImage:myImage];
         title = [NSString stringWithFormat:@"%@: %.4f %.4f", @POM_TYPE_PICTURE, self.coordinate.latitude, self.coordinate.longitude ];
     }
     return self;
@@ -123,6 +123,8 @@
         [self setHeading:hdng];
         [self setType:ptLocation];
         [self generateMyKey:0];
+        [self setImage:nil];
+        
         CLLocationSpeed mySpeed = [TOMSpeed displaySpeed:speed];
         title = [NSString stringWithFormat:@"%@: %.4f %.4f %.2f%@", @POM_TYPE_LOCATION, self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
     }
@@ -141,6 +143,8 @@
         [self copyLocation:loc];
         [self setHeading:hdng];
         [self setType:pt];
+        [self setImage:nil];
+    
         CLLocationSpeed mySpeed = [TOMSpeed displaySpeed:speed];
         switch (pt) {
             case ptError:
@@ -153,10 +157,10 @@
                 title = [NSString stringWithFormat:@"%@: %.4f %.4f %.2f%@", @POM_TYPE_LOCATION, self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
                 break;
             case ptPicture:
-                title = [NSString stringWithFormat:@"%@: %.4f %.4f",      @POM_TYPE_PICTURE, self.coordinate.latitude, self.coordinate.longitude];
+                title = [NSString stringWithFormat:@"%@: %.4f %.4f",        @POM_TYPE_PICTURE, self.coordinate.latitude, self.coordinate.longitude];
                 break;
             case ptStop:
-                title = [NSString stringWithFormat:@"%@: %.4f %.4f",      @POM_TYPE_STOP, self.coordinate.latitude, self.coordinate.longitude];
+                title = [NSString stringWithFormat:@"%@: %.4f %.4f",        @POM_TYPE_STOP, self.coordinate.latitude, self.coordinate.longitude];
                 break;
             default:
                 title = [NSString stringWithFormat:@"%@: %.4f %.4f %.2f%@", @POM_TYPE_OTHER, self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
@@ -184,7 +188,11 @@
 {
     if (CLLocationCoordinate2DIsValid([self coordinate]) == YES) {
         
-        CLLocation *myloc = [[CLLocation alloc] initWithCoordinate:[self coordinate] altitude:[self altitude] horizontalAccuracy:[self horizontal] verticalAccuracy:[self vertical] timestamp:[self timestamp]];
+        CLLocation *myloc = [[CLLocation alloc] initWithCoordinate:[self coordinate]
+                                                          altitude:[self altitude]
+                                                horizontalAccuracy:[self horizontal]
+                                                  verticalAccuracy:[self vertical]
+                                                         timestamp:[self timestamp]];
         return myloc;
     }
     else
@@ -208,6 +216,7 @@
     [aCoder encodeDouble:vertical forKey:@"vacc"];
     [aCoder encodeDouble:horizontal forKey:@"hacc"];
     [aCoder encodeObject:timestamp forKey:@"timestamp"];
+    [aCoder encodeObject:image forKey:@"image"];
 }
 
 -(id) initWithCoder:(NSCoder *) aDecoder
@@ -235,6 +244,7 @@
         [self setTimestamp:[aDecoder decodeObjectForKey:@"timestamp"]];
         coordinate.latitude = mylat;
         coordinate.longitude = mylong;
+        image = [aDecoder decodeObjectForKey:@"image"];
     }
     return self;
 }

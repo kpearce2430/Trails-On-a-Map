@@ -19,8 +19,9 @@
 @synthesize scrollView,titleLabel, titleField, mapTypeLabel, mapTypeSegmentedControl, userTrackingLabel, userTrackingSegmentedControl,
             displaySpeedLabel, displaySpeedSegmentedControl,displayDistanceLabel, displayDistanceSegmentedControl, distanceFilterLabel,
             distanceFilterSliderCtl, accuracyFilterLabel, accuracyFilterSegmentedControl,
-            toggleLabel, locationLabel, locationSwitch, pictureLabel, pictureSwitch, stopLabel, stopSwitch, infoBarLabel, infoBarSwitch, speedBarSwitch, speedBarLabel,
-            syncLabel, syncSwitch, resetButton;
+            toggleLabel, locationLabel, locationSwitch, pictureLabel, pictureSwitch,
+            stopLabel, stopSwitch, infoBarLabel, infoBarSwitch, speedBarSwitch, speedBarLabel,
+            syncLabel, syncSwitch, iCloudLabel, iCloudSwitch, resetButton;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -327,6 +328,8 @@
     UISwitch *toggleOnOffSwitch = (UISwitch *)sender;
     BOOL yn = toggleOnOffSwitch.isOn;
     NSString *keyvalue = NULL;
+    // BOOL isIcloud = NO;
+
     
     switch ([sender tag]) {
             
@@ -362,6 +365,13 @@
             keyvalue = @KEY_PROPERTIES_SYNC;
             break;
 
+#ifdef __FFU__
+        case 9: // This is the iCloud property -
+            // it does not get synced in the NSUbiquitousKeyValueStore
+            keyvalue = @KEY_ICLOUD;
+            isIcloud = YES;
+            break;
+#endif
         default:
             NSLog(@"ERROR: %s Unknown Sender Tag for pt types",__func__);
             break;
@@ -372,12 +382,14 @@
         [[NSUserDefaults standardUserDefaults] setBool:yn forKey:keyvalue];
         
         // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
-        
+
+
         NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
-        if (yn)
+        if  (yn)
             [kvStore setString:@"YES" forKey:keyvalue];
         else
             [kvStore setString:@"NO" forKey:keyvalue];
+
     }
 }
 
@@ -440,7 +452,7 @@
     NSArray *segmentMapTypeContent  = [NSArray arrayWithObjects: @"Standard", @"Satellite", @"Hybrid", nil];
     NSArray *segmentUserTracking = [NSArray arrayWithObjects: @"None", @"Follow", @"Heading", nil];
     NSArray *accuracyTextContent = [NSArray arrayWithObjects: @"Nav", @"Best", @"10m", @"100m", @"1km", @"3km" , nil];
-    NSArray *pebbleTypeText = [NSArray arrayWithObjects: @"Locations:",@"Pictures:", @"Stops:", @"Notes", @"Sounds", @"Speed Time:",@"Distance Info:", @"Sync Properties:", nil];
+    NSArray *pebbleTypeText = [NSArray arrayWithObjects: @"Locations:",@"Pictures:", @"Stops:", @"Notes", @"Sounds", @"Speed Time:",@"Distance Info:", @"Sync Properties:", @"Sync Trails on iCloud",nil];
     NSArray *displaySpeedText = [NSArray arrayWithObjects:@"M P H",@"K P H",@"M P M",@"M P S", nil]; // Miles per Hour, KM per Hour, Min / Mile, Meters / Sec
     NSArray *displayDistanceText = [NSArray arrayWithObjects:@"Miles",@"Kilometers", @"Meters", @"Feet", nil];
     
@@ -800,7 +812,7 @@
     [scrollView addSubview:toggleLabel];
     
     // for (POMType pt = ptLocation; pt <= ptSound; pt++ )
-    for (NSInteger pt = 1; pt <=8 ; pt++)
+    for (NSInteger pt = 1; pt < 9 ; pt++)
     {
         if (pt == ptNote || pt == ptSound) {
             continue;
@@ -929,7 +941,26 @@
                 [syncLabel setTextAlignment:NSTextAlignmentRight];
                 [scrollView addSubview:syncLabel];
                 break;
-                
+#ifdef __FFU__
+                //
+                // Apple doesn't want the application to control if files are saved to
+                // iCloud.   I'm leaving the case statement in for future use.
+            case 9:
+                iCloudSwitch = ptSwitch;
+                if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_ICLOUD] != nil)
+                {
+                    yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_ICLOUD];
+                }
+                else {
+                    yn = NO; // User must request iCloud storage of Documents
+                }
+                frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
+                iCloudLabel = [TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]];
+                [iCloudLabel setFont:myLabelFont];
+                [iCloudLabel setTextAlignment:NSTextAlignmentRight];
+                [scrollView addSubview:iCloudLabel];
+                break;
+#endif
             default:
                 yn = NO;  // default
                 break;
@@ -942,8 +973,9 @@
         // frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
         // [scrollView addSubview:[TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]]];
     }
+ 
     //
-    // Sync the properties via iCloud
+    // Finally - Add a reset button for the user to clear the trail.
     
     frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
     
@@ -1105,7 +1137,7 @@
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [stopSwitch setFrame:myrect];
         
-        // Speed Bar Switch Label
+        // Speed Bar Label
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
         [speedBarLabel setFrame:myrect];
@@ -1114,7 +1146,7 @@
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [speedBarSwitch setFrame:myrect];
         
-        // Info Bar Switch Label
+        // Info Bar Label
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
         [infoBarLabel setFrame:myrect];
@@ -1123,14 +1155,25 @@
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [infoBarSwitch setFrame:myrect];
         
-        // Info Bar Switch Label
+        // Sync Properties Switch Label
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
         [syncLabel setFrame:myrect];
         
-        // Info Bar Switch
+        // Sync Propoerties Switch
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [syncSwitch setFrame:myrect];
+
+#ifdef __FFU__
+        // iCloud Switch Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [iCloudLabel setFrame:myrect];
+        
+        // iCloud Switch
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [iCloudSwitch setFrame:myrect];
+#endif
         
         // Reset Button
         CGFloat buttonX = (screenWidth - (myX + ptRightMargin + 100.0)) / 2.0;
@@ -1262,15 +1305,26 @@
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [infoBarSwitch setFrame:myrect];
         
-        // Info Bar Switch Label
+        // Propeties Sync Switch Label
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
         [syncLabel setFrame:myrect];
         
-        // Info Bar Switch
+        // Propeties Sync Switch
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [syncSwitch setFrame:myrect];
+
+#ifdef __FFU__
+        // Propeties Sync Switch Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [iCloudLabel setFrame:myrect];
         
+        // Propeties Sync Switch
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [iCloudSwitch setFrame:myrect];
+#endif
+
         // Reset Button
         CGFloat buttonX = (screenWidth - (myX + ptRightMargin + 100.0)) / 2.0;
         myY += ptSegmentedControlHeight + SPACING;

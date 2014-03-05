@@ -10,6 +10,7 @@
 		AD26E2F8181B002D0021BEE2 /* TOMTrackView.m in Sources */ = {isa = PBXBuildFile; fileRef = AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */; };
 		AD26E2FB181B129A0021BEE2 /* TOMImageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */; };
 		AD31BFA7182EED5800BCEE96 /* TOMViewSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = AD31BFA6182EED5800BCEE96 /* TOMViewSlider.m */; };
+		AD35F19018C65510006314E1 /* TOMOrganizerViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AD35F18F18C65510006314E1 /* TOMOrganizerViewCell.m */; };
 		AD45010C181191AE00E76DE0 /* TOMPointOnAMap.m in Sources */ = {isa = PBXBuildFile; fileRef = AD45010B181191AE00E76DE0 /* TOMPointOnAMap.m */; };
 		AD45010F1811A77800E76DE0 /* TOMPomSet.m in Sources */ = {isa = PBXBuildFile; fileRef = AD45010E1811A77800E76DE0 /* TOMPomSet.m */; };
 		AD4501131812E74100E76DE0 /* TOMPropertyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */; };
@@ -44,11 +45,13 @@
 		AD7BECBA180E23220003187D /* TOMRootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD7BECB8180E23220003187D /* TOMRootViewController.xib */; };
 		AD7BECBE180E9CDB0003187D /* TOMProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = AD7BECBD180E9CDB0003187D /* TOMProperties.m */; };
 		AD7BECC0180F1AC10003187D /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = AD7BECBF180F1AC10003187D /* settings.png */; };
+		ADA6C32818B8063600F64E59 /* TOMUrl.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA6C32718B8063600F64E59 /* TOMUrl.m */; };
 		ADA795DE18205AD1004E383D /* TOMOrganizerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */; };
 		ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */; };
 		ADA795E31820988D004E383D /* pt57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E01820988D004E383D /* pt57x57.png */; };
 		ADA795E41820988D004E383D /* pt114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E11820988D004E383D /* pt114x114.png */; };
 		ADA795E51820988D004E383D /* pt120x120.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E21820988D004E383D /* pt120x120.png */; };
+		ADBF322F18BD454A00EBEF1D /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBF322E18BD454A00EBEF1D /* iAd.framework */; };
 		ADDE2927184A456F00CBB238 /* TOMSpeed.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDE2926184A456F00CBB238 /* TOMSpeed.m */; };
 		ADDE292A184A4C2000CBB238 /* TOMDistance.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDE2929184A4C2000CBB238 /* TOMDistance.m */; };
 		ADDE292C184D29F500CBB238 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADDE292B184D29F500CBB238 /* AssetsLibrary.framework */; };
@@ -71,6 +74,8 @@
 		AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMImageStore.m; sourceTree = "<group>"; };
 		AD31BFA5182EED5800BCEE96 /* TOMViewSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMViewSlider.h; sourceTree = "<group>"; };
 		AD31BFA6182EED5800BCEE96 /* TOMViewSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMViewSlider.m; sourceTree = "<group>"; };
+		AD35F18E18C65510006314E1 /* TOMOrganizerViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMOrganizerViewCell.h; sourceTree = "<group>"; };
+		AD35F18F18C65510006314E1 /* TOMOrganizerViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMOrganizerViewCell.m; sourceTree = "<group>"; };
 		AD45010A181191AE00E76DE0 /* TOMPointOnAMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPointOnAMap.h; sourceTree = "<group>"; };
 		AD45010B181191AE00E76DE0 /* TOMPointOnAMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMPointOnAMap.m; sourceTree = "<group>"; };
 		AD45010D1811A77800E76DE0 /* TOMPomSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPomSet.h; sourceTree = "<group>"; };
@@ -120,12 +125,15 @@
 		AD7BECBC180E9CDB0003187D /* TOMProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMProperties.h; sourceTree = "<group>"; };
 		AD7BECBD180E9CDB0003187D /* TOMProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMProperties.m; sourceTree = "<group>"; };
 		AD7BECBF180F1AC10003187D /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settings.png; sourceTree = "<group>"; };
+		ADA6C32618B8063600F64E59 /* TOMUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMUrl.h; sourceTree = "<group>"; };
+		ADA6C32718B8063600F64E59 /* TOMUrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMUrl.m; sourceTree = "<group>"; };
 		ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMOrganizerViewController.h; sourceTree = "<group>"; };
 		ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMOrganizerViewController.m; sourceTree = "<group>"; };
 		ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMOrganizerViewController.xib; sourceTree = "<group>"; };
 		ADA795E01820988D004E383D /* pt57x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt57x57.png; sourceTree = "<group>"; };
 		ADA795E11820988D004E383D /* pt114x114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt114x114.png; sourceTree = "<group>"; };
 		ADA795E21820988D004E383D /* pt120x120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt120x120.png; sourceTree = "<group>"; };
+		ADBF322E18BD454A00EBEF1D /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		ADDE2925184A456F00CBB238 /* TOMSpeed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMSpeed.h; sourceTree = "<group>"; };
 		ADDE2926184A456F00CBB238 /* TOMSpeed.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSpeed.m; sourceTree = "<group>"; };
 		ADDE2928184A4C2000CBB238 /* TOMDistance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDistance.h; sourceTree = "<group>"; };
@@ -138,6 +146,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ADBF322F18BD454A00EBEF1D /* iAd.framework in Frameworks */,
 				AD6F03571857DCC700753144 /* ImageIO.framework in Frameworks */,
 				ADDE292C184D29F500CBB238 /* AssetsLibrary.framework in Frameworks */,
 				AD7BECB5180E22EE0003187D /* CoreLocation.framework in Frameworks */,
@@ -185,6 +194,7 @@
 		AD7BEC7C180E22910003187D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ADBF322E18BD454A00EBEF1D /* iAd.framework */,
 				AD6F03561857DCC700753144 /* ImageIO.framework */,
 				ADDE292B184D29F500CBB238 /* AssetsLibrary.framework */,
 				AD7BECB4180E22ED0003187D /* CoreLocation.framework */,
@@ -211,6 +221,8 @@
 				AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */,
 				ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */,
 				ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */,
+				AD35F18E18C65510006314E1 /* TOMOrganizerViewCell.h */,
+				AD35F18F18C65510006314E1 /* TOMOrganizerViewCell.m */,
 				AD6F035E1858074F00753144 /* TOMPhotoAlbumViewController.h */,
 				AD6F035F1858074F00753144 /* TOMPhotoAlbumViewController.m */,
 				AD6F036A1858ADBA00753144 /* TOMPhotoGroupCell.h */,
@@ -237,6 +249,8 @@
 				ADDE2926184A456F00CBB238 /* TOMSpeed.m */,
 				ADDE2928184A4C2000CBB238 /* TOMDistance.h */,
 				ADDE2929184A4C2000CBB238 /* TOMDistance.m */,
+				ADA6C32618B8063600F64E59 /* TOMUrl.h */,
+				ADA6C32718B8063600F64E59 /* TOMUrl.m */,
 				AD7BEC94180E22910003187D /* Images.xcassets */,
 				AD7BEC91180E22910003187D /* Trails_On_a_Map.xcdatamodeld */,
 				AD7BEC86180E22910003187D /* Supporting Files */,
@@ -403,6 +417,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ADA6C32818B8063600F64E59 /* TOMUrl.m in Sources */,
 				AD45010F1811A77800E76DE0 /* TOMPomSet.m in Sources */,
 				AD7BEC8C180E22910003187D /* main.m in Sources */,
 				AD6F036C1858ADBA00753144 /* TOMPhotoGroupCell.m in Sources */,
@@ -419,6 +434,7 @@
 				AD26E2F8181B002D0021BEE2 /* TOMTrackView.m in Sources */,
 				AD7BECBE180E9CDB0003187D /* TOMProperties.m in Sources */,
 				AD6F03661858A88900753144 /* TOMPhotoGroupViewController.m in Sources */,
+				AD35F19018C65510006314E1 /* TOMOrganizerViewCell.m in Sources */,
 				AD7BEC93180E22910003187D /* Trails_On_a_Map.xcdatamodeld in Sources */,
 				AD6CD7E818244814005A0699 /* TOMDetailViewController.m in Sources */,
 				ADA795DE18205AD1004E383D /* TOMOrganizerViewController.m in Sources */,

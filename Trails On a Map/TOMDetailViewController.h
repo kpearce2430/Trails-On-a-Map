@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "TOMPomSet.h"
 #import "TOMImageStore.h"
+#import "TOMDistance.h"
+#import "TOMSpeed.h"
 
 static NSString *detailViewCellIdentifier = @"detaiViewCells";
 
@@ -25,11 +27,14 @@ static NSString *detailViewCellIdentifier = @"detaiViewCells";
 @property (nonatomic, strong) NSString *myName;
 @property (nonatomic, strong) NSMutableArray *imagesSet;
 @property (nonatomic, readwrite) NSInteger picCount;
-@property (nonatomic, readwrite) UISwitch *iCloudSwitch;
+
+@property (nonatomic, readwrite) UISwitch *gpxSwitch;
+@property (nonatomic, readwrite) UISwitch *kmlSwitch;
 
 @property (nonatomic, readonly) UIFont *headerLabelFont;
 @property (nonatomic, readonly) UIFont *footerLabelFont;
-@property (nonatomic, strong) TOMImageStore *imageStore;
+
+// @property (nonatomic, strong) TOMImageStore *imageStore;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil title:(NSString *) t;
 - (UILabel *) newLabelWithTitle:(NSString *)paramTitle;

@@ -41,7 +41,7 @@
     
     TOMTrackView  *trailView;
     TOMMapSet     *mapPoms;
-    TOMImageStore *imageStore;
+    // TOMImageStore *imageStore;
 }
 
 // These would be the current properties
@@ -49,13 +49,14 @@
 @property (nonatomic, readwrite) CLHeading *currentHeading;
 @property (nonatomic, strong)    IBOutlet MKMapView *worldView;
 
-@property (nonatomic, strong) TOMProperties *myProperties;
-@property (nonatomic, strong) TOMPomSet     *theTrail;
+@property (nonatomic, strong)    TOMProperties *myProperties;
+@property (nonatomic, strong)    TOMPomSet     *theTrail;
 
 @property (nonatomic, readwrite) BOOL amiUpdatingLocation;
 @property (nonatomic, readwrite) BOOL hidden;
+@property (nonatomic, readwrite) BOOL amiDeffered;
 
-@property (nonatomic, strong) UIImagePickerController *imagePicker;
+@property (nonatomic, strong)    UIImagePickerController *imagePicker;
 
 // Methods:
 - (void)updateCloudItems:(NSNotification *)notification;
@@ -64,8 +65,8 @@
 - (IBAction)takePicture:(id)sender;
 - (IBAction)organizeTrails:(id)sender;
 - (void) processMyLocation:(CLLocation *)newLocation type: (POMType) pt;
-- (BOOL) loadTrails:(NSString *) title;
-- (BOOL) saveTrails:(NSString *) title;
+- (BOOL) loadTrails:(NSURL *) fileURL;
+- (BOOL) saveTrails:(NSURL *) fileURL update:(BOOL) yn;
 - (void) launchCamera;
 - (void) launchPhotoLibrary;
 // - (CLLocationSpeed) displaySpeed: (CLLocationSpeed) s;

@@ -9,9 +9,11 @@
 #import <Foundation/Foundation.h>
 
 @interface TOMImageStore : NSObject
-{
-    NSMutableDictionary *dictionary;
-}
+
+#ifdef __NUA__
+// {
+//     NSMutableDictionary *dictionary;
+// }
 
 + (TOMImageStore *) sharedStore;
 
@@ -22,10 +24,11 @@
 
 - (void) deleteImageForKey:(NSString *) s;
 - (BOOL) deleteImageForKey:(NSString *) s remove:(BOOL) yn;
+#endif
 
-- (NSString *) pathForImage:(NSString *)key;
-- (BOOL) saveImage:(UIImage *)i forKey:(NSString *)s;
-- (UIImage *) loadImage: (NSString *) s  warn:(BOOL) yn;
-- (BOOL) removeImage: (NSString *) s;
++ (NSString *) pathForImage:(NSString *)key;
++ (BOOL) saveImage:(UIImage *)i forKey:(NSString *)s;
++ (UIImage *) loadImage: (NSString *) s  warn:(BOOL) yn;
++ (BOOL) removeImage: (NSString *) s;
 
 @end

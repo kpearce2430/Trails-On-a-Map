@@ -7,11 +7,11 @@
 //
 
 #import "TOMPomSet.h"
+// #import "TrailOnAMap.h"
 
 @implementation TOMPomSet
 
-
-@synthesize ptTrack, /* ptProperties, */ ptMapRect;
+@synthesize ptTrack, ptMapRect;
 
 //
 // * * * * * * * * * * * * * * * * * * * * * *
@@ -129,14 +129,31 @@
     
     NSError *error;
     [archivedTrack writeToFile:path options:NSDataWritingFileProtectionNone error:&error];
+
+    NSURL *iCloudDocs = [TOMUrl urlForDocumentsDirectory];
     
-    if (error)
-    {
-        NSLog(@"%@",error );
-        return NO;
+    if (iCloudDocs) {
+        NSString *fileName = [title stringByAppendingString:@TOM_FILE_EXT];
+        NSURL *documentURL = [iCloudDocs URLByAppendingPathComponent:fileName ];
+    
+        if (documentURL) {
+            NSError *err;
+            [archivedTrack writeToURL:documentURL options:NSDataWritingAtomic error:&err];
+            if  (err) {
+                NSLog(@"%s: Writing document: %@",__func__,err);
+            }
+        }
+        // [archivedTrack writeToURL:iCloudDocs atomically:YES];
+    
+        if (error)
+        {
+            NSLog(@"%@",error );
+            return NO;
+        }
+        else
+            return YES;
     }
-    else
-        return YES;
+    return NO;
 }
 
 //
@@ -175,16 +192,15 @@
 //
 - (BOOL) deletePoms:(NSString *) title
 {
-    NSString *path = NULL;
-    
-    if (title)
-        path = [self tomArchivePathWithTitle:title];
-    else
-        path = [self tomArchivePath];
+
+    NSURL *fileURL = [TOMUrl fileUrlForTitle:title];
     
     NSError *error;
-    [[NSFileManager defaultManager] removeItemAtPath: path error: &error];
-
+    NSFileManager *fm = [NSFileManager new];
+    if ([fm fileExistsAtPath:[fileURL path]]) {
+        [fm removeItemAtURL:fileURL error:&error];
+    }
+    
     if (error)
     {
         NSLog(@"%@",error );
@@ -397,6 +413,27 @@
     return [myend timeIntervalSinceDate:mystart];
 }
 
+- (double) averageSpeed {
+
+    NSTimeInterval totalTime = [self elapseTime];
+    double distance = [self distanceTotalMeters];
+
+    if (totalTime != 0.0f)
+        return distance / totalTime;
+    else
+        return 0.0f;
+}
+
+- (double) averageSpeedStraightLine {
+
+    NSTimeInterval totalTime = [self elapseTime];
+    double distance = [self distanceStraightLine];
+
+    if (totalTime != 0.0f)
+        return distance / totalTime;
+    else
+        return 0.0f;
+}
 
 // * * * * * * * * *
 
@@ -412,5 +449,74 @@
 }
 
 
+
+
+//
+// Creates an new one
+-(id) initWithFileURL:(NSURL *)url {
+    
+    self = [super initWithFileURL:url];
+    
+    if (self) {
+        //
+        self.ptTrack = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
+
+
+-(BOOL)loadFromContents:(id)contents ofType:(NSString *)typeName error:(NSError *__autoreleasing *)outError
+{
+    //
+    // If there is a track and there is one or more poms
+    //
+    if  (ptTrack && [ptTrack count] > 0)
+        [self.ptTrack removeAllObjects];
+    
+    NSError *error;
+    NSURL *theURL = contents;
+
+    NSData *data = [[NSData alloc] initWithContentsOfURL:theURL options:NSDataReadingUncached error:&error];
+
+    if (error) {
+        NSLog(@"%s %@",__func__, [error localizedDescription]);
+        ptTrack = [[ NSMutableArray alloc] init ];
+        return NO;
+    } else {
+        NSLog(@"%s Data has loaded successfully.",__func__);
+    }
+
+    ptTrack = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    
+    if  (ptTrack) {
+        return YES;
+    }
+    else {
+        // NSLog(@"Nope");
+        ptTrack = [[ NSMutableArray alloc] init ];
+    }
+    return NO;
+}
+
+-(id)contentsForType:(NSString *)typeName error:(NSError *__autoreleasing *)outError
+{
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:self.ptTrack];
+    return data;
+}
+
+#ifdef __NUA__
++ (UIImage *) icon:(NSString *) title
+{
+    NSString *iconName = [[NSString alloc] initWithFormat:@"%@.icon",title];
+    
+    UIImage *trailIcon  = [TOMImageStore loadImage:iconName warn:NO];
+    if (!trailIcon) {
+        trailIcon = [UIImage imageNamed:@"pt114x114.png"];
+    }
+    
+    return trailIcon;
+
+}
+#endif
 
 @end
