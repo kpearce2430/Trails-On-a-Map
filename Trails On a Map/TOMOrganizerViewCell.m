@@ -10,7 +10,7 @@
 
 @implementation TOMOrganizerViewCell
 
-@synthesize title, date, url;
+@synthesize date, icon, title, url;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {

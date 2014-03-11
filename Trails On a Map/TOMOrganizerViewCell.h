@@ -13,5 +13,6 @@
 @property (nonatomic, retain) NSString *title;
 @property (nonatomic, retain) NSDate *date;
 @property (nonatomic, retain) NSURL *url;
+@property (nonatomic, retain) UIImage *icon;
 
 @end
