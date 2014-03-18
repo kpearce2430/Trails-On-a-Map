@@ -10,25 +10,9 @@
 
 @interface TOMImageStore : NSObject
 
-#ifdef __NUA__
-// {
-//     NSMutableDictionary *dictionary;
-// }
-
-+ (TOMImageStore *) sharedStore;
-
-- (void) setImage:(UIImage *)i forKey:(NSString *)s;
-- (BOOL) setImage:(UIImage *)i forKey:(NSString *)s save:(BOOL) yn;
-
-- (UIImage *) imageForKey:(NSString *) s;
-
-- (void) deleteImageForKey:(NSString *) s;
-- (BOOL) deleteImageForKey:(NSString *) s remove:(BOOL) yn;
-#endif
-
-+ (NSString *) pathForImage:(NSString *)key;
-+ (BOOL) saveImage:(UIImage *)i forKey:(NSString *)s;
-+ (UIImage *) loadImage: (NSString *) s  warn:(BOOL) yn;
-+ (BOOL) removeImage: (NSString *) s;
++ (BOOL)        imageExists:(NSString *) title key:(NSString *) key warn:(BOOL) yn;
++ (UIImage *)     loadImage:(NSString *) title key:(NSString *) key warn:(BOOL) yn;
++ (BOOL)        removeImage:(NSString *) title key: (NSString *) key;
++ (BOOL)          saveImage:(UIImage *)i title:(NSString *) title key:(NSString *)key;
 
 @end

@@ -9,15 +9,24 @@
 #import <Foundation/Foundation.h>
 #import "TOM.h"
 
+#ifndef TOM_TEAM_ID
 #define TOM_TEAM_ID "HV9L49AFR8.com.pearcesoftwaresolutions.trailsonamap"
+#endif
 
 @interface TOMUrl : NSObject
 
 + (NSURL *) urlForDocumentsDirectory ;
-+ (NSURL *) fileUrlForTitle :(NSString *) title;
+
 + (BOOL) isIcloudAvailable;
+
 + (NSURL *) urlForICloud;
 + (NSURL *) urlForICloudDocuments;
 + (NSURL *) urlForDefaultDocuments;
++ (NSURL *) urlForImageDirectory :(NSString *) title;
++ (NSURL *) urlForImageFile:(NSString *) title key:(NSString *) key;
++ (NSURL *) urlForFile:(NSString *) title key:(NSString *) filename;
++ (NSURL *) urlForTrail:(NSString *) title;
+
++ (BOOL) checkDirectory: (NSURL *) theURL create:(BOOL)yn;
 
 @end

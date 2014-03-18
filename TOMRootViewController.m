@@ -148,7 +148,7 @@
         // Title
         self.title = @TRAILS_ON_A_MAP;
         // Set up a blank document, other was parts of the map will not work.
-        NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+        NSURL *fileURL = [TOMUrl urlForFile:self.title key:self.title];
         theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
         myProperties = [[TOMProperties alloc]initWithTitle:@TRAILS_ON_A_MAP];
         [[NSUserDefaults standardUserDefaults] setValue:@TRAILS_ON_A_MAP forKey:@KEY_NAME];
@@ -274,8 +274,8 @@
     if (![self.title isEqualToString:@TRAILS_DEFAULT_NAME]) {
         // Save document
         NSLog(@"%s Saving trails", __func__ );
-        NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-        [self saveTrails:fileURL update:NO]; // we are done?
+        // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+        [self saveTrails: NO]; // we are done?
     }
 }
 
@@ -313,7 +313,7 @@
             // orgainizer viewer or the properties views (or any subsequent
             // view added in the future.
             //
-            NSURL *fileURL = [TOMUrl fileUrlForTitle:newTitle];
+            NSURL *fileURL = [TOMUrl urlForFile:newTitle key:newTitle];
             NSFileManager *fm = [NSFileManager new];
             if ([fm fileExistsAtPath:[fileURL path]]) {
                 //
@@ -370,8 +370,8 @@
             //  Save off the old track             //
             if (amiUpdatingLocation == YES) {
                 NSLog(@"Saving[%@]",self.title);
-                NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-                [self saveTrails:fileURL update:NO]; //
+                // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+                [self saveTrails: NO]; //
                 amiUpdatingLocation = NO;
                 startStopItem.title = @TOM_ON_TEXT;
                 [locationManager stopUpdatingLocation];
@@ -398,7 +398,7 @@
             
             
             //  Load in the new one.
-            NSURL *fileURL = [TOMUrl fileUrlForTitle:newTitle];
+            NSURL *fileURL = [TOMUrl urlForFile:newTitle key:newTitle];
             theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
             myProperties = [[TOMProperties alloc]initWithTitle:newTitle];
             
@@ -946,7 +946,7 @@
             self.title = nameStr ;
             [[NSUserDefaults standardUserDefaults] setValue:nameStr forKey:@KEY_NAME];
             
-            NSURL *fileURL = [TOMUrl fileUrlForTitle:nameStr];
+            NSURL *fileURL = [TOMUrl urlForFile:nameStr key:nameStr];
 
             theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
             myProperties = [[TOMProperties alloc]initWithTitle:nameStr];
@@ -960,7 +960,7 @@
         if (![ptTimer isValid])
             ptTimer = [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(checkIfStopped:) userInfo:nil repeats:YES];
     }
-    else  // isOFF
+    else
     {
         // Stop updating the location
         
@@ -986,8 +986,8 @@
         [locationManager stopUpdatingHeading];
         
         //  This will need to be changed to handing the UIDocument Class:
-        NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-        [self saveTrails:fileURL update:NO];
+        // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+        [self saveTrails:NO];
     }
 
     return;
@@ -1117,29 +1117,35 @@
     
     TOMPointOnAMap *imagePebble = [[TOMPointOnAMap alloc] initWithImage: image location:imageloc heading: imagehdng];
     [theTrail addPointOnMap:imagePebble];
+    [TOMImageStore saveImage:image title:self.title key:[imagePebble key]];
 
-    // NSString *myKey = [imagePebble key];
-    // [imageStore setImage:image forKey:myKey save:YES];
-    // UIImage *originalImage = ...
-    
-    // Save off an icon - the last pic taken will the trails icon
-    // Future:  Let the user pic the picture for the icon.
-    CGSize destinationSize = CGSizeMake(90.0f, 90.0f);
-    UIGraphicsBeginImageContext(destinationSize);
-    [image drawInRect:CGRectMake(0,0,destinationSize.width,destinationSize.height)];
-    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    if (![self.title isEqual: @TRAILS_DEFAULT_NAME]   ) {
-        NSString *tomIcon = [[NSString alloc] initWithFormat:@"%@.icon",self.title];
-        [TOMImageStore saveImage:newImage forKey:tomIcon];
+    if (![self.title isEqual: @TRAILS_DEFAULT_NAME] &&
+         [theTrail numPics] == 1) {
+        // This is the first image, save off an icon
+        CGSize destinationSize = CGSizeMake(120.0f, 120.0f);
+        UIGraphicsBeginImageContext(destinationSize);
+        [image drawInRect:CGRectMake(0,0,destinationSize.width,destinationSize.height)];
+        UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+
+        NSString *filename = [NSString stringWithFormat:@"%@.icon",self.title];
+        [TOMImageStore saveImage:newImage title:self.title key:filename];
+        imagePebble.isTrailIcon=YES;
     }
-
+    else {
+        imagePebble.isTrailIcon=NO;
+    }
+    
     // add a parameter to save to album or
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
         UIImageWriteToSavedPhotosAlbum( image, nil, nil, nil );
     
     // Zoom the region to this location
     [worldView addAnnotation:(id)imagePebble];
+    
+    // Good place to mark the file to save it.
+    // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+    [self saveTrails:YES];
     
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -1151,8 +1157,8 @@
 -(IBAction)organizeTrails:(id)sender
 {
     if (![self.title isEqual: @TRAILS_DEFAULT_NAME]   ) {
-        NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-        [self saveTrails:fileURL update:NO];
+        // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+        [self saveTrails:NO];
     }
     
     UIViewController *ptController = [[TOMOrganizerViewController alloc] initWithNibName:@"TOMOrganizerViewController" bundle:nil ];
@@ -1185,26 +1191,17 @@
         //
         // Check to see if the other objects like pictures are there
         //
-#ifdef __NUA__
-        UIImage *img;
         for (int i = 0 ; i < [theTrail.ptTrack count]; i++)
         {
             TOMPointOnAMap *mp = [theTrail.ptTrack objectAtIndex:i];
             if ([mp type] == ptPicture) {
                 NSString *key = [mp key];
-                if  ((img = [imageStore imageForKey:key]) == NULL) {
-                    //
-                    // If we load an image, great!
-                    // otherwise delete the pebble.
-                    //
-                    if ((img = [imageStore loadImage:key warn:YES]) != NULL)
-                        [imageStore saveImage:img forKey:key];
-                    else // delete the point
-                        [theTrail.ptTrack removeObjectAtIndex:i];
+                if  (![TOMImageStore imageExists:self.title key:key warn:YES]) {
+                    [theTrail.ptTrack removeObjectAtIndex:i];
                 }
             }
         }
-#endif
+
         
         if (!mapPoms) {
             mapPoms = [[TOMMapSet alloc] init];
@@ -1228,9 +1225,34 @@
 
 //  * * * * * * * *
 
--(BOOL) saveTrails:(NSURL *)fileURL update:(BOOL) yn
+- (BOOL) saveTrailAs: (NSString *) newTitle warn:(BOOL)yn{
+
+    BOOL result = NO;
+    NSURL *fileURL = [TOMUrl urlForFile:newTitle key:newTitle];
+
+    [activityIndicator startAnimating];
+    
+    if (yn == YES) {
+        // This is just an update - the user has gone off
+        // to do something else and it's a good time to push
+        // any updates to the file
+        [theTrail updateChangeCount:UIDocumentChangeDone];
+        result = YES;
+    }
+    else {
+        [theTrail saveToURL:fileURL forSaveOperation:UIDocumentSaveForOverwriting completionHandler:nil];
+        result = YES;
+    }
+    
+    [activityIndicator stopAnimating];
+    
+    return result;
+}
+
+-(BOOL) saveTrails: (BOOL) yn
 {
     BOOL result = NO;
+    NSURL *fileURL = [TOMUrl urlForFile:self.title key:self.title];
     // NSLog(@"savePebbleTracks:[%@]",title);
     [activityIndicator startAnimating];
     

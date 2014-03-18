@@ -32,6 +32,7 @@ typedef enum  { ptError = -1, ptUnknown, ptLocation, ptPicture, ptStop, ptNote, 
 @property (nonatomic, copy) NSString *title;
 @property (nonatomic, copy) NSString *subtitle;
 @property (nonatomic, copy) UIImage *image; // thumb nail for annotation
+@property (nonatomic, readwrite) BOOL isTrailIcon;
 
 @property (nonatomic, readwrite) POMType type;
 //

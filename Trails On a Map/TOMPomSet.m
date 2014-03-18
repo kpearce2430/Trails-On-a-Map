@@ -11,7 +11,7 @@
 
 @implementation TOMPomSet
 
-@synthesize ptTrack, ptMapRect;
+@synthesize ptTrack, ptMapRect, title;
 
 //
 // * * * * * * * * * * * * * * * * * * * * * *
@@ -23,9 +23,76 @@
     if (self)
     {
         ptTrack = [[NSMutableArray alloc] init];
+        countPics = -1;
+        iconimageID = -1;
+        iconImage = nil;
+        title = t;
     }
     return self;
 }
+
+//
+// Creates an new one
+//
+-(id) initWithFileURL:(NSURL *)url {
+    
+    self = [super initWithFileURL:url];
+    
+    if (self) {
+        //
+        self.ptTrack = [[NSMutableArray alloc] init];
+        countPics = -1;
+        iconimageID = -1;
+        iconImage = nil;
+        NSString *path = [url path];
+        NSArray *parts = [path componentsSeparatedByString:@"/"];
+        NSString *fileName = [parts objectAtIndex:[parts count]-1];
+        title = [fileName stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
+    }
+    return self;
+}
+
+
+-(BOOL)loadFromContents:(id)contents ofType:(NSString *)typeName error:(NSError *__autoreleasing *)outError
+{
+    //
+    // If there is a track and there is one or more poms
+    //
+    if  (ptTrack && [ptTrack count] > 0)
+        [self.ptTrack removeAllObjects];
+    
+    NSError *error;
+    NSURL *theURL = contents;
+    
+    NSData *data = [[NSData alloc] initWithContentsOfURL:theURL options:NSDataReadingUncached error:&error];
+    
+    if (error) {
+        NSLog(@"%s %@",__func__, [error localizedDescription]);
+        ptTrack = [[ NSMutableArray alloc] init ];
+        return NO;
+    } else {
+        NSLog(@"%s Data has loaded successfully.",__func__);
+    }
+    
+    ptTrack = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    
+    if  (ptTrack) {
+        return YES;
+    }
+    else {
+        // NSLog(@"Nope");
+        ptTrack = [[ NSMutableArray alloc] init ];
+    }
+    return NO;
+}
+
+-(id)contentsForType:(NSString *)typeName error:(NSError *__autoreleasing *)outError
+{
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:self.ptTrack];
+    return data;
+}
+
+#pragma point_functions
 
 //
 // * * * * * * * * * * * * * * * * * * * * * *
@@ -33,6 +100,13 @@
 - (void)addPointOnMap:(TOMPointOnAMap *) p;
 {
     [ptTrack addObject:p];
+    
+    if ( [p type] == ptPicture ) {
+        if (countPics < 0)
+            [self numPics]; // count em;
+        else
+            countPics++;
+    }
 }
 
 //
@@ -60,7 +134,6 @@
     
     for ( int i = 0 ; i < [ptTrack count] ; i++ )
     {
-        // NSLog(@"%@", [breadCrumbTrack objectAtIndex: i] );
         mp = [ptTrack objectAtIndex: i];
         coord = [ mp coordinate ];
         alt = [mp altitude];
@@ -71,10 +144,11 @@
     }
 }
 
+#ifdef __FFU__
 //
 // * * * * * * * * * * * * * * * * * * * * * *
 //
--(NSString *) tomArchivePathWithTitle:(NSString *)title
+-(NSString *) tomArchivePathWithTitle:(NSString *)t
 {
     
     if (!title ||
@@ -99,6 +173,7 @@
     return [documentDirectory stringByAppendingPathComponent:fileName];
 }
 
+
 //
 // * * * * * * * * * * * * * * * * * * * * * *
 //
@@ -114,10 +189,11 @@
         return NULL;
 }
 
+
 //
 // * * * * * * * * * * * * * * * * * * * * * *
 //
-- (BOOL) savePoms:(NSString *)title
+- (BOOL) savePoms:(NSString *) t
 {
     NSString *path = NULL;
     NSData * archivedTrack = [NSKeyedArchiver archivedDataWithRootObject:ptTrack];
@@ -156,10 +232,11 @@
     return NO;
 }
 
+
 //
 // * * * * * * * * * * * * * * * * * * * * * *
 //
-- (BOOL) loadPoms:(NSString *)title
+- (BOOL) loadPoms:(NSString *) t
 {
     NSString *path = NULL;
     
@@ -185,15 +262,23 @@
         ptTrack = [[ NSMutableArray alloc] init ];
     }
     
+    
     return NO;
 }
+#endif
+
 //
 // * * * * * * * * * * * * * * * * * * * * * *
 //
-- (BOOL) deletePoms:(NSString *) title
+- (BOOL) deletePoms:(NSString *) t
 {
 
-    NSURL *fileURL = [TOMUrl fileUrlForTitle:title];
+    NSURL *fileURL = nil;
+    
+    if (t) // delete another one
+        fileURL = [TOMUrl urlForTrail:t];
+    else   // delete my self
+        fileURL = [TOMUrl urlForTrail:title];
     
     NSError *error;
     NSFileManager *fm = [NSFileManager new];
@@ -210,6 +295,7 @@
         return YES;
 }
 
+#ifdef __NUA__
 //
 // Check to see if there is a track.
 //
@@ -218,6 +304,9 @@
     NSString *path = [ self tomArchivePath ];
     return [[NSFileManager defaultManager] fileExistsAtPath:path];
 }
+#endif
+
+#pragma distance calcuations
 
 //
 // * * * * * * * * * * * * * * * * * * * * * *
@@ -267,6 +356,7 @@
     return [first distanceFromLocation:last];
 }
 
+#pragma map_functions
 //
 // * * * * * * * * * * * * * * * * * * * * * *
 //
@@ -439,70 +529,23 @@
 
 - (NSInteger) numPics
 {
-    NSInteger count = 0;
+    if ( countPics >= 0 ) {
+        // We've gone thru the points before and know this answer;
+        return countPics;
+    }
+
+    countPics = 0;
     for (int i = 0 ; i < [ptTrack count]; i++ ) {
         TOMPointOnAMap *p = [ptTrack objectAtIndex:i];
         if ([p type] == ptPicture)
-            count++;
+            countPics++;
     }
-    return count;
+    return countPics;
 }
 
 
 
 
-//
-// Creates an new one
--(id) initWithFileURL:(NSURL *)url {
-    
-    self = [super initWithFileURL:url];
-    
-    if (self) {
-        //
-        self.ptTrack = [[NSMutableArray alloc] init];
-    }
-    return self;
-}
-
-
--(BOOL)loadFromContents:(id)contents ofType:(NSString *)typeName error:(NSError *__autoreleasing *)outError
-{
-    //
-    // If there is a track and there is one or more poms
-    //
-    if  (ptTrack && [ptTrack count] > 0)
-        [self.ptTrack removeAllObjects];
-    
-    NSError *error;
-    NSURL *theURL = contents;
-
-    NSData *data = [[NSData alloc] initWithContentsOfURL:theURL options:NSDataReadingUncached error:&error];
-
-    if (error) {
-        NSLog(@"%s %@",__func__, [error localizedDescription]);
-        ptTrack = [[ NSMutableArray alloc] init ];
-        return NO;
-    } else {
-        NSLog(@"%s Data has loaded successfully.",__func__);
-    }
-
-    ptTrack = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    
-    if  (ptTrack) {
-        return YES;
-    }
-    else {
-        // NSLog(@"Nope");
-        ptTrack = [[ NSMutableArray alloc] init ];
-    }
-    return NO;
-}
-
--(id)contentsForType:(NSString *)typeName error:(NSError *__autoreleasing *)outError
-{
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:self.ptTrack];
-    return data;
-}
 
 #ifdef __NUA__
 + (UIImage *) icon:(NSString *) title

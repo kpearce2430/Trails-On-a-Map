@@ -11,15 +11,22 @@
 #import "TOMImageStore.h"
 #import "TOMDistance.h"
 #import "TOMSpeed.h"
+#import "TOMOrganizerViewCell.h"  // reuse this 
+
+#ifndef GPX_SWITCH_TAG
+#define GPX_SWITCH_TAG  1
+#endif
+
+#ifndef KML_SWITCH_TAG
+#define KML_SWITCH_TAG  2
+#endif
 
 static NSString *detailViewCellIdentifier = @"detaiViewCells";
 
 @interface TOMDetailViewController :  UIViewController <UITableViewDataSource, UITableViewDelegate>
 {
     @public
-    // UITableView *detailTable;
     TOMPomSet *theTrail;
-    
 }
 
 @property (nonatomic, strong) TOMPomSet *theTrail;
@@ -37,6 +44,7 @@ static NSString *detailViewCellIdentifier = @"detaiViewCells";
 // @property (nonatomic, strong) TOMImageStore *imageStore;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil title:(NSString *) t;
+
 - (UILabel *) newLabelWithTitle:(NSString *)paramTitle;
 
 @end

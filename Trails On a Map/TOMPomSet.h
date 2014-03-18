@@ -14,24 +14,31 @@
 #import "TOMImageStore.h"
 
 @interface TOMPomSet : UIDocument
+{
+@private
+    NSInteger countPics;
+    NSInteger iconimageID;
+    UIImage *iconImage;
+}
 
-@property (nonatomic, strong) NSMutableArray *ptTrack;
-@property (nonatomic, readwrite) MKMapRect ptMapRect;
+@property (nonatomic, strong) NSString *title;           //
+@property (nonatomic, strong) NSMutableArray *ptTrack;   //
+@property (nonatomic, readwrite) MKMapRect ptMapRect;    //
 
-@property (nonatomic, strong) UIImage* iconImage;
-@property (nonatomic, strong) NSFileWrapper *fileWrapper;
-
+// TOM PomSet Methods
 
 - (id)initWithTitle: (NSString *) t;
 - (void)addPointOnMap:(TOMPointOnAMap *) p;
 
 - (void)listPoms;
-- (NSString *) tomArchivePath;
-- (NSString *) tomArchivePathWithTitle: (NSString *)title;
-- (BOOL) savePoms:(NSString *)title;
-- (BOOL) loadPoms:(NSString *)title;
-- (BOOL) deletePoms:(NSString *) title;
-- (BOOL) areTherePoms;
+// - (NSString *) tomArchivePath;
+// - (NSString *) tomArchivePathWithTitle: (NSString *)title;
+// - (BOOL) savePoms:(NSString *)title;
+// - (BOOL) loadPoms:(NSString *)title;
+
+- (BOOL) deletePoms:(NSString *) t;
+
+// - (BOOL) areTherePoms;
 - (double) distanceTotalMeters;
 - (double) distanceStraightLine;
 

@@ -66,7 +66,8 @@
 - (IBAction)organizeTrails:(id)sender;
 - (void) processMyLocation:(CLLocation *)newLocation type: (POMType) pt;
 - (BOOL) loadTrails:(NSURL *) fileURL;
-- (BOOL) saveTrails:(NSURL *) fileURL update:(BOOL) yn;
+- (BOOL) saveTrails: (BOOL) yn;
+- (BOOL) saveTrailAs: (NSString *) title warn:(BOOL)yn;
 - (void) launchCamera;
 - (void) launchPhotoLibrary;
 // - (CLLocationSpeed) displaySpeed: (CLLocationSpeed) s;

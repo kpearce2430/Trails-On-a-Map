@@ -7,10 +7,11 @@
 //
 
 #import "TOMPointOnAMap.h"
+#import "TOMImageStore.h"
 
 @implementation TOMPointOnAMap
 
-@synthesize altitude, coordinate, heading, horizontal, image, key, speed, subtitle, title, timestamp, type, vertical;
+@synthesize altitude, coordinate, heading, horizontal, image, key, speed, subtitle, title, timestamp, type, vertical,isTrailIcon;
 
 //
 //
@@ -105,7 +106,8 @@
         [self setHeading:hdng];
         [self setType:ptPicture];
         [self generateMyKey:0];
-        [self setImage:myImage];
+        // [self setImage:myImage];
+
         title = [NSString stringWithFormat:@"%@: %.4f %.4f", @POM_TYPE_PICTURE, self.coordinate.latitude, self.coordinate.longitude ];
     }
     return self;
@@ -216,14 +218,25 @@
     [aCoder encodeDouble:vertical forKey:@"vacc"];
     [aCoder encodeDouble:horizontal forKey:@"hacc"];
     [aCoder encodeObject:timestamp forKey:@"timestamp"];
+    
+    image = nil;
     [aCoder encodeObject:image forKey:@"image"];
+    
+    // NSString tmp;
+    // if (isTrailIcon)
+    //     [aCoder encodeObject:@YES_STRING forKey:@"isTrailIcon"];
+    // else
+    //    [aCoder encodeObject:@NO_STRING forKey:@"isTrailIcon"];
 }
 
 -(id) initWithCoder:(NSCoder *) aDecoder
 {
     double mylat,mylong;
     NSInteger myType;
+    UIImage *myImage = nil;
     
+    // NSString *myYN;
+
     self = [ super init];
     
     if (self)
@@ -244,7 +257,16 @@
         [self setTimestamp:[aDecoder decodeObjectForKey:@"timestamp"]];
         coordinate.latitude = mylat;
         coordinate.longitude = mylong;
-        image = [aDecoder decodeObjectForKey:@"image"];
+        myImage = [aDecoder decodeObjectForKey:@"image"];
+        
+        // to take images out of the core data trail
+        if (image) {
+            [TOMImageStore saveImage:myImage title:title key:key];
+            image = nil;
+        }
+        
+        // myYN = [aDecoder decodeObjectForKey:@"isTrailIcon"];
+        // isTrailIcon = [myYN isEqualToString:@YES_STRING];
     }
     return self;
 }

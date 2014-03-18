@@ -8,132 +8,51 @@
 //
 
 #import "TOMImageStore.h"
+#import "TOMUrl.h"
 
 @implementation TOMImageStore
 
-#ifdef __NUA__
-+ (id) allocWithZone:(NSZone *)zone
++ (BOOL) imageExists: (NSString *) title key:(NSString *) key warn:(BOOL) yn
 {
-    return [self sharedStore];
-}
-
-+ (TOMImageStore *) sharedStore
-{
-    static TOMImageStore *sharedStore = nil;
-    
-    if (!sharedStore)
-    {
-        // Create the singleton
-        sharedStore = [[super allocWithZone:NULL] init];
+    if (!key) {  // can't do anything without a key:
+        NSLog(@"ERROR: %s %d:No Key Provided",__FUNCTION__,__LINE__);
+        return NO;
     }
-    return sharedStore;
-}
-
--(id) init
-{
-    self = [super init];
-//    if (self) {
-//       dictionary = [[NSMutableDictionary alloc] init];
-//    }
-    return self;
-}
-
-//
-// setImage
-//
--(BOOL) setImage:(UIImage *)i forKey:(NSString *)s save:(BOOL)yn
-{
-//    [dictionary setObject:i  forKey:s];
-    if (yn == YES)
-    {
-        return [self saveImage:i forKey:s];
+    
+    if  (!title) {
+        NSLog(@"ERROR: %s %d:No Title Provided",__FUNCTION__,__LINE__);
+        return NO;
     }
-    else
-        return YES;
+    
+    NSURL *imageURL = [TOMUrl urlForImageFile:title key:key];
+    
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    
+    return [fileManager fileExistsAtPath:[imageURL path]];
 }
 
--(void) setImage:(UIImage *)i forKey:(NSString *)s
-{
-//    [dictionary setObject:i forKey:s];
-}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
--(UIImage *) imageForKey:(NSString *)s
-{
-//    return [dictionary objectForKey:s];
-    return nil;
-}
-
-//
-// delete image methods
-//
-- (BOOL) deleteImageForKey:(NSString *)s remove:(BOOL)yn
-{
-    // [self deleteImageForKey:s ];
-    if (yn == YES)
-        return [self removeImage:s];
-    else
-        return YES;
-}
-
-//
-//
-//
-- (void) deleteImageForKey:(NSString *)s
-{
-//    if (!s)
-        return;
-//    else
-//        [dictionary removeObjectForKey:s];
-}
-#endif
-
-//
-// Functions for save and loading images
-//
-+ (NSString *) pathForImage:(NSString *)key
-{
-    NSArray *documentDirectories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *fileName = [ key stringByAppendingString:@".jpg"]; // future property
-    
-    // NSLog( @"%s %s %d Image Filename:%@", __FUNCTION__, __func__ , __LINE__, fileName );
-    // Get one and only one document directory
-    
-    NSString *documentDirectory = [ documentDirectories objectAtIndex:0];
-    
-    return [documentDirectory stringByAppendingPathComponent:fileName];
-}
-
-
-+ (BOOL) saveImage:(UIImage *)i forKey:(NSString *)s
-{
-    // Here is code to save to the Documents directory on iOS that is from working code.
-    
-    // Convert UIImage to JPEG
-    NSData *imgData = UIImageJPEGRepresentation(i, 1);
-    
-    // Identify the path
-    NSString  *jpgPath = [self pathForImage: s];
-    
-    // Write the file.  Choose YES atomically to enforce an all or none write. Use the NO flag if partially written files are okay which can occur in cases of corruption
-    return [imgData writeToFile:jpgPath atomically:YES];
-    // return YES;
-}
-
-+ (UIImage *) loadImage: (NSString *) s warn:(BOOL) yn
++ (UIImage *) loadImage: (NSString *) title key:(NSString *) key warn:(BOOL) yn
 {
     
-    if (!s) {
-        NSLog(@"ERROR: %s %d:No Key Provided to Load Image",__FUNCTION__,__LINE__);
+    if (!key) {
+        NSLog(@"ERROR: %s %d:No Key Provided",__FUNCTION__,__LINE__);
         return NULL;
     }
     
-    NSError *err = nil;
-    // Identify the path
-    NSString  *jpgPath = [self pathForImage: s];
+    if  (!title) {
+        NSLog(@"ERROR: %s %d:No Title Provided",__FUNCTION__,__LINE__);
+        return NO;
+    }
     
-    NSData *data = [NSData dataWithContentsOfFile:jpgPath
-                                          options:NSDataReadingUncached
-                                            error:&err];
+    NSError *err = nil;
+    
+    NSURL *imageURL = [TOMUrl urlForImageFile:title key:key];
+    
+    NSData *data = [NSData dataWithContentsOfURL:imageURL
+                                         options:NSDataReadingUncached
+                                           error:&err];
     
     if (err) {
         if (yn == YES)
@@ -147,30 +66,70 @@
     }
 }
 
-+ (BOOL) removeImage: (NSString *) s
-{
-    BOOL removeSuccess = NO;
-    
-    if (!s) {
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-        NSLog(@"ERROR: %s %d No Key Provided to Load Image",__FUNCTION__,__LINE__);
-        return removeSuccess;
++ (BOOL) removeImage:(NSString *) title key: (NSString *) key {
+    
+    if (!key) {
+        NSLog(@"ERROR: %s %d No Key Provided",__FUNCTION__,__LINE__);
+        return NO;
+    }
+    if  (!title) {
+        NSLog(@"ERROR: %s %d:No Title Provided",__FUNCTION__,__LINE__);
+        return NO;
     }
     
+    BOOL removeSuccess = NO;
     // Identify the path
     NSError *err = nil;
-    NSString  *jpgPath = [self pathForImage: s];
+    
+    NSURL *imageURL = [TOMUrl urlForImageFile:title key:key];
+    
     NSFileManager *fileMgr = [[NSFileManager alloc] init];
     
-    removeSuccess = [fileMgr removeItemAtPath:jpgPath error:&err];
+    removeSuccess = [fileMgr removeItemAtURL:imageURL error:&err];
     
     if (err)
     {
-        NSLog(@"%@",err);
+        NSLog(@"ERROR: %s %@",__func__,err);
         return NO;
     }
-    return removeSuccess;
+    else
+        return removeSuccess;
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
++ (BOOL) saveImage:(UIImage *)i title:(NSString *) title key:(NSString *)key
+{
+    // Here is code to save to the Documents directory on iOS that is from working code.
+    if (!key) {
+        NSLog(@"ERROR: %s %d No Key Provided",__FUNCTION__,__LINE__);
+        return NO;
+    }
+    if  (!title) {
+        NSLog(@"ERROR: %s %d:No Title Provided",__FUNCTION__,__LINE__);
+        return NO;
+    }
+    if (!i) {
+        NSLog(@"ERROR: %s %d:No Image Provided",__FUNCTION__,__LINE__);
+        return NO;
+    }
+    
+    // Send if off:
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // Convert UIImage to JPEG
+        NSData *imgData = UIImageJPEGRepresentation(i, 1);
+    
+        // Identify the path
+        NSURL *imageURL = [TOMUrl urlForImageFile:title key:key];
+    
+        // Write the file.  Choose YES atomically to enforce an all or none write. Use the NO flag if partially written files are okay which can occur in cases of corruption
+        if ([imgData writeToURL:imageURL atomically:YES] == NO)
+            NSLog(@"ERROR: %s writing to URL %@",__func__,imageURL);
+    });
+    
+    return YES;
+}
 
 @end

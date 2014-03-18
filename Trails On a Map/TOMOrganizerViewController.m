@@ -44,27 +44,19 @@
     
     self.cells = [NSMutableArray array];
     
-    imageStore = [[TOMImageStore alloc] init];
-
     organizerTable = [[UITableView alloc] initWithFrame:self.view.frame style:UITableViewStylePlain];
 
     [organizerTable setDataSource:self];
     [organizerTable setDelegate:self];
     [self.view addSubview:organizerTable];
 
+    // Push an orientation change on the the view to set the presentation of the screen correctly.
     [self orientationChanged:NULL]; // orientationChanged
     
-    //
-    // [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
-    //
     UIBarButtonItem *anotherButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
     self.navigationItem.rightBarButtonItem = anotherButton;
     amIediting = NO;
     [self prepareFiles];
-    
-
-    
 }
 
 //
@@ -77,9 +69,6 @@
     // Set up notification for
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
-    
-
-    
 }
 
 
@@ -110,7 +99,6 @@
 //4
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     //5
-    static NSString *cellIdentifier = @"tomCell";
     TOMOrganizerViewCell *thisCell = [self.cells objectAtIndex:indexPath.row];
     NSDate *fileDate = thisCell.date;
     static NSDateFormatter *dateFormatter;
@@ -121,32 +109,32 @@
     }
     
     NSString *dateStr = [dateFormatter stringFromDate:fileDate];
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:orgainizerViewCellIdentifier];
     
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:orgainizerViewCellIdentifier];
     }
 
     NSString *myLabel = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
     //6
     
     NSURL *myUrl = thisCell.url;
-    
-    if (myUrl)
+    UIImage *theImage = nil;
+    if (myUrl) {
         cell.accessoryType = UITableViewCellAccessoryDetailButton;
-    else
+        NSString *iconName = [NSString stringWithFormat:@"%@.icon",myLabel];
+        theImage = [TOMImageStore loadImage:myLabel key:iconName warn:NO];
+        if (!theImage) {
+            theImage = [UIImage imageNamed:@"pt114x114.png"];
+        }
+    }
+    else {
         cell.accessoryType = UITableViewCellAccessoryNone;
-
+        theImage = [UIImage imageNamed:@"cloudDownloading.png"];
+    }
+    
     [cell.textLabel setText:myLabel];
     [cell.detailTextLabel setText:dateStr];
-
-
-    NSString *iconName = [[NSString alloc] initWithFormat:@"%@.icon",myLabel];
-    
-    UIImage *theImage = [TOMImageStore loadImage:iconName warn:NO];
-    if (!theImage) {
-        theImage = [UIImage imageNamed:@"pt114x114.png"];
-    }
     
     cell.imageView.image = theImage;
     cell.imageView.backgroundColor    = TOM_LABEL_BACKGROUND_COLOR;
@@ -342,10 +330,15 @@
         [query startQuery]; // off we go:
     }
     else {
-        
+        //
+        // This game unexpected results for me.
+        // I got a list of all the files under the directory tree.
+        // It works out since I'm only looking for .tom files and the URL
+        // that comes along with it.
+        //
         NSURL *theURL = [TOMUrl urlForDocumentsDirectory];
         
-        NSLog(@"%s theURL:%@",__func__,theURL);
+        // NSLog(@"%s theURL:%@",__func__,theURL);
         
         NSFileManager *fileManager = [[NSFileManager alloc]init];
         
@@ -438,10 +431,14 @@
     [organizerTable reloadData];
 }
 
+
 - (void)deleteDocument:(UIDocument *)document withCompletionBlock:(void (^)())completionBlock {
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
         
         NSError *fileCoordinatorError = nil;
+        
+
         
         [[[NSFileCoordinator alloc] initWithFilePresenter:nil] coordinateWritingItemAtURL:document.fileURL options:NSFileCoordinatorWritingForDeleting error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
             
@@ -451,7 +448,17 @@
             // create a fresh instance of NSFileManager since it is not thread-safe
             NSFileManager *fileManager = [[NSFileManager alloc] init];
             NSError *error = nil;
+            
+
             if (![fileManager removeItemAtURL:newURL error:&error]) {
+                NSLog(@"Error: %@", error);
+                // TODO handle the error
+            }
+            
+            NSURL *trailURL = [newURL URLByDeletingLastPathComponent];
+            // NSLog(@"TRAIL URL:%@",trailURL);
+            // Delete the whole directory:
+            if (![fileManager removeItemAtURL:trailURL error:&error]) {
                 NSLog(@"Error: %@", error);
                 // TODO handle the error
             }

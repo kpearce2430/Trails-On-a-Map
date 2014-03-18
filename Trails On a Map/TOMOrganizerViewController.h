@@ -10,24 +10,16 @@
 #import "TOMImageStore.h"
 #import "TOMOrganizerViewCell.h"
 
+static NSString *orgainizerViewCellIdentifier = @"organizerViewCells";
+
 @interface TOMOrganizerViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 {
-@private
-	NSMutableArray *fileList;
-    NSMutableArray *dateList;
-    NSMutableArray *pathList;
-    TOMImageStore *imageStore;
-
 @public
     UITableView *organizerTable;
     BOOL amIediting;
 }
 
 @property (nonatomic, retain) NSMutableArray *cells;
-
-// @property (nonatomic, retain) NSMutableArray *fileList;
-// @property (nonatomic, retain) NSMutableArray *dateList;
-// @property (nonatomic, retain) NSMutableArray *pathList;
 @property (nonatomic, retain) NSMetadataQuery *query;
 
 @end

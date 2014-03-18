@@ -7,6 +7,7 @@
 //
 
 #import "TOMDetailViewController.h"
+#import "TOMImageViewController.h"
 
 
 @interface TOMDetailViewController ()
@@ -82,7 +83,8 @@
     NSFileManager *fm = [[NSFileManager alloc] init];
     // NSFileManager *fm = [NSFileManager new];
     
-    NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title ];
+    NSURL *fileURL = [TOMUrl urlForFile:self.title key:self.title  ];
+    
     theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
     if ([fm fileExistsAtPath:[fileURL path]]) {
         [theTrail loadFromContents:fileURL ofType:nil error:nil];
@@ -95,11 +97,27 @@
     for (int i = 0 ; i < [theTrail.ptTrack count]; i++ ) {
         TOMPointOnAMap *p = [theTrail.ptTrack objectAtIndex:i];
         if ([p type] == ptPicture) {
-            UIImage *myImage = [p image];
+            
+            UIImage *myImage = [TOMImageStore loadImage:self.title key:[p key] warn:NO];
+            
+            TOMOrganizerViewCell *myCell = [[TOMOrganizerViewCell alloc] init];
+            [myCell setTitle:[p key]];
+            [myCell setUrl:[TOMUrl urlForImageFile:self.title key:[p key]]];
+             
             if (myImage == NULL) {
                 myImage = [UIImage imageNamed:@"pt114x114.png"];
+                [myCell setImage:myImage];
+                
             }
-            [imagesSet addObject:myImage];
+            else {
+                CGSize destinationSize = CGSizeMake(120.0f, 120.0f);
+                UIGraphicsBeginImageContext(destinationSize);
+                [myImage drawInRect:CGRectMake(0,0,destinationSize.width,destinationSize.height)];
+                UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+                [myCell setImage:newImage];
+            }
+        [imagesSet addObject:myCell];
         }
     }
 
@@ -201,27 +219,35 @@
 
 - (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    UITableViewCell *cell = nil;
+    TOMOrganizerViewCell *cell = nil;
     
     if ([tableView isEqual:detailTable]) {
         
         cell = [tableView dequeueReusableCellWithIdentifier:detailViewCellIdentifier forIndexPath:indexPath];
+        // Since the cells can get reused and
+        // their variables are not cleaned.  We need to do it ourselves:
+        cell.imageView.image = nil;
+        cell.accessoryView = nil;
+        cell.textLabel.font = headerLabelFont;
         
+        CGRect switchFrame = CGRectMake( 0.0f, 0.0f, 150.0f, 25.0f );
+        UISwitch *aSwitch = [[UISwitch alloc] initWithFrame:switchFrame];
+        [aSwitch setOn:NO];
+        [aSwitch addTarget:self action:@selector(dvcSwitchSelector:) forControlEvents:UIControlEventValueChanged];
         switch (indexPath.section)  {
             case 0:
                 if (indexPath.row == 0) {
-                    CGRect switchFrame = CGRectMake( 0.0f, 0.0f, 150.0f, 25.0f );
                     cell.textLabel.text = @"Save Trail as GPX";
-                    gpxSwitch = [[UISwitch alloc] initWithFrame:switchFrame];
-                    [gpxSwitch setOn:NO];
+                    gpxSwitch = aSwitch;
+                    [gpxSwitch setTag: GPX_SWITCH_TAG];
                     cell.accessoryView = gpxSwitch;
                 }
                 else if (indexPath.row == 1) {
-                    CGRect switchFrame = CGRectMake( 0.0f, 0.0f, 150.0f, 25.0f );
                     cell.textLabel.text = @"Save Trail as KML";
-                    kmlSwitch = [[UISwitch alloc] initWithFrame:switchFrame];
-                    [kmlSwitch setOn:NO];
+                    kmlSwitch = aSwitch;
                     cell.accessoryView = kmlSwitch;
+                    [kmlSwitch setTag:KML_SWITCH_TAG];
+
                 }
                 else {
                     NSLog(@"%s ERROR FFU Cell Reached",__func__);
@@ -236,18 +262,10 @@
                 }
                 else {
                     cell.textLabel.text = [ NSString stringWithFormat:@"Picture %ld",(long)indexPath.row];
-                    UIImage *cellImage = [imagesSet objectAtIndex:indexPath.row];
-                    // UIImage *originalImage = ...;
-                    CGSize destinationSize = CGSizeMake(90.0f, 90.0f);
-                    UIGraphicsBeginImageContext(destinationSize);
-                    [cellImage drawInRect:CGRectMake(0,0,destinationSize.width,destinationSize.height)];
-                    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-                    UIGraphicsEndImageContext();
-                    cell.imageView.image = newImage;
-                    // [cell.imageView.layer setBorderColor:TOM_LABEL_BORDER_COLOR];
-                    // [cell.imageView.layer setBorderWidth:1.0];
-                    //  cell.imageView.layer.borderWidth  = TOM_LABEL_BORDER_WIDTH;
+                    TOMOrganizerViewCell *thisCell = [imagesSet objectAtIndex:indexPath.row];
+                    cell.imageView.image = thisCell.image;
                     cell.imageView.layer.cornerRadius = TOM_LABEL_BORDER_CORNER_RADIUS;
+                    cell.accessoryType = UITableViewCellAccessoryDetailButton;
                 }
                 break;
 
@@ -262,7 +280,6 @@
                 }
                 else if (indexPath.row == 2) {
                     cell.textLabel.text = [ NSString stringWithFormat:@"Elapse Time: %@",[theTrail elapseTimeString]];
-                                        cell.textLabel.font = footerLabelFont;
                 }
                 else if (indexPath.row == 3) {
                     cell.textLabel.text = [ NSString stringWithFormat:@"Avg Speed Total Dist: %.02f %@",[TOMSpeed displaySpeed:[theTrail averageSpeed]],[TOMSpeed displaySpeedUnits]];
@@ -273,7 +290,7 @@
                 else {
                     cell.textLabel.text = [ NSString stringWithFormat:@"Detail Cell %ld",(long)indexPath.row];
                 }
-
+                cell.accessoryType = UITableViewCellAccessoryNone;
                 break;
             
             default:
@@ -281,7 +298,7 @@
                 break;
         }
     }
-    cell.textLabel.font = headerLabelFont;
+
     return cell;
 }
 //
@@ -412,6 +429,49 @@
 
     [detailTable beginUpdates];
     [detailTable endUpdates];
+    
+}
+
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+{
+    // NSLog(@"Picked %@",indexPath);
+    NSLog(@"Selected: %@",indexPath);
+    
+    TOMOrganizerViewCell *thisCell = [imagesSet objectAtIndex:indexPath.row];
+    NSLog(@"%s Title:%@ URL:%@",__func__,thisCell.title,thisCell.url);
+    
+    UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameWithKeyAndImage:@"TOMImageViewController" bundle:nil key:thisCell.title url:thisCell.url];
+    
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
+                                   initWithTitle: @"Back"
+                                   style: UIBarButtonItemStyleBordered
+                                   target: nil action: nil];
+    
+    [self.navigationItem setBackBarButtonItem: backButton];
+    
+    [[self navigationController] pushViewController:ptController animated:YES];
+    
+    
+}
+
+//
+// Switch delegates:
+- (void)dvcSwitchSelector:(id)sender{
+
+    NSLog(@"In %s",__func__);
+    
+    switch ([sender tag]) {
+        case GPX_SWITCH_TAG:
+            NSLog(@"GPX Switch Flipped");
+            break;
+            
+        case KML_SWITCH_TAG:
+            NSLog(@"KML Switch Flipped");
+            break;
+            
+        default:
+            NSLog(@"%s Error: Invalid Tag %ld",__func__,(long)[sender tag]);
+    }
     
 }
 
