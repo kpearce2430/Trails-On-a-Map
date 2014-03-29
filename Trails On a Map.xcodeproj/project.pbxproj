@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD0FC3DB18DCC1970060F2B8 /* pssGPX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD0FC3DA18DCC1970060F2B8 /* pssGPX.framework */; };
 		AD26E2F8181B002D0021BEE2 /* TOMTrackView.m in Sources */ = {isa = PBXBuildFile; fileRef = AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */; };
 		AD26E2FB181B129A0021BEE2 /* TOMImageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */; };
 		AD31BFA7182EED5800BCEE96 /* TOMViewSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = AD31BFA6182EED5800BCEE96 /* TOMViewSlider.m */; };
@@ -48,6 +49,8 @@
 		AD7BECBA180E23220003187D /* TOMRootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD7BECB8180E23220003187D /* TOMRootViewController.xib */; };
 		AD7BECBE180E9CDB0003187D /* TOMProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = AD7BECBD180E9CDB0003187D /* TOMProperties.m */; };
 		AD7BECC0180F1AC10003187D /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = AD7BECBF180F1AC10003187D /* settings.png */; };
+		ADA35A1418E4D29100C1A099 /* pssKML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35A1318E4D29100C1A099 /* pssKML.framework */; };
+		ADA35AB018E7609700C1A099 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35AAF18E7609700C1A099 /* libz.dylib */; };
 		ADA6C32818B8063600F64E59 /* TOMUrl.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA6C32718B8063600F64E59 /* TOMUrl.m */; };
 		ADA795DE18205AD1004E383D /* TOMOrganizerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */; };
 		ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */; };
@@ -71,6 +74,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AD0FC3DA18DCC1970060F2B8 /* pssGPX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = pssGPX.framework; path = ../../../pssGPX.framework; sourceTree = "<group>"; };
 		AD26E2F6181B002D0021BEE2 /* TOMTrackView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TOMTrackView.h; path = ../TOMTrackView.h; sourceTree = "<group>"; };
 		AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TOMTrackView.m; path = ../TOMTrackView.m; sourceTree = "<group>"; };
 		AD26E2F9181B129A0021BEE2 /* TOMImageStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMImageStore.h; sourceTree = "<group>"; };
@@ -132,6 +136,8 @@
 		AD7BECBC180E9CDB0003187D /* TOMProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMProperties.h; sourceTree = "<group>"; };
 		AD7BECBD180E9CDB0003187D /* TOMProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMProperties.m; sourceTree = "<group>"; };
 		AD7BECBF180F1AC10003187D /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settings.png; sourceTree = "<group>"; };
+		ADA35A1318E4D29100C1A099 /* pssKML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = pssKML.framework; sourceTree = "<group>"; };
+		ADA35AAF18E7609700C1A099 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		ADA6C32618B8063600F64E59 /* TOMUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMUrl.h; sourceTree = "<group>"; };
 		ADA6C32718B8063600F64E59 /* TOMUrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMUrl.m; sourceTree = "<group>"; };
 		ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMOrganizerViewController.h; sourceTree = "<group>"; };
@@ -153,9 +159,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ADA35AB018E7609700C1A099 /* libz.dylib in Frameworks */,
 				ADBF322F18BD454A00EBEF1D /* iAd.framework in Frameworks */,
 				AD6F03571857DCC700753144 /* ImageIO.framework in Frameworks */,
+				ADA35A1418E4D29100C1A099 /* pssKML.framework in Frameworks */,
 				ADDE292C184D29F500CBB238 /* AssetsLibrary.framework in Frameworks */,
+				AD0FC3DB18DCC1970060F2B8 /* pssGPX.framework in Frameworks */,
 				AD7BECB5180E22EE0003187D /* CoreLocation.framework in Frameworks */,
 				AD7BECB3180E22E30003187D /* MapKit.framework in Frameworks */,
 				AD7BEC80180E22910003187D /* CoreGraphics.framework in Frameworks */,
@@ -201,6 +210,9 @@
 		AD7BEC7C180E22910003187D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ADA35AAF18E7609700C1A099 /* libz.dylib */,
+				ADA35A1318E4D29100C1A099 /* pssKML.framework */,
+				AD0FC3DA18DCC1970060F2B8 /* pssGPX.framework */,
 				ADBF322E18BD454A00EBEF1D /* iAd.framework */,
 				AD6F03561857DCC700753144 /* ImageIO.framework */,
 				ADDE292B184D29F500CBB238 /* AssetsLibrary.framework */,
@@ -573,9 +585,18 @@
 				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/pearcek,
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trails On a Map/Trails On a Map-Prefix.pch";
 				INFOPLIST_FILE = "Trails On a Map/Trails On a Map-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/pearcek,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -590,9 +611,18 @@
 				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/pearcek,
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trails On a Map/Trails On a Map-Prefix.pch";
 				INFOPLIST_FILE = "Trails On a Map/Trails On a Map-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/pearcek,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
