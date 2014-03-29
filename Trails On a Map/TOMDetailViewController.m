@@ -8,7 +8,8 @@
 
 #import "TOMDetailViewController.h"
 #import "TOMImageViewController.h"
-
+#import "pssGPX/pssGPX.h"
+#import "pssKML/pssKML.h"
 
 @interface TOMDetailViewController ()
 
@@ -460,19 +461,230 @@
 
     NSLog(@"In %s",__func__);
     
-    switch ([sender tag]) {
-        case GPX_SWITCH_TAG:
-            NSLog(@"GPX Switch Flipped");
-            break;
+    UISwitch *toggleOnOffSwitch = (UISwitch *)sender;
+    BOOL yn = toggleOnOffSwitch.isOn;
+    
+    if (yn) {
+        switch ([sender tag]) {
+            case GPX_SWITCH_TAG:
+                NSLog(@"GPX Switch Flipped");
+                [self createGPX];
+                break;
             
-        case KML_SWITCH_TAG:
-            NSLog(@"KML Switch Flipped");
-            break;
+            case KML_SWITCH_TAG:
+                NSLog(@"KML Switch Flipped");
+                [self createKML];
+                break;
             
-        default:
-            NSLog(@"%s Error: Invalid Tag %ld",__func__,(long)[sender tag]);
+            default:
+                NSLog(@"%s Error: Invalid Tag %ld",__func__,(long)[sender tag]);
+        }
+    }
+}
+
+- (void) createGPX
+{
+    // gpx
+    pssGPXRoot *gpx = [pssGPXRoot rootWithCreator:@TRAILS_ON_A_MAP];
+    // gpx > trk
+    pssGPXTrack *gpxTrack = [gpx newTrack];
+    gpxTrack.name = [theTrail title];
+    
+    for ( int i = 0 ; i < [theTrail.ptTrack count] ; i++ )
+    {
+        TOMPointOnAMap *mp = [theTrail.ptTrack objectAtIndex: i];
+        
+        if  ([mp type] == ptLocation) {
+            
+            CLLocationCoordinate2D coord = mp.coordinate;
+            pssGPXTrackPoint *gpxTrackPoint = [gpxTrack newTrackpointWithLatitude:coord.latitude  longitude:coord.longitude];
+            gpxTrackPoint.elevation = mp.altitude;
+            gpxTrackPoint.time = mp.timestamp;
+            
+        }
     }
     
+    NSString *gpxString = gpx.gpx;
+    
+    NSURL *docsdirURL = [TOMUrl urlForDocumentsDirectory];
+    NSString *fileName = [NSString stringWithFormat:@"%@.gpx",self.title];
+    NSURL *documentURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
+    NSError *err;
+    
+    [gpxString writeToURL:documentURL atomically:YES encoding:NSUTF8StringEncoding error:&err];
+    if (err) {
+        NSLog(@"%s ERROR WRITE GPX FILE: %@",__func__,err);
+    }
+    return;
 }
+
+#pragma __KML_Functions__
+
+- (KMLPlacemark *)placemarkWithName:(NSString *)name coordinate:(CLLocationCoordinate2D)coordinate altitude:(CLLocationDistance) altitude
+{
+    KMLPlacemark *placemarkElement = [KMLPlacemark new];
+    placemarkElement.name = name;
+    
+    KMLPoint *pointElement = [KMLPoint new];
+    placemarkElement.geometry = pointElement;
+    
+    KMLCoordinate *coordinateElement = [KMLCoordinate new];
+    coordinateElement.latitude = coordinate.latitude;
+    coordinateElement.longitude = coordinate.longitude;
+    coordinateElement.altitude = altitude;
+    pointElement.coordinate = coordinateElement;
+    
+    return placemarkElement;
+}
+
+- (KMLPlacemark *)lineWithTrakPoints
+{
+    KMLPlacemark *placemark = [KMLPlacemark new];
+    placemark.name = @"Line";
+    
+    __block KMLLineString *lineString = [KMLLineString new];
+    placemark.geometry = lineString;
+    
+    for ( int i = 0 ; i < [theTrail.ptTrack count] ; i++ )
+    {
+         TOMPointOnAMap *mp = [theTrail.ptTrack objectAtIndex: i];
+         KMLCoordinate *coordinate = [KMLCoordinate new];
+         coordinate.latitude = mp.coordinate.latitude;
+         coordinate.longitude = mp.coordinate.longitude;
+         coordinate.altitude = mp.altitude;
+         [lineString addCoordinate:coordinate];
+    };
+    
+    KMLStyle *style = [KMLStyle new];
+    [placemark addStyleSelector:style];
+    
+    KMLLineStyle *lineStyle = [KMLLineStyle new];
+    style.lineStyle = lineStyle;
+    lineStyle.width = 5;
+    lineStyle.UIColor = [UIColor blueColor];
+    
+    return placemark;
+}
+
+- (void) createKML
+{
+    // [pssKML pssKMLMessage];
+    
+    // kml
+    KMLRoot *kml = [KMLRoot new];
+    
+    // kml > document
+    KMLDocument *document = [KMLDocument new];
+    kml.feature = document;
+    
+    [document setName:[theTrail title]];
+    
+    TOMPointOnAMap *mp = [theTrail.ptTrack objectAtIndex: 0];
+    
+    KMLPlacemark *startPlacemark = [self placemarkWithName:@"Start" coordinate:[mp coordinate] altitude:[mp altitude]];
+    [document addFeature:startPlacemark];
+
+    // kml > document > placemark#line
+    KMLPlacemark *line = [self lineWithTrakPoints];
+    [document addFeature:line];
+    
+    mp = [theTrail lastPom];
+    KMLPlacemark *endPlacemark = [self placemarkWithName:@"End" coordinate:[mp coordinate] altitude:[mp altitude]];
+    [document addFeature:endPlacemark];
+    int photoCount = 1;
+    for ( int i = 0 ; i < [theTrail.ptTrack count] ; i++ )
+    {
+        TOMPointOnAMap *mp = [theTrail.ptTrack objectAtIndex: i];
+        if ([mp type] == ptPicture) {
+
+#ifdef __USE_PLACEMARKS_FOR_PHOTOS__
+            KMLPlacemark *photoPlacemark = [self placemarkWithName:[mp title] coordinate:[mp coordinate] altitude:[mp altitude]];
+            [document addFeature:photoPlacemark];
+#else
+            KMLPhotoOverlay *photoOverlay = [KMLPhotoOverlay new];
+            [document addFeature:photoOverlay];
+            NSString *photoTitle = [[NSString alloc] initWithFormat:@"Photo %d",photoCount++ ];
+            
+            [photoOverlay setName:photoTitle];
+            [photoOverlay setDescriptionValue:[mp title]];
+
+            // Set Up The Camera
+            KMLCamera *photoCamera = [KMLCamera new];
+            [photoOverlay setAbstractView:photoCamera];
+            photoCamera.longitude = mp.coordinate.longitude;
+            photoCamera.latitude = mp.coordinate.latitude;
+            photoCamera.altitude = 2.0f;
+            photoCamera.heading = [mp.heading trueHeading];
+            photoCamera.tilt = 90.0f;
+            photoCamera.roll = 0.0f;
+            photoCamera.altitudeMode = KMLAltitudeModeRelativeToGround;
+            
+            KMLStyle *photoStyle = [KMLStyle new];
+            [photoOverlay addStyleSelector:photoStyle];
+            
+            KMLIconStyle *photoIconStyle = [KMLIconStyle new];
+            [photoStyle setIconStyle:photoIconStyle];
+            
+            KMLIcon *styleIcon = [KMLIcon new];
+            [photoIconStyle setIcon:styleIcon];
+            [styleIcon setHref:@"http://maps.google.com/mapfiles/kml/shapes/camera.png"];
+            
+            // points to the image
+            KMLIcon *photoIcon = [KMLIcon new];
+            [photoOverlay setIcon:photoIcon];
+            [photoIcon setHref:@"files/DSC_0016.jpg"];
+            
+            KMLViewVolume *photoViewVolume = [KMLViewVolume new];
+            [photoOverlay setViewVolume:photoViewVolume];
+            photoViewVolume.near = 1.0f;
+            photoViewVolume.leftFov = -26.667f;
+            photoViewVolume.rightFov = 26.667f;
+            photoViewVolume.bottomFov = -25.0f;
+            photoViewVolume.topFov = 25.0f;
+            
+            KMLPoint *photoPoint = [KMLPoint new];
+            [photoOverlay setPoint:photoPoint];
+            
+            KMLCoordinate *photoCoordinate = [KMLCoordinate new];
+            [photoPoint setCoordinate:photoCoordinate];
+            
+            [photoCoordinate setLatitude:mp.coordinate.latitude];
+            [photoCoordinate setLongitude:mp.coordinate.longitude];
+            [photoCoordinate setAltitude:2.0f];
+            photoPoint.altitudeMode = KMLAltitudeModeRelativeToGround;
+            
+            KMLShape photoShape = KMLShapeRectangle;
+            [photoOverlay setShape:photoShape];
+            
+#endif
+        }
+    }
+    
+    NSString *kmlString = kml.kml;
+    NSURL *docsdirURL = [TOMUrl urlForDocumentsDirectory];
+    NSString *fileName = [NSString stringWithFormat:@"%@.kml",self.title];
+    NSURL *documentURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
+    NSError *err;
+    
+    [kmlString writeToURL:documentURL atomically:YES encoding:NSUTF8StringEncoding error:&err];
+    if (err) {
+        NSLog(@"%s ERROR WRITE KML FILE: %@",__func__,err);
+    }
+
+#ifdef __FFU__
+    NSURL *zipdirURL = [TOMUrl urlForDocumentsDirectory];
+    NSString *zipName = [NSString stringWithFormat:@"%@.kmz",self.title];
+    NSURL *zipFullURL = [zipdirURL URLByAppendingPathComponent:zipName isDirectory:NO];
+
+
+    ZKFileArchive *archive = [ZKFileArchive archiveWithArchivePath:[zipFullURL path]];
+    NSInteger result = [archive deflateFile:[documentURL path] relativeToPath:[docsdirURL path] usingResourceFork:NO];
+    NSLog(@"Result: %ld",(long)result);
+#endif
+    // NSInteger result = [archive deflateDirectory:@"/Documents/myfolder" relativeToPath:@"/Documents" usingResourceFork:NO];
+    
+}
+
+
 
 @end
