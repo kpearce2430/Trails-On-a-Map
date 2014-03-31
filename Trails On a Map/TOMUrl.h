@@ -28,5 +28,7 @@
 + (NSURL *) urlForTrail:(NSString *) title;
 
 + (BOOL) checkDirectory: (NSURL *) theURL create:(BOOL)yn;
++ (BOOL) removeURL:(NSURL *)targetURL;
++ (NSURL *) temporaryDir: (NSString *) ext;
 
 @end

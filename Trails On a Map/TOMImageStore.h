@@ -14,5 +14,6 @@
 + (UIImage *)     loadImage:(NSString *) title key:(NSString *) key warn:(BOOL) yn;
 + (BOOL)        removeImage:(NSString *) title key: (NSString *) key;
 + (BOOL)          saveImage:(UIImage *)i title:(NSString *) title key:(NSString *)key;
++ (BOOL)     saveImageToURL:(UIImage *)i url:(NSURL *) imageURL;
 
 @end

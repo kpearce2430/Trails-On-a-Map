@@ -10,6 +10,7 @@
 #import "TOMImageViewController.h"
 #import "pssGPX/pssGPX.h"
 #import "pssKML/pssKML.h"
+#import "pssZipKit/pssZipKit.h"
 
 @interface TOMDetailViewController ()
 
@@ -224,6 +225,10 @@
     
     if ([tableView isEqual:detailTable]) {
         
+        NSURL *docsdirURL = [TOMUrl urlForDocumentsDirectory];
+        NSString *fileName = [NSString stringWithFormat:@"%@.gpx",self.title];
+        NSURL *fileFullURL = nil;
+        
         cell = [tableView dequeueReusableCellWithIdentifier:detailViewCellIdentifier forIndexPath:indexPath];
         // Since the cells can get reused and
         // their variables are not cleaned.  We need to do it ourselves:
@@ -242,13 +247,27 @@
                     gpxSwitch = aSwitch;
                     [gpxSwitch setTag: GPX_SWITCH_TAG];
                     cell.accessoryView = gpxSwitch;
+                    
+                    docsdirURL = [TOMUrl urlForDocumentsDirectory];
+                    fileName = [NSString stringWithFormat:@"%@.gpx",self.title];
+                    fileFullURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
+                    
+                    if ([TOMUrl checkDirectory:fileFullURL create:NO]) {
+                        [gpxSwitch setOn:YES];
+                    }
                 }
                 else if (indexPath.row == 1) {
-                    cell.textLabel.text = @"Save Trail as KML";
+                    cell.textLabel.text = @"Save Trail as KMZ";
                     kmlSwitch = aSwitch;
                     cell.accessoryView = kmlSwitch;
                     [kmlSwitch setTag:KML_SWITCH_TAG];
-
+                    docsdirURL = [TOMUrl urlForDocumentsDirectory];
+                    fileName = [NSString stringWithFormat:@"%@.kmz",self.title];
+                    fileFullURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
+                    
+                    if ([TOMUrl checkDirectory:fileFullURL create:NO]) {
+                        [kmlSwitch setOn:YES];
+                    }
                 }
                 else {
                     NSLog(@"%s ERROR FFU Cell Reached",__func__);
@@ -459,31 +478,44 @@
 // Switch delegates:
 - (void)dvcSwitchSelector:(id)sender{
 
-    NSLog(@"In %s",__func__);
+    // NSLog(@"In %s",__PRETTY_FUNCTION__);
     
     UISwitch *toggleOnOffSwitch = (UISwitch *)sender;
     BOOL yn = toggleOnOffSwitch.isOn;
     
-    if (yn) {
-        switch ([sender tag]) {
-            case GPX_SWITCH_TAG:
-                NSLog(@"GPX Switch Flipped");
-                [self createGPX];
-                break;
-            
-            case KML_SWITCH_TAG:
-                NSLog(@"KML Switch Flipped");
-                [self createKML];
-                break;
-            
-            default:
-                NSLog(@"%s Error: Invalid Tag %ld",__func__,(long)[sender tag]);
+    if ([sender tag] == GPX_SWITCH_TAG) {
+        if (yn) {
+            [self createGPX];
         }
+        else {
+            NSURL *gpxdocdirURL = [TOMUrl urlForDocumentsDirectory];
+            NSString *gpxName = [NSString stringWithFormat:@"%@.gpx",self.title];
+            NSURL *gpxFullURL = [gpxdocdirURL URLByAppendingPathComponent:gpxName isDirectory:NO];
+            [TOMUrl removeURL:gpxFullURL];
+        }
+    }
+    else if ([sender tag] == KML_SWITCH_TAG ) {
+        if (yn) {
+            [self createKML];
+        }
+        else {
+            NSURL *kmzdocdirURL = [TOMUrl urlForDocumentsDirectory];
+            NSString *kmzName = [NSString stringWithFormat:@"%@.kmz",self.title];
+            NSURL *kmzFullURL = [kmzdocdirURL URLByAppendingPathComponent:kmzName isDirectory:NO];
+            [TOMUrl removeURL:kmzFullURL];
+        }
+    }
+    else {
+            NSLog(@"%s Error: Invalid Tag %ld",__PRETTY_FUNCTION__,(long)[sender tag]);
     }
 }
 
+
+#pragma __GPX_Functions__
+
 - (void) createGPX
 {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     // gpx
     pssGPXRoot *gpx = [pssGPXRoot rootWithCreator:@TRAILS_ON_A_MAP];
     // gpx > trk
@@ -515,6 +547,8 @@
     if (err) {
         NSLog(@"%s ERROR WRITE GPX FILE: %@",__func__,err);
     }
+    }); // end dispatch
+    
     return;
 }
 
@@ -548,12 +582,14 @@
     for ( int i = 0 ; i < [theTrail.ptTrack count] ; i++ )
     {
          TOMPointOnAMap *mp = [theTrail.ptTrack objectAtIndex: i];
-         KMLCoordinate *coordinate = [KMLCoordinate new];
-         coordinate.latitude = mp.coordinate.latitude;
-         coordinate.longitude = mp.coordinate.longitude;
-         coordinate.altitude = mp.altitude;
-         [lineString addCoordinate:coordinate];
-    };
+        if ([mp type] == ptLocation) {
+            KMLCoordinate *coordinate = [KMLCoordinate new];
+            coordinate.latitude = mp.coordinate.latitude;
+            coordinate.longitude = mp.coordinate.longitude;
+            coordinate.altitude = mp.altitude;
+            [lineString addCoordinate:coordinate];
+        }
+    }
     
     KMLStyle *style = [KMLStyle new];
     [placemark addStyleSelector:style];
@@ -568,11 +604,14 @@
 
 - (void) createKML
 {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     // [pssKML pssKMLMessage];
+    NSMutableArray *imageURLs = [[NSMutableArray alloc] init] ;
     
     // kml
     KMLRoot *kml = [KMLRoot new];
-    
+    NSURL *tempURL = nil;
+
     // kml > document
     KMLDocument *document = [KMLDocument new];
     kml.feature = document;
@@ -597,13 +636,9 @@
         TOMPointOnAMap *mp = [theTrail.ptTrack objectAtIndex: i];
         if ([mp type] == ptPicture) {
 
-#ifdef __USE_PLACEMARKS_FOR_PHOTOS__
-            KMLPlacemark *photoPlacemark = [self placemarkWithName:[mp title] coordinate:[mp coordinate] altitude:[mp altitude]];
-            [document addFeature:photoPlacemark];
-#else
             KMLPhotoOverlay *photoOverlay = [KMLPhotoOverlay new];
             [document addFeature:photoOverlay];
-            NSString *photoTitle = [[NSString alloc] initWithFormat:@"Photo %d",photoCount++ ];
+            NSString *photoTitle = [[NSString alloc] initWithFormat:@"Photo %d",photoCount ];
             
             [photoOverlay setName:photoTitle];
             [photoOverlay setDescriptionValue:[mp title]];
@@ -632,8 +667,10 @@
             // points to the image
             KMLIcon *photoIcon = [KMLIcon new];
             [photoOverlay setIcon:photoIcon];
-            [photoIcon setHref:@"files/DSC_0016.jpg"];
-            
+            NSString *imageName = [NSString stringWithFormat:@"Photo %d.jpg",photoCount++];
+            NSString *imagePath = [NSString stringWithFormat:@"files/%@",imageName];
+            [photoIcon setHref:imagePath];
+
             KMLViewVolume *photoViewVolume = [KMLViewVolume new];
             [photoOverlay setViewVolume:photoViewVolume];
             photoViewVolume.near = 1.0f;
@@ -656,7 +693,43 @@
             KMLShape photoShape = KMLShapeRectangle;
             [photoOverlay setShape:photoShape];
             
-#endif
+            //
+            // Make the image to be included with the KMZ file.
+            // Images have a limit of 8196x8196 is Google Earth.  Scale ours down if neccessary
+            //
+            UIImage *myImage = [TOMImageStore loadImage:self.title key:[mp key] warn:NO];
+            CGSize imageSize = [myImage size];
+            CGSize newImageSize = CGSizeMake(KML_JPG_SIZE, KML_JPG_SIZE);
+            UIImage *newImage = myImage;
+
+            if (imageSize.width > KML_JPG_SIZE || imageSize.height > KML_JPG_SIZE )
+            {
+                if (imageSize.width > imageSize.height) {
+                    newImageSize.height = (imageSize.height * KML_JPG_SIZE) /imageSize.width;
+                }
+                else {
+                    newImageSize.width = (imageSize.width * KML_JPG_SIZE) / imageSize.height;
+                }
+                UIGraphicsBeginImageContextWithOptions(newImageSize, NO, 0.0);
+                [myImage drawInRect:CGRectMake(0, 0, newImageSize.width, newImageSize.height)];
+                newImage = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+            }
+            else {
+                NSLog(@"%s myImage small enough to be used as existing image",__PRETTY_FUNCTION__);
+            }
+            
+            // Image was small enough to be used in the KMZ file.
+
+            
+            if (!tempURL) {
+                tempURL = [TOMUrl temporaryDir:@"files"];
+                [TOMUrl checkDirectory:tempURL create:YES];
+            }
+            
+            NSURL *imageURL = [tempURL URLByAppendingPathComponent:imageName isDirectory:NO];
+            [TOMImageStore saveImageToURL:newImage url:imageURL];
+            [imageURLs addObject:[imageURL path]];
         }
     }
     
@@ -671,20 +744,40 @@
         NSLog(@"%s ERROR WRITE KML FILE: %@",__func__,err);
     }
 
-#ifdef __FFU__
     NSURL *zipdirURL = [TOMUrl urlForDocumentsDirectory];
     NSString *zipName = [NSString stringWithFormat:@"%@.kmz",self.title];
     NSURL *zipFullURL = [zipdirURL URLByAppendingPathComponent:zipName isDirectory:NO];
 
+    // Delete any existing KMZ file.
+    [TOMUrl removeURL:zipFullURL];
 
+    // Add the KML file to the KMZ archive.
     ZKFileArchive *archive = [ZKFileArchive archiveWithArchivePath:[zipFullURL path]];
     NSInteger result = [archive deflateFile:[documentURL path] relativeToPath:[docsdirURL path] usingResourceFork:NO];
-    NSLog(@"Result: %ld",(long)result);
-#endif
-    // NSInteger result = [archive deflateDirectory:@"/Documents/myfolder" relativeToPath:@"/Documents" usingResourceFork:NO];
+    // NSLog(@"Result For KML File: %ld",(long)result);
+    if  (result == 1) {
+        // Don't leave the KML file laying around since it's in the KMZ file
+        [TOMUrl removeURL:documentURL];
+    }
+    else {
+        NSLog(@"%s Error in archiving:%d",__PRETTY_FUNCTION__,result);
+    }
     
+    //
+    // Clean out the tmp/files directory
+    if ([imageURLs count] > 0) {
+        tempURL = [TOMUrl temporaryDir:nil];
+    
+        result = [archive deflateFiles:imageURLs relativeToPath:[tempURL path] usingResourceFork:NO];
+        if  (result == 1) {
+            tempURL = [TOMUrl temporaryDir:@"files"];
+            [TOMUrl removeURL:tempURL];
+        }
+        else {
+            NSLog(@"%s Error archiving photos.  Result: %d",__PRETTY_FUNCTION__,result);
+        }
+    }
+    }); // end dispatch
 }
-
-
 
 @end

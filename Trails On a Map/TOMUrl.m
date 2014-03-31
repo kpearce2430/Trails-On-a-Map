@@ -152,8 +152,6 @@
         return nil;
     }
 
-    // NSString *titlePath = [NSString stringWithFormat:@".%@",title];
-    
     NSURL *documentsURL = [TOMUrl urlForDocumentsDirectory];
     NSURL *rootURL = [documentsURL URLByAppendingPathComponent:title isDirectory:YES];
     
@@ -169,15 +167,16 @@
     // BOOL result = NO;
     
     if (theURL) {
-        NSFileManager *fileManager = [[NSFileManager alloc] init];
         
-        if ([fileManager fileExistsAtPath:[theURL path]] == NO ) {
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+        NSString *thePath = [theURL path];
+        if ([fileManager fileExistsAtPath:thePath] == NO ) {
             
             if (yn) {
                 
                 NSError *err;
                 BOOL created = [fileManager createDirectoryAtURL:theURL withIntermediateDirectories:YES attributes:nil error:&err];
-            
+                
                 if (created) {
                     // NSLog(@"%s: Successfully Created %@",__func__,theURL);
                     return YES;
@@ -193,6 +192,52 @@
         }
     }
     return NO;
+}
+
++ (NSURL *) temporaryDir: (NSString *) ext
+{
+    NSURL *turl = nil;
+    
+    if (ext) {
+        turl = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:ext]];
+    }
+    else {
+        turl = [NSURL fileURLWithPath:NSTemporaryDirectory()];
+    }
+    
+    return turl;
+}
+
++ (BOOL) removeURL:(NSURL *)targetURL
+{
+    
+    if (!targetURL) {
+        NSLog(@"ERROR: %s %d No Key Provided",__PRETTY_FUNCTION__,__LINE__);
+        return NO;
+    }
+ 
+    BOOL removeSuccess = NO;
+    NSError *err = nil;
+    
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    
+    if ([fileManager fileExistsAtPath:[targetURL path]] == YES )  {
+        removeSuccess = [fileManager removeItemAtURL:targetURL error:&err];
+    }
+#ifdef DEBUG
+    else {
+        NSLog(@"%s Warning - No File at URL %@",__PRETTY_FUNCTION__,targetURL);
+        // removeSuccess = NO;
+    }
+#endif
+    
+    if (err)
+    {
+        NSLog(@"ERROR: %s %@",__func__,err);
+        return NO;
+    }
+    else
+        return removeSuccess;
 }
 
 @end

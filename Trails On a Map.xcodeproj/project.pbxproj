@@ -51,6 +51,7 @@
 		AD7BECC0180F1AC10003187D /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = AD7BECBF180F1AC10003187D /* settings.png */; };
 		ADA35A1418E4D29100C1A099 /* pssKML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35A1318E4D29100C1A099 /* pssKML.framework */; };
 		ADA35AB018E7609700C1A099 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35AAF18E7609700C1A099 /* libz.dylib */; };
+		ADA35AC018E76DD800C1A099 /* pssZipKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */; };
 		ADA6C32818B8063600F64E59 /* TOMUrl.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA6C32718B8063600F64E59 /* TOMUrl.m */; };
 		ADA795DE18205AD1004E383D /* TOMOrganizerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */; };
 		ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */; };
@@ -138,6 +139,7 @@
 		AD7BECBF180F1AC10003187D /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settings.png; sourceTree = "<group>"; };
 		ADA35A1318E4D29100C1A099 /* pssKML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = pssKML.framework; sourceTree = "<group>"; };
 		ADA35AAF18E7609700C1A099 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = pssZipKit.framework; path = ../../../pssZipKit.framework; sourceTree = "<group>"; };
 		ADA6C32618B8063600F64E59 /* TOMUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMUrl.h; sourceTree = "<group>"; };
 		ADA6C32718B8063600F64E59 /* TOMUrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMUrl.m; sourceTree = "<group>"; };
 		ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMOrganizerViewController.h; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ADA35AB018E7609700C1A099 /* libz.dylib in Frameworks */,
+				ADA35AC018E76DD800C1A099 /* pssZipKit.framework in Frameworks */,
 				ADBF322F18BD454A00EBEF1D /* iAd.framework in Frameworks */,
 				AD6F03571857DCC700753144 /* ImageIO.framework in Frameworks */,
 				ADA35A1418E4D29100C1A099 /* pssKML.framework in Frameworks */,
@@ -211,6 +214,7 @@
 			isa = PBXGroup;
 			children = (
 				ADA35AAF18E7609700C1A099 /* libz.dylib */,
+				ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */,
 				ADA35A1318E4D29100C1A099 /* pssKML.framework */,
 				AD0FC3DA18DCC1970060F2B8 /* pssGPX.framework */,
 				ADBF322E18BD454A00EBEF1D /* iAd.framework */,
@@ -539,6 +543,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -571,6 +579,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;

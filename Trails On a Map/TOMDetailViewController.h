@@ -21,6 +21,10 @@
 #define KML_SWITCH_TAG  2
 #endif
 
+#ifndef KML_JPG_SIZE
+#define KML_JPG_SIZE    512.0F
+#endif
+
 static NSString *detailViewCellIdentifier = @"detaiViewCells";
 
 @interface TOMDetailViewController :  UIViewController <UITableViewDataSource, UITableViewDelegate>
