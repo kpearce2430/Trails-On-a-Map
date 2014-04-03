@@ -17,7 +17,7 @@
 #import "TOMTrackView.h"
 #import "TOMImageStore.h"
 #import "TOMViewSlider.h"
-
+#import "TOMSpeedOMeter.h"
 
 @interface TOMRootViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIActionSheetDelegate >
 
@@ -27,6 +27,7 @@
     IBOutlet MKMapView *worldView;
     UIToolbar *toolbar;
     TOMViewSlider *mySlider;
+    TOMSpeedOMeter *mySpeedOMeter;
 
 @public
     IBOutlet UIActivityIndicatorView *activityIndicator;
@@ -70,6 +71,6 @@
 - (BOOL) saveTrailAs: (NSString *) title warn:(BOOL)yn;
 - (void) launchCamera;
 - (void) launchPhotoLibrary;
-// - (CLLocationSpeed) displaySpeed: (CLLocationSpeed) s;
+- (void) checkProperties;
 
 @end

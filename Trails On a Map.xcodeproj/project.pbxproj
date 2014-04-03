@@ -52,6 +52,7 @@
 		ADA35A1418E4D29100C1A099 /* pssKML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35A1318E4D29100C1A099 /* pssKML.framework */; };
 		ADA35AB018E7609700C1A099 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35AAF18E7609700C1A099 /* libz.dylib */; };
 		ADA35AC018E76DD800C1A099 /* pssZipKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */; };
+		ADA35AC718EC72ED00C1A099 /* TOMSpeedOMeter.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA35AC618EC72ED00C1A099 /* TOMSpeedOMeter.m */; };
 		ADA6C32818B8063600F64E59 /* TOMUrl.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA6C32718B8063600F64E59 /* TOMUrl.m */; };
 		ADA795DE18205AD1004E383D /* TOMOrganizerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */; };
 		ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */; };
@@ -140,6 +141,8 @@
 		ADA35A1318E4D29100C1A099 /* pssKML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = pssKML.framework; sourceTree = "<group>"; };
 		ADA35AAF18E7609700C1A099 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = pssZipKit.framework; path = ../../../pssZipKit.framework; sourceTree = "<group>"; };
+		ADA35AC518EC72ED00C1A099 /* TOMSpeedOMeter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMSpeedOMeter.h; sourceTree = "<group>"; };
+		ADA35AC618EC72ED00C1A099 /* TOMSpeedOMeter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSpeedOMeter.m; sourceTree = "<group>"; };
 		ADA6C32618B8063600F64E59 /* TOMUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMUrl.h; sourceTree = "<group>"; };
 		ADA6C32718B8063600F64E59 /* TOMUrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMUrl.m; sourceTree = "<group>"; };
 		ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMOrganizerViewController.h; sourceTree = "<group>"; };
@@ -238,44 +241,10 @@
 				AD7BECBB180E239E0003187D /* TOM.h */,
 				AD7BEC8E180E22910003187D /* TOMAppDelegate.h */,
 				AD7BEC8F180E22910003187D /* TOMAppDelegate.m */,
-				AD6CD7E518244814005A0699 /* TOMDetailViewController.h */,
-				AD6CD7E618244814005A0699 /* TOMDetailViewController.m */,
-				AD72939C18D65D6E0095FE53 /* TOMImageViewController.h */,
-				AD72939D18D65D6E0095FE53 /* TOMImageViewController.m */,
-				ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */,
-				ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */,
-				AD35F18E18C65510006314E1 /* TOMOrganizerViewCell.h */,
-				AD35F18F18C65510006314E1 /* TOMOrganizerViewCell.m */,
-				AD6F035E1858074F00753144 /* TOMPhotoAlbumViewController.h */,
-				AD6F035F1858074F00753144 /* TOMPhotoAlbumViewController.m */,
-				AD6F036A1858ADBA00753144 /* TOMPhotoGroupCell.h */,
-				AD6F036B1858ADBA00753144 /* TOMPhotoGroupCell.m */,
-				AD6F03631858A88800753144 /* TOMPhotoGroupViewController.h */,
-				AD6F03641858A88900753144 /* TOMPhotoGroupViewController.m */,
-				AD7BECBC180E9CDB0003187D /* TOMProperties.h */,
-				AD7BECBD180E9CDB0003187D /* TOMProperties.m */,
-				AD4501101812E74100E76DE0 /* TOMPropertyViewController.h */,
-				AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */,
-				AD7BECB6180E23210003187D /* TOMRootViewController.h */,
-				AD7BECB7180E23220003187D /* TOMRootViewController.m */,
-				AD26E2F6181B002D0021BEE2 /* TOMTrackView.h */,
-				AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */,
-				AD778D36181454A3008E1D06 /* TOMMapSet.h */,
-				AD778D37181454A3008E1D06 /* TOMMapSet.m */,
-				AD45010D1811A77800E76DE0 /* TOMPomSet.h */,
-				AD45010E1811A77800E76DE0 /* TOMPomSet.m */,
-				AD31BFA5182EED5800BCEE96 /* TOMViewSlider.h */,
-				AD31BFA6182EED5800BCEE96 /* TOMViewSlider.m */,
-				AD45010A181191AE00E76DE0 /* TOMPointOnAMap.h */,
-				AD45010B181191AE00E76DE0 /* TOMPointOnAMap.m */,
-				ADDE2925184A456F00CBB238 /* TOMSpeed.h */,
-				ADDE2926184A456F00CBB238 /* TOMSpeed.m */,
-				ADDE2928184A4C2000CBB238 /* TOMDistance.h */,
-				ADDE2929184A4C2000CBB238 /* TOMDistance.m */,
-				AD26E2F9181B129A0021BEE2 /* TOMImageStore.h */,
-				AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */,
-				ADA6C32618B8063600F64E59 /* TOMUrl.h */,
-				ADA6C32718B8063600F64E59 /* TOMUrl.m */,
+				ADA35AC318E9F8AE00C1A099 /* Model */,
+				ADA35AC218E9F86A00C1A099 /* Controllers */,
+				ADA35AC418E9F97600C1A099 /* SubViews */,
+				ADA35AC118E9F83D00C1A099 /* Utilities */,
 				AD7BEC94180E22910003187D /* Images.xcassets */,
 				AD7BEC91180E22910003187D /* Trails_On_a_Map.xcdatamodeld */,
 				AD7BEC86180E22910003187D /* Supporting Files */,
@@ -322,6 +291,74 @@
 				AD7BECA5180E22910003187D /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		ADA35AC118E9F83D00C1A099 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				AD26E2F9181B129A0021BEE2 /* TOMImageStore.h */,
+				AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */,
+				ADA6C32618B8063600F64E59 /* TOMUrl.h */,
+				ADA6C32718B8063600F64E59 /* TOMUrl.m */,
+				ADDE2928184A4C2000CBB238 /* TOMDistance.h */,
+				ADDE2929184A4C2000CBB238 /* TOMDistance.m */,
+				ADDE2925184A456F00CBB238 /* TOMSpeed.h */,
+				ADDE2926184A456F00CBB238 /* TOMSpeed.m */,
+			);
+			name = Utilities;
+			sourceTree = "<group>";
+		};
+		ADA35AC218E9F86A00C1A099 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				AD6CD7E518244814005A0699 /* TOMDetailViewController.h */,
+				AD6CD7E618244814005A0699 /* TOMDetailViewController.m */,
+				AD72939C18D65D6E0095FE53 /* TOMImageViewController.h */,
+				AD72939D18D65D6E0095FE53 /* TOMImageViewController.m */,
+				ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */,
+				ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */,
+				AD35F18E18C65510006314E1 /* TOMOrganizerViewCell.h */,
+				AD35F18F18C65510006314E1 /* TOMOrganizerViewCell.m */,
+				AD4501101812E74100E76DE0 /* TOMPropertyViewController.h */,
+				AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */,
+				AD7BECB6180E23210003187D /* TOMRootViewController.h */,
+				AD7BECB7180E23220003187D /* TOMRootViewController.m */,
+				AD6F03631858A88800753144 /* TOMPhotoGroupViewController.h */,
+				AD6F03641858A88900753144 /* TOMPhotoGroupViewController.m */,
+				AD6F035E1858074F00753144 /* TOMPhotoAlbumViewController.h */,
+				AD6F035F1858074F00753144 /* TOMPhotoAlbumViewController.m */,
+				AD6F036A1858ADBA00753144 /* TOMPhotoGroupCell.h */,
+				AD6F036B1858ADBA00753144 /* TOMPhotoGroupCell.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		ADA35AC318E9F8AE00C1A099 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				AD778D36181454A3008E1D06 /* TOMMapSet.h */,
+				AD778D37181454A3008E1D06 /* TOMMapSet.m */,
+				AD45010D1811A77800E76DE0 /* TOMPomSet.h */,
+				AD45010E1811A77800E76DE0 /* TOMPomSet.m */,
+				AD45010A181191AE00E76DE0 /* TOMPointOnAMap.h */,
+				AD45010B181191AE00E76DE0 /* TOMPointOnAMap.m */,
+				AD7BECBC180E9CDB0003187D /* TOMProperties.h */,
+				AD7BECBD180E9CDB0003187D /* TOMProperties.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		ADA35AC418E9F97600C1A099 /* SubViews */ = {
+			isa = PBXGroup;
+			children = (
+				AD26E2F6181B002D0021BEE2 /* TOMTrackView.h */,
+				AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */,
+				AD31BFA5182EED5800BCEE96 /* TOMViewSlider.h */,
+				AD31BFA6182EED5800BCEE96 /* TOMViewSlider.m */,
+				ADA35AC518EC72ED00C1A099 /* TOMSpeedOMeter.h */,
+				ADA35AC618EC72ED00C1A099 /* TOMSpeedOMeter.m */,
+			);
+			name = SubViews;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -455,6 +492,7 @@
 				AD4501131812E74100E76DE0 /* TOMPropertyViewController.m in Sources */,
 				ADDE2927184A456F00CBB238 /* TOMSpeed.m in Sources */,
 				AD31BFA7182EED5800BCEE96 /* TOMViewSlider.m in Sources */,
+				ADA35AC718EC72ED00C1A099 /* TOMSpeedOMeter.m in Sources */,
 				AD72939F18D65D6E0095FE53 /* TOMImageViewController.m in Sources */,
 				AD45010C181191AE00E76DE0 /* TOMPointOnAMap.m in Sources */,
 				AD7BECB9180E23220003187D /* TOMRootViewController.m in Sources */,

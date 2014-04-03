@@ -15,20 +15,23 @@
 
 {
 @private
-    BOOL  displayup;  // YES - Display is up and visable; NO - Display is down
-    CLLocationSpeed  displaySpeeds[TOM_SLIDER_NUM_PTS];
-    CLLocationSpeed  maxSpeed;
-    CLLocationSpeed  minSpeed;
-    NSInteger        numSpeeds;
+    // BOOL  displayup;  // YES - Display is up and visable; NO - Display is down
+    NSMutableArray   *displayAltitudes;
+    NSMutableArray   *displaySpeeds;
 }
 
 @property (nonatomic, readwrite) BOOL displayup;
+@property (nonatomic, readwrite) BOOL active;
+@property (nonatomic, readwrite) NSInteger startIndex;
 @property (nonatomic, readwrite) CLLocationSpeed maxSpeed;
 @property (nonatomic, readwrite) CLLocationSpeed minSpeed;
-@property (nonatomic, readwrite) NSInteger numSpeeds;
+@property (nonatomic, readwrite) CLLocationDistance maxAltitude;
+@property (nonatomic, readwrite) CLLocationDistance minAltitude;
 
-// Methods
-- (void) addSpeed: (CLLocationSpeed) sp;
-- (CGFloat) percentY: (NSInteger) i;
+// Public Methods
+- (void) addSpeed: (CLLocationSpeed) sp Altitude: (CLLocationDistance) alt;
+- (void) clearSpeedsAndAltitudes;
+
+
 
 @end

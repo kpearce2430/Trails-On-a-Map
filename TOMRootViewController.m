@@ -78,10 +78,15 @@
         worldView = [[MKMapView alloc] initWithFrame:mapRect];
         [self.view addSubview:worldView];
         
-        CGRect mySliderRect = CGRectMake( 0.0f , (screenHeight - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MIN_Y), screenWidth, TOM_SLIDER_MIN_Y );
+        CGRect mySpeedOMeterRect = CGRectMake(0.0f, (screenHeight - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MAX_Y - 200 ), TOM_SLIDER_MIN_X, 200);
+        mySpeedOMeter = [[TOMSpeedOMeter alloc] initWithFrame:mySpeedOMeterRect];
+        [self.view addSubview:mySpeedOMeter];
+        
+        CGRect mySliderRect = CGRectMake( 0.0f , (screenHeight - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MAX_Y), TOM_SLIDER_MIN_X, TOM_SLIDER_MAX_Y );
         mySlider = [[TOMViewSlider alloc] initWithFrame:mySliderRect];
         [self.view addSubview:mySlider];
-        
+
+       
         CGRect toolbarRect;
         toolbarRect.origin.y = screenHeight - TOM_TOOL_BAR_HEIGHT;
         toolbarRect.origin.x = 0;
@@ -167,6 +172,7 @@
         [activityIndicator hidesWhenStopped];
         [self.view addSubview:activityIndicator];
     }
+    [self checkProperties];
     return self;
 }
 
@@ -353,6 +359,7 @@
                 theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
                 [self loadTrails:fileURL];
                 [self processMyLocation:userCoordinate type:ptUnknown];
+                [mySlider clearSpeedsAndAltitudes];
             }
             else {
                 //    the points of the trail will be kept as the new name
@@ -395,7 +402,7 @@
                 [mapPoms clearPoms];
             
             [self->worldView addOverlay:(id <MKOverlay>)mapPoms];
-            
+            [mySlider clearSpeedsAndAltitudes];
             
             //  Load in the new one.
             NSURL *fileURL = [TOMUrl urlForFile:newTitle key:newTitle];
@@ -418,199 +425,13 @@
         //
         [self.myProperties setPtName:@TRAILS_DEFAULT_NAME];  // default
         [self setTitle:@TRAILS_DEFAULT_NAME];
+        [mySlider clearSpeedsAndAltitudes];
     }
     
     //
     //  Check the properties
-    //
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_MAP_TYPE] != nil)
-    {
-        [self.myProperties setPtMapType:[[NSUserDefaults standardUserDefaults] integerForKey:@KEY_MAP_TYPE]];
-    }
-    else
-    {
-        // we don't have a color preference stored on this device,
-        // use the default value in this case (white)
-        //
-        [self.myProperties setPtMapType:MKMapTypeStandard];  // default
-    }
-    [worldView setMapType:[self.myProperties ptMapType]];
+    [self checkProperties];
     
-    //
-    // User Tracking Mode
-    //
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_USER_TRACKING_MODE] != nil)
-    {
-        [self.myProperties setPtUserTrackingMode:[[NSUserDefaults standardUserDefaults] integerForKey:@KEY_USER_TRACKING_MODE]];
-    }
-    else
-    {
-        // we don't have a color preference stored on this device,
-        // use the default value in this case (white)
-        //
-        [self.myProperties setPtUserTrackingMode:MKUserTrackingModeNone];  // default
-    }
-    [worldView setUserTrackingMode:[self.myProperties ptUserTrackingMode] animated:YES];
-    
-    //
-    // Location Accuracy
-    //
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_LOCATION_ACCURACY] != nil)
-    {
-        [self.myProperties setPtLocationAccuracy:[[NSUserDefaults standardUserDefaults] floatForKey:@KEY_LOCATION_ACCURACY]];
-    }
-    else
-    {
-        // we don't have a preference stored on this device,
-        // use the default value in this case (kCLLocationAccuracyBest)
-        //
-        [self.myProperties setPtLocationAccuracy:kCLLocationAccuracyBest];  // default
-    }
-    [locationManager setDesiredAccuracy:[self.myProperties ptLocationAccuracy]];
-    
-    //
-    // Distance Filter
-    //
-#ifdef __NUA__
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_DISTANCE_FILTER] != nil)
-    {
-        [self.myProperties setPtDistanceFilter:[[NSUserDefaults standardUserDefaults] floatForKey:@KEY_DISTANCE_FILTER]];
-    }
-    else
-    {
-        // we don't have a preference stored on this device,
-        // use the default value in this case (kCLLocationAccuracyBest)
-        //
-        [self.myProperties setPtDistanceFilter:50.0];  // default
-    }
-    [locationManager setDistanceFilter:[self.myProperties ptDistanceFilter]];
-#else
-    [locationManager setDistanceFilter:1.0];
-#endif
-
-    // Hoping to improve performance here ...
-    if ((myProperties.ptLocationAccuracy == kCLLocationAccuracyBest) ||
-        (myProperties.ptLocationAccuracy == kCLLocationAccuracyBestForNavigation)) {
-        NSTimeInterval myTimeout = 5.0;
-        [locationManager allowDeferredLocationUpdatesUntilTraveled:[myProperties ptDistanceFilter] timeout:myTimeout];
-    }
-    else
-        [locationManager disallowDeferredLocationUpdates];
-    
-    //
-    // Toggle buttons
-    //
-    // LOCATIONS
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_LOCATIONS] != nil)
-    {
-        [self.myProperties setShowLocations:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_LOCATIONS]];
-    }
-    else
-    {
-        // we don't have a preference stored on this device,
-        // use the default value in this case (YES)
-        //
-        [self.myProperties setShowLocations:YES];  // default
-    }
-    
-    // Pictures
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_PICTURES] != nil)
-    {
-        [self.myProperties setShowPictures:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_PICTURES]];
-    }
-    else
-    {
-        // we don't have a preference stored on this device,
-        // use the default value in this case (YES)
-        //
-        [self.myProperties setShowPictures:YES];  // default
-    }
-    
-    // STOPS
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_STOPS] != nil)
-    {
-        [self.myProperties setShowStops:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_STOPS]];
-    }
-    else
-    {
-        // we don't have a preference stored on this device,
-        // use the default value in this case (YES)
-        //
-        [self.myProperties setShowStops:YES];  // default
-    }
-    
-    // NOTES
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_NOTES] != nil)
-    {
-        [self.myProperties setShowNotes:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_NOTES]];
-    }
-    else
-    {
-        // we don't have a preference stored on this device,
-        // use the default value in this case (YES)
-        //
-        [self.myProperties setShowNotes:YES];  // default
-    }
-    
-    // Sounds (or Movies)
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_SOUNDS] != nil)
-    {
-        [self.myProperties setShowSounds:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_SOUNDS]];
-    }
-    else
-    {
-        // we don't have a preference stored on this device,
-        // use the default value in this case (YES)
-        //
-        [self.myProperties setShowSounds:YES];  // default
-    }
-    
-    // KEY_PT_SHOW_SPEED_LABEL
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_SPEED_LABEL] != nil)
-    {
-        [self.myProperties setShowSpeedBar:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_SPEED_LABEL]];
-    }
-    else
-    {
-        // we don't have a preference stored on this device,
-        // use the default value in this case (YES)
-        //
-        [self.myProperties setShowSpeedBar:YES];  // default
-    }
-    // Trigger the display
-    if ([self.myProperties showSpeedBar]) {
-        [speedTimeBar setHidden:NO];
-        // speedBar.layer.borderColor = TOM_LABEL_BORDER_COLOR;
-        // speedBar.layer.borderWidth = TOM_LABEL_BORDER_WIDTH;
-        // speedBar.layer.cornerRadius = TOM_LABEL_BORDER_CORNER_RADIUS;
-    }
-    else
-        [speedTimeBar setHidden:YES];
-    
-    
-    // KEY_PT_SHOW_SPEED_LABEL
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_INFO_LABEL] != nil)
-    {
-        [self.myProperties setShowInfoBar:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_INFO_LABEL]];
-    }
-    else
-    {
-        // we don't have a preference stored on this device,
-        // use the default value in this case (YES)
-        //
-        [self.myProperties setShowInfoBar:YES];  // default
-    }
-    
-    // Trigger the display
-    if ([self.myProperties showInfoBar]) {
-        [distanceInfoBar setHidden:NO];
-        // infoBar.layer.borderColor  = TOM_LABEL_BORDER_COLOR;
-        // infoBar.layer.borderWidth  = TOM_LABEL_BORDER_WIDTH;
-        // infoBar.layer.cornerRadius = TOM_LABEL_BORDER_CORNER_RADIUS;
-    }
-    else {
-        [distanceInfoBar setHidden:YES];
-    }
     // Update all the pins
     [self updateAnnotations];
 }
@@ -623,8 +444,8 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+    
 }
-
 
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -644,8 +465,8 @@
         pt != ptError ) {
         TOMPointOnAMap *mp = [[TOMPointOnAMap alloc] initWithLocationHeadingType:newLocation heading:currentHeading type:pt];
         [ theTrail addPointOnMap:mp ];
-        // [ mySlider addSpeed:[newLocation speed] ];
-        [ mySlider setNeedsDisplay ];
+
+        // [ mySlider setNeedsDisplay ];
         if ((pt == ptLocation && [self.myProperties showLocations]) ||
             (pt == ptStop && [self.myProperties showStops]) ||
             (pt == ptPicture && [self.myProperties showPictures])) {
@@ -753,7 +574,7 @@
     // NSLog(@"Speed: %.2f",[loc speed]);
     // NSLog(@"Time: %f", t);
     if (loc.speed < 0.00) {
-        NSLog(@"Speed[%.2f] less than 0",loc.speed);
+        NSLog(@"%s : Speed[%.2f] less than 0",__PRETTY_FUNCTION__,loc.speed);
         return;
     }
     /*
@@ -853,10 +674,12 @@
         return;
     
     CLLocation *stopLoc = [locationManager location];
-    [ mySlider addSpeed:[stopLoc speed] ];
+    [ mySlider addSpeed:[stopLoc speed] Altitude:[stopLoc altitude] ];
     [ mySlider setNeedsDisplay];
-
-    // Still Moving...
+    [ mySpeedOMeter updateSpeed:[stopLoc speed]];
+    [ mySpeedOMeter setNeedsDisplay];
+     
+     // Still Moving...
     if  ([stopLoc speed] > 0.0) {
         // NSLog(@"Moving %.2f",[stopLoc speed]);
         return;
@@ -950,6 +773,7 @@
 
             theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
             myProperties = [[TOMProperties alloc]initWithTitle:nameStr];
+            [self checkProperties];
         }
         
         [worldView setDelegate:self];
@@ -963,7 +787,21 @@
     else
     {
         // Stop updating the location
+        NSString *alertTitle = @"Are you sure you want to turn off?";
         
+        UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:alertTitle
+                                                                 delegate:self
+                                                        cancelButtonTitle:@"NO"
+                                                   destructiveButtonTitle:@"YES"
+                                                        otherButtonTitles:nil];
+        actionSheet.actionSheetStyle = UIActionSheetStyleDefault;
+        
+        [actionSheet setTag:3];
+        
+        // [actionSheet setDelegate:self];
+        [actionSheet showInView:self.view];
+
+#ifdef __FFU__
         // add this last location:
         //
         CLLocation     *stopLoc = [locationManager location];
@@ -988,9 +826,39 @@
         //  This will need to be changed to handing the UIDocument Class:
         // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
         [self saveTrails:NO];
+#endif
+        
     }
 
     return;
+}
+
+-(void) stopTrail
+{
+    // add this last location:
+    //
+    CLLocation     *stopLoc = [locationManager location];
+    TOMPointOnAMap *lastOne = [theTrail lastPom];
+    if (!lastOne) { // or the first location:
+        [self processMyLocation:stopLoc type:ptStop];
+    }
+    else if ([lastOne type] != ptStop ) {
+        [self processMyLocation:stopLoc type:ptStop];
+    }
+    
+    // NSLog(@TOM_OFF_TEXT);
+    amiUpdatingLocation = NO;;
+    startStopItem.title = @TOM_ON_TEXT;
+    
+    // Stop the timer
+    [ptTimer invalidate];
+    
+    [locationManager stopUpdatingLocation];
+    [locationManager stopUpdatingHeading];
+    
+    //  This will need to be changed to handing the UIDocument Class:
+    // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
+    [self saveTrails:NO];
 }
 
 //
@@ -1060,10 +928,13 @@
     NSLog(@"Button Index:%ld",(long)buttonIndex);
     NSInteger myTag = [actionSheet tag];
     
-    if (myTag == 1) {
+    if (myTag == 3) {
         // This is the actions for the iCloud check
-        NSLog(@"User Selected to go to setting to do iCloud Stuff");
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs:root=CASTLE&path=STORAGE_AND_BACKUP"]];
+        
+        if (buttonIndex == 0 ) {
+            NSLog(@"User Selected to go to setting to STOP");
+            [self stopTrail];
+        }
         return;
     }
     else {
@@ -1175,6 +1046,7 @@
     return;
 }
 
+#pragma file_section
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //  Wrapper functions to load and save the data.
@@ -1273,6 +1145,297 @@
     return result;
 }
 
+
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * * *
+//
+- (void)orientationChanged:(NSNotification *)notification {
+    // Respond to changes in device orientation
+    //  NSLog(@"Orientation Changed!");
+    static UIDeviceOrientation currentOrientation = UIDeviceOrientationUnknown;
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    
+    if (orientation == UIDeviceOrientationFaceUp ||
+        orientation == UIDeviceOrientationFaceDown ||
+        orientation == UIDeviceOrientationUnknown ||
+        orientation == UIDeviceOrientationPortraitUpsideDown ||
+        currentOrientation == orientation) {
+        return;
+    }
+    
+    if ((UIDeviceOrientationIsPortrait(currentOrientation) && UIDeviceOrientationIsPortrait(orientation)) ||
+        (UIDeviceOrientationIsLandscape(currentOrientation) && UIDeviceOrientationIsLandscape(orientation))) {
+        //still saving the current orientation
+        currentOrientation = orientation;
+        return;
+    }
+
+    currentOrientation = orientation;
+    
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGFloat screenHeight = screenRect.size.height;
+    CGFloat screenWidth = screenRect.size.width;
+    CGFloat sliderMaxY = TOM_SLIDER_MAX_Y_VERT;
+    if (UIDeviceOrientationIsLandscape(currentOrientation)  ||
+        currentOrientation == UIDeviceOrientationPortraitUpsideDown ) {
+        screenHeight = screenRect.size.width;
+        screenWidth = screenRect.size.height;
+        sliderMaxY = TOM_SLIDER_MAX_Y_HORZ;
+    }
+    // else {
+    //     NSLog(@"Not Landscape");
+    // }
+    //
+    // NSLog(@"Screen Rect: x:%f y:%f w:%f h:%f",screenRect.origin.x,screenRect.origin.y,screenWidth,screenHeight);
+
+    [self.view setFrame:screenRect];
+    CGRect mapRect = CGRectMake( 0.0, 0.0, screenWidth, (screenHeight - TOM_TOOL_BAR_HEIGHT ));
+    [worldView setFrame:mapRect];
+    
+    CGFloat myWidth = 0.0;
+    if ([mySlider displayup]) {
+        if (UIDeviceOrientationIsLandscape(currentOrientation))
+            myWidth = screenWidth-200;
+        else
+            myWidth = screenWidth;
+    }
+    else
+        myWidth = TOM_SLIDER_MIN_X;
+    
+    CGRect sliderRect = CGRectMake(0.0f, (screenHeight - sliderMaxY - TOM_TOOL_BAR_HEIGHT), myWidth, sliderMaxY );
+    [mySlider setFrame:sliderRect];
+    [mySlider setNeedsDisplay];
+    
+    if ([mySpeedOMeter displayup]) {
+        if (UIDeviceOrientationIsLandscape(currentOrientation))
+            myWidth = 200.0f;
+        else
+            myWidth = screenWidth;
+    }
+    else
+        myWidth = TOM_SLIDER_MIN_X;
+        
+    CGRect speedOMeterRect;
+    
+    if (UIDeviceOrientationIsLandscape(currentOrientation))
+        speedOMeterRect = CGRectMake(screenWidth-myWidth, (screenHeight - sliderMaxY - TOM_TOOL_BAR_HEIGHT), myWidth, sliderMaxY);
+    else // Portrait.
+        speedOMeterRect = CGRectMake(0.0f,(sliderRect.origin.y - 200 ) ,myWidth, 200.0f);
+    
+    [mySpeedOMeter setFrame:speedOMeterRect];
+    [mySpeedOMeter setNeedsDisplay];
+    
+    
+    CGRect toolbarRect;
+    toolbarRect.origin.x = 0;
+    toolbarRect.origin.y = screenHeight - TOM_TOOL_BAR_HEIGHT;
+    toolbarRect.size.height = TOM_TOOL_BAR_HEIGHT;
+    toolbarRect.size.width = screenWidth;
+    [toolbar setFrame:toolbarRect];
+
+    CGRect speedBarRect;
+    speedBarRect.origin.x = ((screenWidth / 2) - (TOM_LABEL_WIDTH/2));
+    speedBarRect.origin.y = ptTopMargin + 50;
+    speedBarRect.size.height = ptLabelHeight;
+    speedBarRect.size.width = TOM_LABEL_WIDTH;
+    [speedTimeBar setFrame:speedBarRect];
+    
+    CGRect infoBarRect;
+    infoBarRect.origin.x = ((screenWidth / 2) - (TOM_LABEL_WIDTH/2));
+    infoBarRect.origin.y = ptTopMargin +50  + ptLabelHeight + 10;
+    infoBarRect.size.height = ptLabelHeight;
+    infoBarRect.size.width = TOM_LABEL_WIDTH;
+    [distanceInfoBar setFrame:infoBarRect];
+}
+
+#pragma properties
+
+- (void) checkProperties
+{
+    //
+    //  Check the properties
+    //
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_MAP_TYPE] != nil)
+    {
+        [self.myProperties setPtMapType:[[NSUserDefaults standardUserDefaults] integerForKey:@KEY_MAP_TYPE]];
+    }
+    else
+    {
+        // we don't have a color preference stored on this device,
+        // use the default value in this case (white)
+        //
+        [self.myProperties setPtMapType:MKMapTypeStandard];  // default
+    }
+    [worldView setMapType:[self.myProperties ptMapType]];
+    
+    //
+    // User Tracking Mode
+    //
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_USER_TRACKING_MODE] != nil)
+    {
+        [self.myProperties setPtUserTrackingMode:[[NSUserDefaults standardUserDefaults] integerForKey:@KEY_USER_TRACKING_MODE]];
+    }
+    else
+    {
+        // we don't have a color preference stored on this device,
+        // use the default value in this case (white)
+        //
+        [self.myProperties setPtUserTrackingMode:MKUserTrackingModeNone];  // default
+    }
+    [worldView setUserTrackingMode:[self.myProperties ptUserTrackingMode] animated:YES];
+    
+    //
+    // Location Accuracy
+    //
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_LOCATION_ACCURACY] != nil)
+    {
+        [self.myProperties setPtLocationAccuracy:[[NSUserDefaults standardUserDefaults] floatForKey:@KEY_LOCATION_ACCURACY]];
+    }
+    else
+    {
+        // we don't have a preference stored on this device,
+        // use the default value in this case (kCLLocationAccuracyBest)
+        //
+        [self.myProperties setPtLocationAccuracy:kCLLocationAccuracyBest];  // default
+    }
+    [locationManager setDesiredAccuracy:[self.myProperties ptLocationAccuracy]];
+    
+    //
+    // Distance Filter
+    //
+    [locationManager setDistanceFilter:1.0];
+    
+    // Hoping to improve performance here ...
+    if ((myProperties.ptLocationAccuracy == kCLLocationAccuracyBest) ||
+        (myProperties.ptLocationAccuracy == kCLLocationAccuracyBestForNavigation)) {
+        NSTimeInterval myTimeout = 5.0;
+        [locationManager allowDeferredLocationUpdatesUntilTraveled:[myProperties ptDistanceFilter] timeout:myTimeout];
+    }
+    else
+        [locationManager disallowDeferredLocationUpdates];
+    
+    //
+    // Toggle buttons
+    //
+    // LOCATIONS
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_LOCATIONS] != nil)
+    {
+        [self.myProperties setShowLocations:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_LOCATIONS]];
+    }
+    else
+    {
+        // we don't have a preference stored on this device,
+        // use the default value in this case (YES)
+        //
+        [self.myProperties setShowLocations:YES];  // default
+    }
+    
+    // Pictures
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_PICTURES] != nil)
+    {
+        [self.myProperties setShowPictures:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_PICTURES]];
+    }
+    else
+    {
+        // we don't have a preference stored on this device,
+        // use the default value in this case (YES)
+        //
+        [self.myProperties setShowPictures:YES];  // default
+    }
+    
+    // STOPS
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_STOPS] != nil)
+    {
+        [self.myProperties setShowStops:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_STOPS]];
+    }
+    else
+    {
+        // we don't have a preference stored on this device,
+        // use the default value in this case (YES)
+        //
+        [self.myProperties setShowStops:YES];  // default
+    }
+    
+    // NOTES
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_NOTES] != nil)
+    {
+        [self.myProperties setShowNotes:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_NOTES]];
+    }
+    else
+    {
+        // we don't have a preference stored on this device,
+        // use the default value in this case (YES)
+        //
+        [self.myProperties setShowNotes:YES];  // default
+    }
+    
+    // Sounds (or Movies)
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_SOUNDS] != nil)
+    {
+        [self.myProperties setShowSounds:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_SOUNDS]];
+    }
+    else
+    {
+        // we don't have a preference stored on this device,
+        // use the default value in this case (YES)
+        //
+        [self.myProperties setShowSounds:YES];  // default
+    }
+    
+    // KEY_PT_SHOW_SPEED_LABEL
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_SPEED_LABEL] != nil)
+    {
+        [self.myProperties setShowSpeedBar:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_SPEED_LABEL]];
+    }
+    else
+    {   // we don't have a preference stored on this device,
+        // use the default value in this case (YES)
+        //
+        [self.myProperties setShowSpeedBar:YES];  // default
+    }
+    // Trigger the display
+    if ([self.myProperties showSpeedBar]) {
+        [speedTimeBar setHidden:NO];
+    }
+    else
+        [speedTimeBar setHidden:YES];
+    
+    
+    // KEY_PT_SHOW_SPEED_LABEL
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_INFO_LABEL] != nil)
+    {
+        [self.myProperties setShowInfoBar:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_INFO_LABEL]];
+    }
+    else
+    {
+        // we don't have a preference stored on this device,
+        // use the default value in this case (YES)
+        //
+        [self.myProperties setShowInfoBar:YES];  // default
+    }
+    
+    // Trigger the display
+    if ([self.myProperties showInfoBar]) {
+        [distanceInfoBar setHidden:NO];
+
+    }
+    else {
+        [distanceInfoBar setHidden:YES];
+    }
+
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_DISTANCE_FILTER] != nil)
+    {
+        [self.myProperties setPtDistanceFilter:[[NSUserDefaults standardUserDefaults] floatForKey:@KEY_DISTANCE_FILTER]];
+    }
+    else
+    {   //
+        // we don't have a preference stored on this device,use the kCLLocationAccuracyBest as default.
+        //
+        [self.myProperties setPtDistanceFilter:100.0];  // default
+    }
+    
+}
+
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //
@@ -1339,83 +1502,5 @@
     return;
 }
 
-//
-// * * * * * * * * * * * * * * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * * *
-//
-- (void)orientationChanged:(NSNotification *)notification {
-    // Respond to changes in device orientation
-    //  NSLog(@"Orientation Changed!");
-    static UIDeviceOrientation currentOrientation = UIDeviceOrientationUnknown;
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    
-    if (orientation == UIDeviceOrientationFaceUp ||
-        orientation == UIDeviceOrientationFaceDown ||
-        orientation == UIDeviceOrientationUnknown ||
-        orientation == UIDeviceOrientationPortraitUpsideDown ||
-        currentOrientation == orientation) {
-        return;
-    }
-    
-    if ((UIDeviceOrientationIsPortrait(currentOrientation) && UIDeviceOrientationIsPortrait(orientation)) ||
-        (UIDeviceOrientationIsLandscape(currentOrientation) && UIDeviceOrientationIsLandscape(orientation))) {
-        //still saving the current orientation
-        currentOrientation = orientation;
-        return;
-    }
-
-    currentOrientation = orientation;
-    
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    CGFloat screenHeight = screenRect.size.height;
-    CGFloat screenWidth = screenRect.size.width;
-
-    if (UIDeviceOrientationIsLandscape(currentOrientation) ||
-        currentOrientation == UIDeviceOrientationPortraitUpsideDown) {
-        screenHeight = screenRect.size.width;
-        screenWidth = screenRect.size.height;
-    }
-    // else {
-    //     NSLog(@"Not Landscape");
-    // }
-    //
-    // NSLog(@"Screen Rect: x:%f y:%f w:%f h:%f",screenRect.origin.x,screenRect.origin.y,screenWidth,screenHeight);
-
-    [self.view setFrame:screenRect];
-    
-    CGRect mapRect = CGRectMake( 0.0, 0.0, screenWidth, (screenHeight - TOM_TOOL_BAR_HEIGHT ));
-    [worldView setFrame:mapRect];
-    
-    CGFloat myHieght = 0.0;
-    if ([mySlider displayup]) {
-        myHieght = 100.0;
-    }
-    else
-        myHieght = TOM_SLIDER_MIN_Y;
-        
-    CGRect sliderRect = CGRectMake(0.0f, (screenHeight - TOM_TOOL_BAR_HEIGHT - myHieght), screenWidth, myHieght);
-    [mySlider setFrame:sliderRect];
-    [mySlider setNeedsDisplay];
-    
-    CGRect toolbarRect;
-    toolbarRect.origin.x = 0;
-    toolbarRect.origin.y = screenHeight - TOM_TOOL_BAR_HEIGHT;
-    toolbarRect.size.height = TOM_TOOL_BAR_HEIGHT;
-    toolbarRect.size.width = screenWidth;
-    [toolbar setFrame:toolbarRect];
-
-    CGRect speedBarRect;
-    speedBarRect.origin.x = ((screenWidth / 2) - (TOM_LABEL_WIDTH/2));
-    speedBarRect.origin.y = ptTopMargin + 50;
-    speedBarRect.size.height = ptLabelHeight;
-    speedBarRect.size.width = TOM_LABEL_WIDTH;
-    [speedTimeBar setFrame:speedBarRect];
-    
-    CGRect infoBarRect;
-    infoBarRect.origin.x = ((screenWidth / 2) - (TOM_LABEL_WIDTH/2));
-    infoBarRect.origin.y = ptTopMargin +50  + ptLabelHeight + 10;
-    infoBarRect.size.height = ptLabelHeight;
-    infoBarRect.size.width = TOM_LABEL_WIDTH;
-    [distanceInfoBar setFrame:infoBarRect];
-}
 
 @end

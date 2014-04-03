@@ -44,6 +44,37 @@
     return -9999.99;
 }
 
++ (CLLocationSpeed) speedToMPS: (CLLocationSpeed) s
+{
+
+    TOMDisplaySpeedType myDisplayUnits = [TOMSpeed speedType];
+    
+    switch (myDisplayUnits)
+    {
+        case tomDSMilesPerHour:
+            return s * 0.44704f;
+            break;
+            
+        case tomDSKmPerHour:
+            return s * 0.2777777777777778f;
+            break;
+            
+        case tomDSMinutesPerMile:
+            return s*0.037282272f;
+            break;
+            
+        case tomDSMetersPerSecond:
+            return s;
+            break;
+            
+        default:
+            NSLog(@"ERROR: Invalid or Unknown %@",@KEY_SPEED_UNITS);
+            break;
+    }
+    return -9999.99;
+}
+
+
 //
 // * * * * * * * * * * * * * * * * * * *
 //

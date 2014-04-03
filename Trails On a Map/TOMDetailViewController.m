@@ -760,7 +760,7 @@
         [TOMUrl removeURL:documentURL];
     }
     else {
-        NSLog(@"%s Error in archiving:%d",__PRETTY_FUNCTION__,result);
+        NSLog(@"%s Error in archiving:%ld",__PRETTY_FUNCTION__,(long)result);
     }
     
     //
@@ -774,7 +774,7 @@
             [TOMUrl removeURL:tempURL];
         }
         else {
-            NSLog(@"%s Error archiving photos.  Result: %d",__PRETTY_FUNCTION__,result);
+            NSLog(@"%s Error archiving photos.  Result: %ld",__PRETTY_FUNCTION__,(long)result);
         }
     }
     }); // end dispatch

@@ -15,6 +15,7 @@
 // FFU: @property (nonatomic, readwrite) CLLocationSpeed speed;
 
 + (CLLocationSpeed) displaySpeed: (CLLocationSpeed) s;
++ (CLLocationSpeed) speedToMPS: (CLLocationSpeed) s;
 + (NSString *) displaySpeedUnits;
 + (TOMDisplaySpeedType) speedType;
 

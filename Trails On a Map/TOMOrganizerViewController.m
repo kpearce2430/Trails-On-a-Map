@@ -254,7 +254,7 @@
 
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
-    // NSLog(@"In %s",__func__);
+
     return UITableViewCellEditingStyleDelete;
 
 }
@@ -263,7 +263,7 @@
     
     [super setEditing:editing animated:animated];
     [organizerTable setEditing:editing animated:animated];
-    // NSLog(@"In %s",__func__);
+
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -437,9 +437,6 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
         
         NSError *fileCoordinatorError = nil;
-        
-
-        
         [[[NSFileCoordinator alloc] initWithFilePresenter:nil] coordinateWritingItemAtURL:document.fileURL options:NSFileCoordinatorWritingForDeleting error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
             
             // extra check to ensure coordinator is not running on main thread

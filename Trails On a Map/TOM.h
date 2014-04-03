@@ -36,6 +36,8 @@ typedef enum  { tomDDError = -1, tomDDUnknown, tomDDMiles, tomDDKilometers, tomD
 #define TOM_FILE_EXT             ".tom"
 #define TOM_GPX_EXT              ".gpx"
 #define TOM_KML_EXT              ".kml"
+#define TOM_KMZ_EXT              ".kmz"
+#define TOM_JPG_EXT              ".jpg"
 #define TOM_TOOL_BAR_HEIGHT      35
 #define TOM_LABEL_WIDTH          200
 
@@ -91,9 +93,14 @@ typedef enum  { tomDDError = -1, tomDDUnknown, tomDDMiles, tomDDKilometers, tomD
 //
 // Slider defines
 #define TOM_SLIDER_MIN_Y    20
-#define TOM_SLIDER_MAX_Y    120
+#define TOM_SLIDER_MAX_Y    150
+#define TOM_SLIDER_MAX_Y_VERT   150
+#define TOM_SLIDER_MAX_Y_HORZ   120
+#define TOM_SLIDER_MIN_X    20
+#define TOM_SLIDER_MAX_X    999
 
 #define TOM_SLIDER_NUM_PTS  61
+#define TOM_SLIDER_HALF_PTS 30
 #define TOM_FONT            "Helvetica-Bold"
 #define TOM_PVC_EXTRA       300
 
