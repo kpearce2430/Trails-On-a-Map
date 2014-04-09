@@ -78,12 +78,17 @@
         worldView = [[MKMapView alloc] initWithFrame:mapRect];
         [self.view addSubview:worldView];
         
-        CGRect mySpeedOMeterRect = CGRectMake(0.0f, (screenHeight - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MAX_Y - 200 ), TOM_SLIDER_MIN_X, 200);
-        mySpeedOMeter = [[TOMSpeedOMeter alloc] initWithFrame:mySpeedOMeterRect];
+        // Build the SpeedOMeter View
+        CGRect mySpeedOMeterPortraitRect = CGRectMake(0.0f, (screenHeight - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MAX_Y - 200 ), screenWidth, 200);
+        // note: Height and Width are reversed on the landscape view.
+        CGRect mySpeedOMeterLandscapeRect = CGRectMake(screenHeight-200.0f, (screenWidth - TOM_SLIDER_MAX_Y - TOM_TOOL_BAR_HEIGHT), 200.0f, TOM_SLIDER_MAX_Y);
+        mySpeedOMeter = [[TOMSpeedOMeter alloc] initWithFramePortrait:mySpeedOMeterPortraitRect Landscape:mySpeedOMeterLandscapeRect ];
         [self.view addSubview:mySpeedOMeter];
         
-        CGRect mySliderRect = CGRectMake( 0.0f , (screenHeight - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MAX_Y), TOM_SLIDER_MIN_X, TOM_SLIDER_MAX_Y );
-        mySlider = [[TOMViewSlider alloc] initWithFrame:mySliderRect];
+        CGRect mySliderPortraitRect = CGRectMake( 0.0f , (screenHeight - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MAX_Y), screenWidth, TOM_SLIDER_MAX_Y );
+        // note: Height and Width are reversed on the landscape view.
+        CGRect mySliderLandScapeRect = CGRectMake( 0.0f , (screenWidth - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MAX_Y), screenHeight - 200.0f, TOM_SLIDER_MAX_Y );
+        mySlider = [[TOMViewSlider alloc] initWithFramePortrait:mySliderPortraitRect Landscape:mySliderLandScapeRect];
         [self.view addSubview:mySlider];
 
        
@@ -171,6 +176,13 @@
         [activityIndicator setCenter:CGPointMake(screenWidth/2.0, screenHeight/2.0)];
         [activityIndicator hidesWhenStopped];
         [self.view addSubview:activityIndicator];
+        
+        
+        UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(scaleTheView:)];
+        // [pinchGesture setDelegate:self];
+        [self.view addGestureRecognizer:pinchGesture];
+        
+
     }
     [self checkProperties];
     return self;
@@ -447,6 +459,219 @@
     
 }
 
+#pragma touch_methods
+
+-(void) scaleTheView:(UIPinchGestureRecognizer *)pinchRecognizer
+{
+    UIView *theView = [pinchRecognizer view];
+    
+    static TOMSubView *workingView = nil;
+    static CGPoint locationOne;
+    static CGPoint locationTwo;
+    
+    if ([pinchRecognizer numberOfTouches] == 2 ) {
+        @try {
+            locationOne = [pinchRecognizer locationOfTouch:0 inView:theView];
+            locationTwo = [pinchRecognizer locationOfTouch:1 inView:theView];
+            // NSLog(@"%s touch ONE  = %f, %f",__PRETTY_FUNCTION__, locationOne.x, locationOne.y);
+            // NSLog(@"%s touch TWO  = %f, %f",__PRETTY_FUNCTION__, locationTwo.x, locationTwo.y);
+        }
+        @catch (NSException *exception)
+        {
+            // Print exception information
+            NSLog( @"NSException caught" );
+            NSLog( @"Name: %@", exception.name);
+            NSLog( @"Reason: %@", exception.reason );
+            return;
+        }
+#ifdef __FFU__
+        @finally {
+            NSLog(@"Finally block");
+        }
+#endif
+    }
+    else {
+        //
+        // NSLog(@"%s Warning Invalid Number of Touches: %ld",__PRETTY_FUNCTION__,(long)[pinchRecognizer numberOfTouches]);
+        if (workingView == nil)
+            return;
+    }
+
+    if (workingView == nil) {
+        if (CGRectContainsPoint(mySlider.frame, locationOne) &&
+            CGRectContainsPoint(mySlider.frame, locationTwo)) {
+            workingView = mySlider;
+        }
+        else if (CGRectContainsPoint(mySpeedOMeter.frame, locationOne) &&
+                 CGRectContainsPoint(mySpeedOMeter.frame, locationTwo)) {
+            workingView = mySpeedOMeter;
+        }
+        else {
+            return;
+        }
+    }
+    
+    CGRect myFrame =  CGRectMake(MIN(locationOne.x, locationTwo.x),
+                                 MIN(locationOne.y, locationTwo.y),
+                                 fabs(locationOne.x - locationTwo.x),
+                                 fabs(locationOne.y - locationTwo.y));
+    
+    if ([pinchRecognizer state] == UIGestureRecognizerStateBegan) {
+        NSLog(@"StateBegan");
+        self.worldView.zoomEnabled = NO;
+        self.worldView.scrollEnabled = NO;
+        self.worldView.userInteractionEnabled = NO;
+    }
+    else if ([pinchRecognizer state] == UIGestureRecognizerStateChanged) {
+         NSLog(@"StateChanged");
+        [workingView setFrame:myFrame];
+        [workingView setNeedsDisplay];
+
+    }
+    else if ([pinchRecognizer state] == UIGestureRecognizerStateCancelled) {
+        NSLog(@"StateCancelled");
+        self.worldView.zoomEnabled = YES;
+        self.worldView.scrollEnabled = YES;
+        self.worldView.userInteractionEnabled = YES;
+    }
+    else if ([pinchRecognizer state] == UIGestureRecognizerStateEnded )
+    {
+        NSLog(@"StateEnded");
+        if (workingView) {
+            [workingView setFrame:myFrame];
+            [workingView saveFrame:myFrame];
+            [workingView setNeedsDisplay];
+            [workingView resetView];
+            workingView = nil;
+        }
+        
+        self.worldView.zoomEnabled = YES;
+        self.worldView.scrollEnabled = YES;
+        self.worldView.userInteractionEnabled = YES;
+    }
+    else {
+        NSLog(@"%s Unrecognized UIGestureRecognizer State: %ld",__PRETTY_FUNCTION__,(long)[pinchRecognizer state]);
+    }
+}
+
+
+/**
+ Scales up a view slightly which makes the piece slightly larger, as if it is being picked up by the user.
+ */
+-(void)animateFirstTouchAtPoint:(CGPoint)touchPoint forView:(UIView *)theView
+{
+    NSLog(@"%s <-- Here",__PRETTY_FUNCTION__);
+#ifdef __FFU__
+	// Pulse the view by scaling up, then move the view to under the finger.
+	[UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDuration:2.0];
+	theView.transform = CGAffineTransformMakeScale(1.2, 1.2);
+	[UIView commitAnimations];
+#endif
+}
+
+-(void)dispatchFirstTouchAtPoint:(CGPoint)touchPoint forEvent:(UIEvent *)event
+{
+    NSLog(@"%s ",__PRETTY_FUNCTION__);
+	if (CGRectContainsPoint(mySlider.frame, touchPoint)) {
+		[self animateFirstTouchAtPoint:touchPoint forView:mySlider];
+	}
+    else if (CGRectContainsPoint(mySpeedOMeter.frame, touchPoint)) {
+		[self animateFirstTouchAtPoint:touchPoint forView:mySpeedOMeter];
+	}
+
+}
+
+
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+	NSUInteger numTaps = [[touches anyObject] tapCount];
+    NSLog(@"%s <-- Began %lu",__PRETTY_FUNCTION__,(unsigned long)numTaps);
+    
+    // Enumerate through all the touch objects.
+	NSUInteger touchCount = 0;
+	for (UITouch *touch in touches) {
+		// Send to the dispatch method, which will make sure the appropriate subview is acted upon.
+		[self dispatchFirstTouchAtPoint:[touch locationInView:self.view] forEvent:nil];
+		touchCount++;
+	}
+    
+
+}
+
+-(void)dispatchTouchEvent:(UIView *)theView toPosition:(CGPoint)position
+{
+    NSLog(@"%s ",__PRETTY_FUNCTION__);
+    
+    if (CGRectContainsPoint([mySlider frame], position)) {
+		mySlider.center = position;
+	}
+	else if (CGRectContainsPoint([mySpeedOMeter frame], position)) {
+		mySpeedOMeter.center = position;
+	}
+    
+}
+
+-(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    NSLog(@"%s <-- Moved",__PRETTY_FUNCTION__);
+    NSUInteger touchCount = 0;
+    
+    for (UITouch *touch in touches) {
+		// Send to the dispatch method, which will make sure the appropriate subview is acted upon
+		[self dispatchTouchEvent:[touch view] toPosition:[touch locationInView:self.view]];
+		touchCount++;
+	}
+    NSLog(@"%s Number of Touches: %ld",__PRETTY_FUNCTION__,(long)touchCount);
+}
+
+/**
+ Scales down the view and moves it to the new position.
+ */
+-(void)animateView:(UIView *)theView toPosition:(CGPoint)thePosition
+{
+    NSLog(@"%s <-- here",__PRETTY_FUNCTION__);
+#ifdef __FFU__
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationDuration:2.0];
+#endif
+	// Set the center to the final postion.
+	theView.center = thePosition;
+
+    
+#ifdef __FFU__
+	// Set the transform back to the identity, thus undoing the previous scaling effect.
+	theView.transform = CGAffineTransformIdentity;
+	[UIView commitAnimations];
+#endif
+}
+
+-(void)dispatchTouchEndEvent:(UIView *)theView toPosition:(CGPoint)position
+{
+    
+	// Check to see which view, or views, the point is in and then animate to that position.
+	if (CGRectContainsPoint([mySlider frame], position)) {
+		[self animateView:mySlider toPosition: position];
+        [mySlider saveFrame: theView.frame];
+	}
+	if (CGRectContainsPoint([mySpeedOMeter frame], position)) {
+		[self animateView:mySpeedOMeter toPosition: position];
+        [mySpeedOMeter saveFrame: theView.frame];
+	}
+}
+
+-(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    NSLog(@"%s <--- Ended",__PRETTY_FUNCTION__);
+    NSUInteger touchCount = 0;
+    for (UITouch *touch in touches) {
+		// Sends to the dispatch method, which will make sure the appropriate subview is acted upon
+		[self dispatchTouchEndEvent:[touch view] toPosition:[touch locationInView:self.view]];
+    }
+    NSLog(@"%s Number of Touches: %ld",__PRETTY_FUNCTION__,(long)touchCount);
+}
+
+#pragma location_methods
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //
@@ -556,8 +781,6 @@
 -(void) locationManager:(CLLocationManager *) manager
        didUpdateHeading:(CLHeading *)newHeading
 {
-    // NSLog(@"New Heading");
-    // NSLog(@"%@", [newHeading description]);
     [self setCurrentHeading:newHeading];
 }
 
@@ -593,7 +816,7 @@
         }
 #ifdef __DEBUG__
         else {
-            NSLog(@"Distance %.2f",myDistance);
+            NSLog(@"%s Distance %.2f",__PRETTY_FUNCTION__,myDistance);
         }
 #endif
     }
@@ -712,6 +935,7 @@
     return;
 }
 
+#pragma actions_pragma
 
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -800,34 +1024,6 @@
         
         // [actionSheet setDelegate:self];
         [actionSheet showInView:self.view];
-
-#ifdef __FFU__
-        // add this last location:
-        //
-        CLLocation     *stopLoc = [locationManager location];
-        TOMPointOnAMap *lastOne = [theTrail lastPom];
-        if (!lastOne) { // or the first location:
-            [self processMyLocation:stopLoc type:ptStop];
-        }
-        else if ([lastOne type] != ptStop ) {
-            [self processMyLocation:stopLoc type:ptStop];
-        }
-
-        // NSLog(@TOM_OFF_TEXT);
-        amiUpdatingLocation = NO;;
-        startStopBarButton.title = @TOM_ON_TEXT;
-        
-        // Stop the timer
-        [ptTimer invalidate];
-        
-        [locationManager stopUpdatingLocation];
-        [locationManager stopUpdatingHeading];
-        
-        //  This will need to be changed to handing the UIDocument Class:
-        // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-        [self saveTrails:NO];
-#endif
-        
     }
 
     return;
@@ -937,6 +1133,7 @@
         }
         return;
     }
+#ifdef DEBUG
     else {
         switch (buttonIndex)
         {
@@ -949,6 +1146,7 @@
             break;
         }
     }
+#endif
 }
 
 - (void) launchCamera
@@ -1175,53 +1373,26 @@
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     CGFloat screenHeight = screenRect.size.height;
     CGFloat screenWidth = screenRect.size.width;
-    CGFloat sliderMaxY = TOM_SLIDER_MAX_Y_VERT;
+    // CGFloat sliderMaxY = TOM_SLIDER_MAX_Y_VERT;
     if (UIDeviceOrientationIsLandscape(currentOrientation)  ||
         currentOrientation == UIDeviceOrientationPortraitUpsideDown ) {
         screenHeight = screenRect.size.width;
         screenWidth = screenRect.size.height;
-        sliderMaxY = TOM_SLIDER_MAX_Y_HORZ;
+        // sliderMaxY = TOM_SLIDER_MAX_Y_HORZ;
     }
-    // else {
-    //     NSLog(@"Not Landscape");
-    // }
-    //
-    // NSLog(@"Screen Rect: x:%f y:%f w:%f h:%f",screenRect.origin.x,screenRect.origin.y,screenWidth,screenHeight);
+
 
     [self.view setFrame:screenRect];
     CGRect mapRect = CGRectMake( 0.0, 0.0, screenWidth, (screenHeight - TOM_TOOL_BAR_HEIGHT ));
     [worldView setFrame:mapRect];
-    
-    CGFloat myWidth = 0.0;
-    if ([mySlider displayup]) {
-        if (UIDeviceOrientationIsLandscape(currentOrientation))
-            myWidth = screenWidth-200;
-        else
-            myWidth = screenWidth;
-    }
-    else
-        myWidth = TOM_SLIDER_MIN_X;
-    
-    CGRect sliderRect = CGRectMake(0.0f, (screenHeight - sliderMaxY - TOM_TOOL_BAR_HEIGHT), myWidth, sliderMaxY );
+
+    // Note:  When I did this inside the TOMSubView class, it seemed to have unpredictable resultes.
+    CGRect sliderRect = [mySlider getFrame];
     [mySlider setFrame:sliderRect];
     [mySlider setNeedsDisplay];
-    
-    if ([mySpeedOMeter displayup]) {
-        if (UIDeviceOrientationIsLandscape(currentOrientation))
-            myWidth = 200.0f;
-        else
-            myWidth = screenWidth;
-    }
-    else
-        myWidth = TOM_SLIDER_MIN_X;
-        
-    CGRect speedOMeterRect;
-    
-    if (UIDeviceOrientationIsLandscape(currentOrientation))
-        speedOMeterRect = CGRectMake(screenWidth-myWidth, (screenHeight - sliderMaxY - TOM_TOOL_BAR_HEIGHT), myWidth, sliderMaxY);
-    else // Portrait.
-        speedOMeterRect = CGRectMake(0.0f,(sliderRect.origin.y - 200 ) ,myWidth, 200.0f);
-    
+
+    // See note with mySlider
+    CGRect speedOMeterRect = [mySpeedOMeter getFrame];
     [mySpeedOMeter setFrame:speedOMeterRect];
     [mySpeedOMeter setNeedsDisplay];
     

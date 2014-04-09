@@ -7,31 +7,37 @@
 //
 
 #import "TOMViewSlider.h"
-#import "TOMSpeed.h"
-#import "TOMDistance.h"
+
 
 @implementation TOMViewSlider
 
-@synthesize active,displayup,minAltitude,maxAltitude,minSpeed,maxSpeed,startIndex;
+@synthesize minAltitude,maxAltitude,minSpeed,maxSpeed,startIndex;
+
+- (id)initWithFramePortrait:(CGRect)pFrame Landscape:(CGRect) lFrame
+{
+    self = [super initWithFramePortrait:pFrame Landscape:lFrame];
+    if (self) {
+        // Initialization code
+        [self resetSlider];
+        [self resetView];
+    }
+    return self;
+}
 
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
-        maxSpeed  = 0.0f;
-        minSpeed  = 99999.0f;
-        maxAltitude = 0.0f;
-        minAltitude = 999999.0f;
-        displaySpeeds = [[NSMutableArray alloc] initWithCapacity:100];
-        displayAltitudes = [[NSMutableArray alloc] initWithCapacity:100];
-        active = YES;
-        startIndex = 0;
+        [self resetSlider];
+        [self resetView];
     }
-    
+ 
+#ifdef __NUA__
     UITapGestureRecognizer *doubleFingerTap =[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
     [doubleFingerTap setNumberOfTapsRequired:2];
     [self addGestureRecognizer:doubleFingerTap];
+
 
     UISwipeGestureRecognizer *swipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipedLeft:)];
     [swipeLeft setDirection:UISwipeGestureRecognizerDirectionLeft ];
@@ -40,6 +46,7 @@
     UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipedRight:)];
     [swipeRight setDirection:UISwipeGestureRecognizerDirectionRight ];
     [self addGestureRecognizer:swipeRight];
+#endif
 
     return self;
 }
@@ -47,17 +54,19 @@
 #pragma __gesture_methods__
 
 //The event handling methods:
-
+#ifdef __NUA__
 - (void)handleDoubleTap:(UITapGestureRecognizer *)recognizer {
     
     // Do stuff here...
     // CGPoint location = [recognizer locationInView:[recognizer.view superview]];
     // NSLog(@"%s : Location(%.2f.%.2f)",__PRETTY_FUNCTION__,location.x, location.y);
-    static UIDeviceOrientation orientation = UIDeviceOrientationUnknown;
     UIDeviceOrientation currentOrientation = [[UIDevice currentDevice] orientation];
     
     if (currentOrientation != orientation) {
         orientation = currentOrientation;
+        font = nil;
+        speedDict = nil;
+        altDict = nil;
     }
     
     CGRect screenRect = [[UIScreen mainScreen] bounds];
@@ -79,8 +88,11 @@
     
     [self setFrame:myframe];
     [self setNeedsDisplay];
-    
+  
 }
+#endif
+
+#ifdef __FFU__
 
 - (IBAction)swipedRight:(UISwipeGestureRecognizer *)recognizer
 {
@@ -92,8 +104,7 @@
     // {
     //    CGPoint locOfTouch = [recognizer locationOfTouch:i inView:self];
     //    NSLog(@"location Of Touch %d (%.1f,%.1f)",(int)i,locOfTouch.x,locOfTouch.y);
-    // }
-    //
+    // }    //
     // int half = TOM_SLIDER_NUM_PTS / 2.0f;
     if ((startIndex + TOM_SLIDER_HALF_PTS) > [displayAltitudes count] - TOM_SLIDER_NUM_PTS )
     {
@@ -104,7 +115,7 @@
         startIndex += TOM_SLIDER_HALF_PTS;
     }
     
-    NSLog(@"%s Swipped Right Start Index:%ld Active:%hhd",__PRETTY_FUNCTION__,(long)startIndex,active);
+    // NSLog(@"%s Swipped Right Start Index:%ld Active:%hhd",__PRETTY_FUNCTION__,(long)startIndex,active);
     
 }
 
@@ -125,88 +136,9 @@
         startIndex = startIndex - TOM_SLIDER_HALF_PTS;
     
     active = NO;
-    NSLog(@"%s Swipped Left Start Index:%d Active:%hhd",__PRETTY_FUNCTION__ ,startIndex,active);
-}
-#ifdef __TRACKING_TOUCHES__
-//
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-//
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-#ifdef DEBUG
-    NSLog(@"%s In touches Began %@",__PRETTY_FUNCTION__,event);
-    
-    // NSEnumerator *enumerator = [touches objectEnumerator];
-    // id value;
-    
-    // while ((value = [enumerator nextObject])) {
-        /* code that acts on the set’s values */
-        // NSLog(@"%@",value);
-    // }
-#endif
-    
-#ifdef __FFU__
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    // CGFloat screenHeight = screenRect.size.height;
-    CGFloat screenWidth = screenRect.size.width;
-    
-    CGRect myframe = [self frame];
-    if (myframe.size.width <= TOM_SLIDER_MIN_X ) {
-        // increase
-        displayup = YES;
-        myframe.size.width = screenWidth;
-        // myframe.origin.y -= TOM_SLIDER_MAX_Y;
-    }
-    else {
-        // decrease
-        displayup = NO;
-        myframe.size.width = TOM_SLIDER_MIN_X;
-        // myframe.origin.y += TOM_SLIDER_MAX_Y;
-    }
-    
-    [self setFrame:myframe];
-    [self setNeedsDisplay];
-#endif
-    
+    // NSLog(@"%s Swipped Left Start Index:%d Active:%hhd",__PRETTY_FUNCTION__ ,startIndex,active);
 }
 
-- (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{
-#ifdef DEBUG
-    NSLog(@"%s In touches Began %@",__PRETTY_FUNCTION__,event);
-    
-    // NSEnumerator *enumerator = [touches objectEnumerator];
-    // id value;
-    // UITouch *touch;
-    // while ((touch = [enumerator nextObject])) {
-        /* code that acts on the set’s values */
-        // NSLog(@"Touch: %@",touch);
-    // }
-#else
-    
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    // CGFloat screenHeight = screenRect.size.height;
-    CGFloat screenWidth = screenRect.size.width;
-    
-    CGRect myframe = [self frame];
-    if (myframe.size.width <= TOM_SLIDER_MIN_X ) {
-        // increase
-        displayup = YES;
-        myframe.size.width = screenWidth;
-        // myframe.origin.y -= TOM_SLIDER_MAX_Y;
-    }
-    else {
-        // decrease
-        displayup = NO;
-        myframe.size.width = TOM_SLIDER_MIN_X;
-        // myframe.origin.y += TOM_SLIDER_MAX_Y;
-    }
-    
-    [self setFrame:myframe];
-    [self setNeedsDisplay];
-#endif
-    
-}
 #endif
 
 #pragma class_methods
@@ -227,6 +159,7 @@
     minSpeed  = 99999.0f;
     maxAltitude = 0.0f;
     minAltitude = 99999.0f;
+
 }
 
 //
@@ -239,7 +172,7 @@
     CGContextRef myContext = UIGraphicsGetCurrentContext();
     
     [self setBackgroundColor:[UIColor grayColor]];
-    if (displayup)
+    if ([self displayup])
         [self setAlpha: 0.50];
     else
         [self setAlpha: 0.80];
@@ -247,15 +180,26 @@
     CGFloat myWidth = rect.size.width;
     CGFloat myHeight = rect.size.height;
 
-    if (displayup) {
+    if ([self displayup]) {
+        
+        //  Build the outer box
+        CGRect myFrame = CGRectMake( 0.00f , 0.00f, myWidth, myHeight);
+        CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
+        CGContextSetLineWidth(myContext, 3.0 );
+        CGContextAddRect(myContext, myFrame);
+        CGContextStrokePath(myContext);
         
         CGFloat oneSegX = myWidth / 12.0;
         CGFloat oneSegY = myHeight / 12.0;
-        UIFont *font = [UIFont fontWithName: @TOM_FONT size: oneSegY ];
+        
+        if (!font)
+            font = [UIFont fontWithName: @TOM_FONT size: oneSegY ];
+        
         NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [style setAlignment:NSTextAlignmentRight];
         
-        NSDictionary *speedDict = [[NSDictionary alloc] initWithObjectsAndKeys: font, NSFontAttributeName, [UIColor greenColor], NSForegroundColorAttributeName, style, NSParagraphStyleAttributeName, nil];
+        if (!speedDict)
+            speedDict = [[NSDictionary alloc] initWithObjectsAndKeys: font, NSFontAttributeName, [UIColor greenColor], NSForegroundColorAttributeName, style, NSParagraphStyleAttributeName, nil];
 
         NSString *maxText = [[NSString alloc] initWithFormat:@"%.0f",[TOMSpeed displaySpeed: maxSpeed]];
         NSString *minText = [[NSString alloc] initWithFormat:@"%.0f",[TOMSpeed displaySpeed: minSpeed]];
@@ -263,15 +207,17 @@
         [maxText drawAtPoint:CGPointMake(5.0f, 10.0f ) withAttributes:speedDict];
         [minText drawAtPoint:CGPointMake(5.0f, (myHeight -((3*oneSegY)/2.0))) withAttributes:speedDict];
 
-        NSDictionary *altDict = [[NSDictionary alloc] initWithObjectsAndKeys: font, NSFontAttributeName, [UIColor redColor], NSForegroundColorAttributeName, style, NSParagraphStyleAttributeName, nil];
+        if (!altDict)
+            altDict = [[NSDictionary alloc] initWithObjectsAndKeys: font, NSFontAttributeName, [UIColor redColor], NSForegroundColorAttributeName, style, NSParagraphStyleAttributeName, nil];
+        
         NSString *altMaxText = [[NSString alloc] initWithFormat:@"%.0f",maxAltitude];
         NSString *altMinText = [[NSString alloc] initWithFormat:@"%.0f",minAltitude];
         
         [altMaxText drawAtPoint:CGPointMake(myWidth-oneSegX, 10.0f ) withAttributes:altDict];
         [altMinText drawAtPoint:CGPointMake(myWidth-oneSegX, (myHeight -((3*oneSegY)/2.0))) withAttributes:altDict];
         
-        //  Build the outer box
-        CGRect myFrame = CGRectMake( oneSegX, oneSegY, 10.0 * oneSegX , 10.0 * oneSegY);
+        //  Build the box to contain the grid.
+        myFrame = CGRectMake( oneSegX, oneSegY, 10.0 * oneSegX , 10.0 * oneSegY);
         CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
         CGContextSetLineWidth(myContext, 3.0 );
         CGContextAddRect(myContext, myFrame);
@@ -298,7 +244,7 @@
 
         // int startSpeedIndex;
         if ([displaySpeeds count ] > TOM_SLIDER_NUM_PTS ) {
-            if (active)
+            // if ([self active])
                 startIndex = (int) ([displaySpeeds count] - (TOM_SLIDER_NUM_PTS));
         }
         else
@@ -482,5 +428,26 @@
         return y;
 }
 
+-(void) resetSlider
+{
+    maxSpeed  = 0.0f;
+    minSpeed  = 99999.0f;
+    maxAltitude = 0.0f;
+    minAltitude = 99999.0f;
+    displaySpeeds = [[NSMutableArray alloc] initWithCapacity:1000];
+    displayAltitudes = [[NSMutableArray alloc] initWithCapacity:1000];
+    startIndex = 0;
+    font = nil;
+    speedDict = nil;
+    altDict = nil;
+}
+
+
+-(void) resetView
+{
+    font = nil;
+    speedDict = nil;
+    altDict = nil;
+}
 
 @end

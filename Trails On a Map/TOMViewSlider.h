@@ -8,20 +8,24 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
-#include "TOM.h"
+#import "TOMSubView.h"
+#import "TOM.h"
+#import "TOMSpeed.h"
+#import "TOMDistance.h"
 
-
-@interface TOMViewSlider : UIView
+@interface TOMViewSlider : TOMSubView
 
 {
 @private
-    // BOOL  displayup;  // YES - Display is up and visable; NO - Display is down
     NSMutableArray   *displayAltitudes;
     NSMutableArray   *displaySpeeds;
+    UIFont *font;
+    NSDictionary *speedDict;
+    NSDictionary *altDict;
 }
 
-@property (nonatomic, readwrite) BOOL displayup;
-@property (nonatomic, readwrite) BOOL active;
+// @property (nonatomic, readwrite) BOOL displayup;
+// @property (nonatomic, readwrite) BOOL active;
 @property (nonatomic, readwrite) NSInteger startIndex;
 @property (nonatomic, readwrite) CLLocationSpeed maxSpeed;
 @property (nonatomic, readwrite) CLLocationSpeed minSpeed;
@@ -31,7 +35,5 @@
 // Public Methods
 - (void) addSpeed: (CLLocationSpeed) sp Altitude: (CLLocationDistance) alt;
 - (void) clearSpeedsAndAltitudes;
-
-
 
 @end

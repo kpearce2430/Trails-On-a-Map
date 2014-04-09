@@ -17,6 +17,7 @@
 		AD4501131812E74100E76DE0 /* TOMPropertyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */; };
 		AD4501141812E74100E76DE0 /* TOMPropertyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */; };
 		AD5993B818D607920094045F /* cloudDownload.png in Resources */ = {isa = PBXBuildFile; fileRef = AD5993B718D607920094045F /* cloudDownload.png */; };
+		AD5CC56A18F1A53C00393BC1 /* TOMSubView.m in Sources */ = {isa = PBXBuildFile; fileRef = AD5CC56918F1A53C00393BC1 /* TOMSubView.m */; };
 		AD6CD7E818244814005A0699 /* TOMDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD6CD7E618244814005A0699 /* TOMDetailViewController.m */; };
 		AD6CD7E918244814005A0699 /* TOMDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD6CD7E718244814005A0699 /* TOMDetailViewController.xib */; };
 		AD6F03571857DCC700753144 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD6F03561857DCC700753144 /* ImageIO.framework */; };
@@ -93,6 +94,8 @@
 		AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMPropertyViewController.m; sourceTree = "<group>"; };
 		AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMPropertyViewController.xib; sourceTree = "<group>"; };
 		AD5993B718D607920094045F /* cloudDownload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cloudDownload.png; path = ../../../../Downloads/cloudDownload.png; sourceTree = "<group>"; };
+		AD5CC56818F1A53C00393BC1 /* TOMSubView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMSubView.h; sourceTree = "<group>"; };
+		AD5CC56918F1A53C00393BC1 /* TOMSubView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSubView.m; sourceTree = "<group>"; };
 		AD6CD7E518244814005A0699 /* TOMDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDetailViewController.h; sourceTree = "<group>"; };
 		AD6CD7E618244814005A0699 /* TOMDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMDetailViewController.m; sourceTree = "<group>"; };
 		AD6CD7E718244814005A0699 /* TOMDetailViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMDetailViewController.xib; sourceTree = "<group>"; };
@@ -351,6 +354,8 @@
 		ADA35AC418E9F97600C1A099 /* SubViews */ = {
 			isa = PBXGroup;
 			children = (
+				AD5CC56818F1A53C00393BC1 /* TOMSubView.h */,
+				AD5CC56918F1A53C00393BC1 /* TOMSubView.m */,
 				AD26E2F6181B002D0021BEE2 /* TOMTrackView.h */,
 				AD26E2F7181B002D0021BEE2 /* TOMTrackView.m */,
 				AD31BFA5182EED5800BCEE96 /* TOMViewSlider.h */,
@@ -495,6 +500,7 @@
 				ADA35AC718EC72ED00C1A099 /* TOMSpeedOMeter.m in Sources */,
 				AD72939F18D65D6E0095FE53 /* TOMImageViewController.m in Sources */,
 				AD45010C181191AE00E76DE0 /* TOMPointOnAMap.m in Sources */,
+				AD5CC56A18F1A53C00393BC1 /* TOMSubView.m in Sources */,
 				AD7BECB9180E23220003187D /* TOMRootViewController.m in Sources */,
 				AD6F03611858074F00753144 /* TOMPhotoAlbumViewController.m in Sources */,
 				AD26E2FB181B129A0021BEE2 /* TOMImageStore.m in Sources */,

@@ -16,7 +16,17 @@
 
 @implementation TOMSpeedOMeter
 
-@synthesize active,currentSpeed,displayup,lastType,maximumSpeed,maximumDisplay;
+@synthesize currentSpeed,lastType,maximumSpeed,maximumDisplay;
+
+- (id)initWithFramePortrait:(CGRect)pFrame Landscape:(CGRect) lFrame
+{
+    self = [super initWithFramePortrait:pFrame Landscape:lFrame];
+    if (self) {
+        [self resetSpeedOMeter];
+        [self resetView];
+    }
+    return self;
+}
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -24,20 +34,14 @@
     if (self) {
         // Initialization code
         [self resetSpeedOMeter];
-        
-        UITapGestureRecognizer *doubleFingerTap =[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
-        [doubleFingerTap setNumberOfTapsRequired:2];
-        [self addGestureRecognizer:doubleFingerTap];
-        font = nil;
-        textDict = nil;
-        redDict = nil;
-        displayup = NO;
-        active = NO;
-        orientation = UIDeviceOrientationUnknown;
+        [self resetView];
     }
     return self;
 }
 
+#pragma gesture_handlers
+
+#ifdef __FFU__
 - (void)handleDoubleTap:(UITapGestureRecognizer *)recognizer {
     
     //Do stuff here...
@@ -48,9 +52,7 @@
     
     if (currentOrientation != orientation) {
         orientation = currentOrientation;
-        font = nil;
-        textDict = nil;
-        redDict = nil;
+        [self resetView];
     }
     
     CGRect screenRect = [[UIScreen mainScreen] bounds];
@@ -63,7 +65,7 @@
 
     if (myframe.size.width <= TOM_SLIDER_MIN_X ) {
         // increase
-        displayup = YES;
+        [self setDisplayup:YES];
         if (UIDeviceOrientationIsLandscape(orientation)) {
             myframe.origin.x = screenWidth - 200.0f;
             myframe.size.width = 200.0f;
@@ -73,7 +75,7 @@
     }
     else {
         // decrease
-        displayup = NO;
+        [self setDisplayup:NO];
         myframe.size.width = TOM_SLIDER_MIN_X;
         if (UIDeviceOrientationIsLandscape(orientation)) {
             myframe.origin.x = screenWidth - TOM_SLIDER_MIN_X;
@@ -84,6 +86,8 @@
     [self setFrame:myframe];
     [self setNeedsDisplay];
 }
+
+#endif
 
 /*
 // Only override drawRect: if you perform custom drawing.
@@ -98,9 +102,7 @@
     
     if  (currentOrientation != orientation) {
         orientation = currentOrientation;
-        font = nil;
-        textDict = nil;
-        redDict = nil;
+        [self resetView];
     }
     
     [self setBackgroundColor:[UIColor grayColor]];
@@ -108,7 +110,7 @@
     CGFloat myWidth = rect.size.width;
     CGFloat myHeight = rect.size.height;
     
-    if (displayup) {
+    if ([self displayup]) {
         [self setAlpha: 0.50];
         //  Build the outer box
         CGRect myFrame = CGRectMake( 0.00f , 0.00f, myWidth, myHeight);
@@ -120,8 +122,10 @@
         CGPoint centerPt = CGPointMake((myWidth/2.0f), (myHeight/2.0f));
     
         CGFloat radius = MIN(centerPt.x, centerPt.y);
-    
         radius -= (.25f * radius);
+        
+        //
+        // Draw the upright tic on the speedO
         CGFloat ticRadious = radius - (.2f *radius);
         CGFloat centerAngle = deg2rad*270.0f; // points up
         CGPoint ticPnt = CGPointMake(centerPt.x + (ticRadious * cos(centerAngle)), centerPt.y + (ticRadious * sin(centerAngle)));
@@ -134,6 +138,7 @@
         CGContextAddLineToPoint(myContext, midPnt.x, midPnt.y );
         CGContextStrokePath(myContext);
     
+        // Draw the Minimum Line
         CGFloat minAngle = deg2rad*135.0f;
         CGPoint minPnt = CGPointMake(centerPt.x + (radius * cos(minAngle)),centerPt.y + (radius * sin(minAngle)));
 
@@ -143,16 +148,16 @@
         CGContextAddLineToPoint(myContext, minPnt.x, minPnt.y );
         CGContextStrokePath(myContext);
     
+        // Draw the Maximum Line
         CGFloat maxAngle = deg2rad*45.0f;
         CGPoint maxPnt = CGPointMake(centerPt.x + (radius * cos(maxAngle)), centerPt.y + (radius * sin(maxAngle)));
-    
-        // CGPoint minPoint = CGPointMake(minX, minY);
         CGContextBeginPath (myContext);
         CGContextSetRGBStrokeColor(myContext, 0.2, 0.2, 0.2, 1.0);
         CGContextMoveToPoint(myContext, centerPt.x, centerPt.y );
         CGContextAddLineToPoint(myContext, maxPnt.x, maxPnt.y );
         CGContextStrokePath(myContext);
-    
+
+        // Draw the Arc
         CGContextBeginPath (myContext);
         CGContextSetRGBStrokeColor(myContext, 0.2, 0.2, 0.2, 1.0);
         CGContextAddArc(myContext, centerPt.x, centerPt.y, radius, minAngle, maxAngle, NO);
@@ -160,25 +165,15 @@
 
         CGFloat currSpeedPct = 0.0f;
         CGFloat maxSpeedPct = 0.0f;
-    
+
+        // Draw the current and maximum speed arcs
         if (maximumDisplay > 0.0f) {
             currSpeedPct = currentSpeed / maximumDisplay;
             maxSpeedPct = maximumSpeed / maximumDisplay;
         }
 
-        CGFloat currSpeedAngle = (270.0f * currSpeedPct) + 135.0f;
-        currSpeedAngle = fmodf(currSpeedAngle, 360.0f);
-        currSpeedAngle = currSpeedAngle * deg2rad;
-        CGPoint currSpeed = CGPointMake(0.0f, 0.0f);
-        currSpeed.x = centerPt.x + (radius * cos(currSpeedAngle));
-        currSpeed.y = centerPt.y + (radius * sin(currSpeedAngle));
-    
-        CGContextBeginPath (myContext);
-        CGContextSetRGBStrokeColor(myContext, 0.0, 1.0, 1.0, 1.0);
-        CGContextMoveToPoint(myContext, centerPt.x, centerPt.y );
-        CGContextAddLineToPoint(myContext, currSpeed.x, currSpeed.y);
-        CGContextStrokePath(myContext);
-    
+        //
+        // Draw the maximum speed line.
         CGFloat maxSpeedAngle =  (270.0f * maxSpeedPct) + 135.0f;
         maxSpeedAngle = fmodf(maxSpeedAngle, 360.0f );
         maxSpeedAngle = maxSpeedAngle * deg2rad;
@@ -191,25 +186,47 @@
         CGContextMoveToPoint(myContext, centerPt.x, centerPt.y );
         CGContextAddLineToPoint(myContext, maxSpeed.x, maxSpeed.y);
         CGContextStrokePath(myContext);
+        
+        // Draw the current speed line.
+        CGFloat currSpeedAngle = (270.0f * currSpeedPct) + 135.0f;
+        currSpeedAngle = fmodf(currSpeedAngle, 360.0f);
+        currSpeedAngle = currSpeedAngle * deg2rad;
+        CGPoint currSpeed = CGPointMake(0.0f, 0.0f);
+        currSpeed.x = centerPt.x + (radius * cos(currSpeedAngle));
+        currSpeed.y = centerPt.y + (radius * sin(currSpeedAngle));
+        
+        CGContextBeginPath (myContext);
+        CGContextSetRGBStrokeColor(myContext, 0.0, 1.0, 0.0, 1.0);
+        CGContextMoveToPoint(myContext, centerPt.x, centerPt.y );
+        CGContextAddLineToPoint(myContext, currSpeed.x, currSpeed.y);
+        CGContextStrokePath(myContext);
     
-        if (!font) {
-            font = [UIFont fontWithName: @TOM_FONT size: (radius/4) ];
+        if (!textFont) {
+            textFont = [UIFont fontWithName: @TOM_FONT size: (radius/4.0f) ];
+        }
+        
+        if (!mphFont) {
+            mphFont = [UIFont fontWithName:@TOM_FONT size:(radius/3.0f)];
         }
     
         NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
         [style setAlignment:NSTextAlignmentRight];
     
         if (!textDict)
-            textDict = [[NSDictionary alloc] initWithObjectsAndKeys: font, NSFontAttributeName, [UIColor whiteColor], NSForegroundColorAttributeName, style, NSParagraphStyleAttributeName, nil];
+            textDict = [[NSDictionary alloc] initWithObjectsAndKeys: textFont, NSFontAttributeName, [UIColor whiteColor], NSForegroundColorAttributeName, style, NSParagraphStyleAttributeName, nil];
     
         if (!redDict)
-            redDict = [[NSDictionary alloc] initWithObjectsAndKeys: font, NSFontAttributeName, [UIColor redColor], NSForegroundColorAttributeName, style, NSParagraphStyleAttributeName, nil];
+            redDict = [[NSDictionary alloc] initWithObjectsAndKeys: textFont, NSFontAttributeName, [UIColor redColor], NSForegroundColorAttributeName, style, NSParagraphStyleAttributeName, nil];
     
+        if (!mphDict)
+            mphDict = [[NSDictionary alloc] initWithObjectsAndKeys:mphFont,  NSFontAttributeName, [UIColor greenColor], NSForegroundColorAttributeName, style, NSParagraphStyleAttributeName, nil];
+        
         CLLocationSpeed tempSpeed = [TOMSpeed displaySpeed:currentSpeed];
         NSString *currSpeedText = [[NSString alloc] initWithFormat:@"%.1f %@", tempSpeed,[TOMSpeed displaySpeedUnits]];
+        
         CGFloat currSpeedTextAngle = 110.0f * deg2rad;
         CGPoint currSpeedTextPnt = CGPointMake(centerPt.x + (radius * cos(currSpeedTextAngle)), centerPt.y + (radius * sin(currSpeedTextAngle)));
-        [currSpeedText drawAtPoint:currSpeedTextPnt withAttributes:textDict];
+        [currSpeedText drawAtPoint:currSpeedTextPnt withAttributes:mphDict];
     
         NSString *minSpeedText = nil;
         NSString *format = nil;
@@ -288,10 +305,22 @@
     currentSpeed = sp;
 }
 
+
 -(void) resetSpeedOMeter
 {
     currentSpeed = 0.00f;
     maximumSpeed = 0.00f;
     maximumDisplay = 0.00f;
 }
+
+-(void) resetView
+{
+    textDict = nil;
+    mphDict = nil;
+    redDict = nil;
+    textFont = nil;
+    mphFont = nil;
+    
+}
+
 @end

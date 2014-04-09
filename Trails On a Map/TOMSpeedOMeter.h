@@ -9,24 +9,25 @@
 #import <UIKit/UIKit.h>
 #import "TOM.h"
 #import "TOMSpeed.h"
+#import "TOMSubView.h"
 
-@interface TOMSpeedOMeter : UIView
+@interface TOMSpeedOMeter : TOMSubView
 {
     @private
     NSDictionary *textDict;
     NSDictionary *redDict;
-    UIFont *font;
-    UIDeviceOrientation orientation;
+    NSDictionary *mphDict;
+    UIFont       *textFont;
+    UIFont       *mphFont;
 }
 
 @property (nonatomic, readwrite) CGFloat currentSpeed;
 @property (nonatomic, readwrite) CGFloat maximumSpeed;
 @property (nonatomic, readwrite) CGFloat maximumDisplay; // Will always be a little more of the maximum speed so the maximumSpeed line doesn't look pegged.
 @property (nonatomic, readwrite) TOMDisplaySpeedType lastType;
-@property (nonatomic, readwrite) BOOL displayup;
-@property (nonatomic, readwrite) BOOL active;
 
 -(void) resetSpeedOMeter;
 -(void) updateSpeed: (CGFloat) sp;
+- (id)initWithFramePortrait:(CGRect)pFrame Landscape:(CGRect) lFrame;
 
 @end
