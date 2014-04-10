@@ -123,7 +123,7 @@
         }
     }
 
-    NSLog(@"Image Count:%ld  I:%ld",(long)[theTrail numPics],(unsigned long)[imagesSet count]);
+    // NSLog(@"%s Image Count:%ld  I:%ld",__PRETTY_FUNCTION__,(long)[theTrail numPics],(unsigned long)[imagesSet count]);
     
     // Do any additional setup after loading the view from its nib.
     // CGRect screenRect = [[UIScreen mainScreen] bounds];
@@ -226,7 +226,7 @@
     if ([tableView isEqual:detailTable]) {
         
         NSURL *docsdirURL = [TOMUrl urlForDocumentsDirectory];
-        NSString *fileName = [NSString stringWithFormat:@"%@.gpx",self.title];
+        NSString *fileName = nil; // [NSString stringWithFormat:@"%@.gpx",self.title];
         NSURL *fileFullURL = nil;
         
         cell = [tableView dequeueReusableCellWithIdentifier:detailViewCellIdentifier forIndexPath:indexPath];
@@ -248,7 +248,7 @@
                     [gpxSwitch setTag: GPX_SWITCH_TAG];
                     cell.accessoryView = gpxSwitch;
                     
-                    docsdirURL = [TOMUrl urlForDocumentsDirectory];
+                    // docsdirURL = [TOMUrl urlForDocumentsDirectory];
                     fileName = [NSString stringWithFormat:@"%@.gpx",self.title];
                     fileFullURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
                     
@@ -261,7 +261,7 @@
                     kmlSwitch = aSwitch;
                     cell.accessoryView = kmlSwitch;
                     [kmlSwitch setTag:KML_SWITCH_TAG];
-                    docsdirURL = [TOMUrl urlForDocumentsDirectory];
+                    // docsdirURL = [TOMUrl urlForDocumentsDirectory];
                     fileName = [NSString stringWithFormat:@"%@.kmz",self.title];
                     fileFullURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
                     
