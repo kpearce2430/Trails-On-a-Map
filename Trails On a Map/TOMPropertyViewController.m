@@ -697,7 +697,7 @@
     frame = CGRectMake(	ptLeftMargin, yPlacement, objectWidth, ptSegmentedControlHeight);
     
     // Had to get the value now so it can be displayed in the distance filter title.
-    CLLocationDistance myDistanceFilter = [TOMDistance distanceFilter];
+    CLLocationDistance myDistanceFilter ; // = [TOMDistance distanceFilter];
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_DISTANCE_FILTER] != nil)
     {
         myDistanceFilter = [[NSUserDefaults standardUserDefaults] floatForKey:@KEY_DISTANCE_FILTER];
