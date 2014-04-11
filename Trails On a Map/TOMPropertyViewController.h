@@ -65,13 +65,21 @@
 @property (nonatomic, readwrite) UILabel *stopLabel;
 @property (nonatomic, readwrite) UISwitch *stopSwitch;
 
-// Speed Bar
-@property (nonatomic, readwrite) UILabel *speedBarLabel;
-@property (nonatomic, readwrite) UISwitch *speedBarSwitch;
+// Odometer
+@property (nonatomic, readwrite) UILabel *odoMeterLabel;
+@property (nonatomic, readwrite) UISwitch *odoMeterSwitch;
 
-// Info Bar
-@property (nonatomic, readwrite) UILabel *infoBarLabel;
-@property (nonatomic, readwrite) UISwitch *infoBarSwitch;
+// Trip Meter
+@property (nonatomic, readwrite) UILabel *tripMeterLabel;
+@property (nonatomic, readwrite) UISwitch *tripMeterSwitch;
+
+// Slider (histograph)
+@property (nonatomic, readwrite) UILabel *sliderLabel;
+@property (nonatomic, readwrite) UISwitch *sliderSwitch;
+
+@property (nonatomic, readwrite) UILabel *speedOMeterLabel;
+@property (nonatomic, readwrite) UISwitch *speedOMeterSwitch;
+
 
 // Properties Sync Switch
 @property (nonatomic, readwrite) UILabel *syncLabel;

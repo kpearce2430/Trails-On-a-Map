@@ -23,8 +23,10 @@
 @property (nonatomic, readwrite) BOOL showStops;
 @property (nonatomic, readwrite) BOOL showNotes;
 @property (nonatomic, readwrite) BOOL showSounds;
-@property (nonatomic, readwrite) BOOL showInfoBar;
-@property (nonatomic, readwrite) BOOL showSpeedBar;
+@property (nonatomic, readwrite) BOOL showOdoMeter;
+@property (nonatomic, readwrite) BOOL showTripMeter;
+@property (nonatomic, readwrite) BOOL showSlider;
+@property (nonatomic, readwrite) BOOL showSpeedOMeter;
 @property (nonatomic, readwrite) TOMDisplaySpeedType ptDisplaySpeedType;
 
 

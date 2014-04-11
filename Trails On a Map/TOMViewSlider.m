@@ -21,6 +21,17 @@
         [self resetSlider];
         [self resetView];
     }
+    
+    UISwipeGestureRecognizer *swipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipedLeft:)];
+    [swipeLeft setDirection:UISwipeGestureRecognizerDirectionLeft ];
+    [self addGestureRecognizer:swipeLeft];
+    
+    UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipedRight:)];
+    [swipeRight setDirection:UISwipeGestureRecognizerDirectionRight ];
+    [self addGestureRecognizer:swipeRight];
+    
+    [self setActive:YES];
+    
     return self;
 }
 
@@ -33,12 +44,6 @@
         [self resetView];
     }
  
-#ifdef __NUA__
-    UITapGestureRecognizer *doubleFingerTap =[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleDoubleTap:)];
-    [doubleFingerTap setNumberOfTapsRequired:2];
-    [self addGestureRecognizer:doubleFingerTap];
-
-
     UISwipeGestureRecognizer *swipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipedLeft:)];
     [swipeLeft setDirection:UISwipeGestureRecognizerDirectionLeft ];
     [self addGestureRecognizer:swipeLeft];
@@ -46,7 +51,7 @@
     UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipedRight:)];
     [swipeRight setDirection:UISwipeGestureRecognizerDirectionRight ];
     [self addGestureRecognizer:swipeRight];
-#endif
+
 
     return self;
 }
@@ -54,12 +59,17 @@
 #pragma __gesture_methods__
 
 //The event handling methods:
-#ifdef __NUA__
-- (void)handleDoubleTap:(UITapGestureRecognizer *)recognizer {
+#ifdef __FFU__
+- (void)handleSingleTap:(UITapGestureRecognizer *)sender {
     
     // Do stuff here...
     // CGPoint location = [recognizer locationInView:[recognizer.view superview]];
     // NSLog(@"%s : Location(%.2f.%.2f)",__PRETTY_FUNCTION__,location.x, location.y);
+    
+    CGPoint tapPoint = [sender locationInView:self];
+    NSLog(@"%s tapPoint[%.1f,%.1f",__PRETTY_FUNCTION__,tapPoint.x,tapPoint.y);
+    
+
     UIDeviceOrientation currentOrientation = [[UIDevice currentDevice] orientation];
     
     if (currentOrientation != orientation) {
@@ -85,36 +95,29 @@
         displayup = NO;
         myframe.size.width = TOM_SLIDER_MIN_X;
     }
-    
+
     [self setFrame:myframe];
     [self setNeedsDisplay];
   
 }
+
 #endif
 
-#ifdef __FFU__
-
+#ifndef __FFU__
+#endif
 - (IBAction)swipedRight:(UISwipeGestureRecognizer *)recognizer
 {
     // NSLog(@"swiped right");
-    // CGPoint locInView = [recognizer locationInView:self];
-    // NSLog(@"location In View (%.1f,%.1f)",locInView.x,locInView.y);
-    //
-    // for (NSInteger i = 0 ; i < [recognizer numberOfTouches]; i++)
-    // {
-    //    CGPoint locOfTouch = [recognizer locationOfTouch:i inView:self];
-    //    NSLog(@"location Of Touch %d (%.1f,%.1f)",(int)i,locOfTouch.x,locOfTouch.y);
-    // }    //
-    // int half = TOM_SLIDER_NUM_PTS / 2.0f;
     if ((startIndex + TOM_SLIDER_HALF_PTS) > [displayAltitudes count] - TOM_SLIDER_NUM_PTS )
     {
         startIndex = [displayAltitudes count] - TOM_SLIDER_NUM_PTS;
-        active = YES;
+        [self setActive:YES];
     }
     else {
         startIndex += TOM_SLIDER_HALF_PTS;
     }
     
+    [self setNeedsDisplay];
     // NSLog(@"%s Swipped Right Start Index:%ld Active:%hhd",__PRETTY_FUNCTION__,(long)startIndex,active);
     
 }
@@ -122,28 +125,20 @@
 - (IBAction)swipedLeft:(UISwipeGestureRecognizer *)recognizer
 {
     // NSLog(@"swiped left");
-    // CGPoint locInView = [recognizer locationInView:self];
-    // NSLog(@"location In View (%.1f,%.1f)",locInView.x,locInView.y);
-    //
-    // CGPoint locOfTouch = [recognizer locationOfTouch:0 inView:nil];
-    // NSLog(@"location Of Topuch (%.1f,%.1f)",locOfTouch.x,locOfTouch.y);
-    //
-    // int half = TOM_SLIDER_NUM_PTS / 2.0f;
-    //
     if (startIndex - TOM_SLIDER_HALF_PTS < 0)
         startIndex = 0;
     else
         startIndex = startIndex - TOM_SLIDER_HALF_PTS;
     
-    active = NO;
+    [self setActive:NO];
+    [self setNeedsDisplay];
     // NSLog(@"%s Swipped Left Start Index:%d Active:%hhd",__PRETTY_FUNCTION__ ,startIndex,active);
 }
 
-#endif
-
-#pragma class_methods
 
 // * * * * * * * * * * * * * * * * * * * * * * * * *
+
+#pragma class_methods
 
 - (void) clearSpeedsAndAltitudes
 {
@@ -172,16 +167,12 @@
     CGContextRef myContext = UIGraphicsGetCurrentContext();
     
     [self setBackgroundColor:[UIColor grayColor]];
-    if ([self displayup])
-        [self setAlpha: 0.50];
-    else
-        [self setAlpha: 0.80];
 
     CGFloat myWidth = rect.size.width;
     CGFloat myHeight = rect.size.height;
 
     if ([self displayup]) {
-        
+        [self setAlpha: 0.90];
         //  Build the outer box
         CGRect myFrame = CGRectMake( 0.00f , 0.00f, myWidth, myHeight);
         CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
@@ -241,32 +232,56 @@
         
         CGFloat incX = ((myWidth - (2*oneSegX))/(TOM_SLIDER_NUM_PTS-1));
         CGFloat incY = ((myHeight - (2*oneSegY))/1.0);
-
+        
+        // Draw the arrows
+        CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
+        CGContextSetRGBFillColor(myContext, 0.0, 0.0, 0.0, 1.0);
+        CGContextSetLineWidth(myContext, 1.0);
+        
         // int startSpeedIndex;
         if ([displaySpeeds count ] > TOM_SLIDER_NUM_PTS ) {
-            // if ([self active])
+            if ([self active])
                 startIndex = (int) ([displaySpeeds count] - (TOM_SLIDER_NUM_PTS));
         }
         else
             startIndex = 0;
-        
-        if ([displaySpeeds count] >= 2) {
-            CGContextBeginPath (myContext);
-            CGContextSetRGBStrokeColor(myContext, 1.0, 0.0, 0.0, 1.0);
-            CGContextSetLineWidth(myContext, 3.0 );
-            int numPts = 1;
-            
-            // NSLog(@"0: sp:%.2f x:%.2f y:%.2f min: %.2f max: %.2f num:%ld" ,displaySpeeds[0], oneSegX, oneSegY + ([self percentSpeedY:0] * incY), minSpeed, maxSpeed, (long)numSpeeds );
-            CGContextMoveToPoint(myContext, oneSegX, oneSegY + ([self percentAltitudeY:startIndex] * incY) );
-            for (NSInteger i = startIndex+1 ; i < [displayAltitudes count] && numPts < TOM_SLIDER_NUM_PTS; i++) {
-                // NSLog(@"%ld sp:%@ x:%.2f y:%.2f (p:%.2f)",(long)i, displayAltitudes[i] ,oneSegX + (numPts*incX), oneSegY + ([self percentAltitudeY:i] * incY),[self percentAltitudeY:i]);
-                CGContextAddLineToPoint(myContext, oneSegX + (numPts*incX), oneSegY + ([self percentAltitudeY:i] * incY));
-                numPts++;
+            [self setAlpha: 0.80];
+        // Draw them with a 2.0 stroke width so they are a bit more visible.
+            if ((startIndex != 0) && ([displaySpeeds count] > TOM_SLIDER_NUM_PTS)) {
+                CGContextMoveToPoint(myContext,    oneSegX,      9.0f*oneSegY );
+                CGContextAddLineToPoint(myContext, oneSegX/2.0f, 6.0f*oneSegY );
+                CGContextAddLineToPoint(myContext, oneSegX,      3.0f*oneSegY );
+                CGContextAddLineToPoint(myContext, oneSegX,      9.0f*oneSegY );
+                CGContextFillPath(myContext);
+                CGContextStrokePath(myContext);
             }
-            CGContextStrokePath(myContext);
+        
+            if (![self active] && (startIndex <  ([displaySpeeds count] - TOM_SLIDER_NUM_PTS))) {
+                CGContextMoveToPoint(myContext,    11.0f * oneSegX, 9.0f*oneSegY );
+                CGContextAddLineToPoint(myContext, 11.5f * oneSegX, 6.0f*oneSegY );
+                CGContextAddLineToPoint(myContext, 11.0f * oneSegX, 3.0f*oneSegY );
+                CGContextAddLineToPoint(myContext, 11.0f * oneSegX, 9.0f*oneSegY );
+                CGContextFillPath(myContext);
+                CGContextStrokePath(myContext);
+            }
 
-
+            // Begin the Altitude Graph Line
+            if ([displaySpeeds count] >= 2) {
+                CGContextBeginPath (myContext);
+                CGContextSetRGBStrokeColor(myContext, 1.0, 0.0, 0.0, 1.0);
+                CGContextSetLineWidth(myContext, 3.0 );
+                int numPts = 1;
             
+                // NSLog(@"0: sp:%.2f x:%.2f y:%.2f min: %.2f max: %.2f num:%ld" ,displaySpeeds[0], oneSegX, oneSegY + ([self percentSpeedY:0] * incY), minSpeed, maxSpeed, (long)numSpeeds );
+                CGContextMoveToPoint(myContext, oneSegX, oneSegY + ([self percentAltitudeY:startIndex] * incY) );
+                for (NSInteger i = startIndex+1 ; i < [displayAltitudes count] && numPts < TOM_SLIDER_NUM_PTS; i++) {
+                    // NSLog(@"%ld sp:%@ x:%.2f y:%.2f (p:%.2f)",(long)i, displayAltitudes[i] ,oneSegX + (numPts*incX), oneSegY + ([self percentAltitudeY:i] * incY),[self percentAltitudeY:i]);
+                    CGContextAddLineToPoint(myContext, oneSegX + (numPts*incX), oneSegY + ([self percentAltitudeY:i] * incY));
+                    numPts++;
+                }
+            CGContextStrokePath(myContext);
+          
+            // Begin the Speeds Graph Line
             CGContextBeginPath (myContext);
             CGContextSetRGBStrokeColor(myContext, 0.0, 1.0, 0.0, 1.0);
             CGContextSetLineWidth(myContext, 3.0 );
@@ -278,6 +293,7 @@
                 numPts++;
             }
             CGContextStrokePath(myContext);
+            
         }
     }
     else {

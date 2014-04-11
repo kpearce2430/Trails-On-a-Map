@@ -22,10 +22,14 @@ typedef enum  { tomDDError = -1, tomDDUnknown, tomDDMiles, tomDDKilometers, tomD
 #define KEY_SHOW_STOPS           "ptShowStops"
 #define KEY_SHOW_NOTES           "ptShowNotes"
 #define KEY_SHOW_SOUNDS          "ptShowSounds"
-#define KEY_SHOW_SPEED_LABEL     "ptShowSpeedLabel"
-#define KEY_SHOW_INFO_LABEL      "ptShowInfoLabel"
+// #define KEY_SHOW_SPEED_LABEL     "ptShowSpeedLabel"
+// #define KEY_SHOW_INFO_LABEL      "ptShowInfoLabel"
 #define KEY_SPEED_UNITS          "ptDisplaySpeed"
 #define KEY_DISTANCE_UNITS       "ptDisplayDistance"
+#define KEY_ODOMETER             "ptOdoMeter"
+#define KEY_TRIPMETER            "ptTripMeter"
+#define KEY_SLIDER               "ptSlider"
+#define KEY_SPEEDOMETER          "ptSpeedOMeter"
 #define KEY_PROPERTIES_SYNC      "ptPropertiesSync"  // Yes/No if properties are synced on iCloud.
 #define KEY_ICLOUD               "ptICloud"
 #define KEY_ICON_IMAGE           "ptIconImage"
@@ -98,11 +102,25 @@ typedef enum  { tomDDError = -1, tomDDUnknown, tomDDMiles, tomDDKilometers, tomD
 #define TOM_SLIDER_MAX_Y_HORZ   120
 #define TOM_SLIDER_MIN_X    20
 #define TOM_SLIDER_MAX_X    999
-
 #define TOM_SLIDER_NUM_PTS  61
 #define TOM_SLIDER_HALF_PTS 30
+#define TOM_SLIDER_DEFAULT_Y    (TOM_TOOL_BAR_HEIGHT + TOM_SLIDER_MAX_Y)
+
+// SpeedOMeter defines
+#define TOM_SPEEDOMETER_DEFAULT_HEIGHT  200
+#define TOM_SPEEDOMETER_DEFAULT_WIDTH   200
+#define TOM_SPEEDOMETER_DEFAULT_Y       (TOM_SLIDER_DEFAULT_Y + TOM_SPEEDOMETER_DEFAULT_HEIGHT)
+
+
+// OdoMter defines
+#define TOM_ODOMETER_DEFAULT_HIEGHT     100
+#define TOM_ODOMETER_DEFAULT_WIDTH      100
+#define TOM_ODOMETER_DEFAULT_PORTRAIT_Y   (TOM_SPEEDOMETER_DEFAULT_Y + TOM_ODOMETER_DEFAULT_HIEGHT)
+#define TOM_ODOMETER_DEFAULT_LANDSCAPE_Y  (TOM_SLIDER_DEFAULT_Y + TOM_ODOMETER_DEFAULT_HIEGHT)
+
+
 #define TOM_FONT            "Helvetica-Bold"
-#define TOM_PVC_EXTRA       300
+#define TOM_PVC_EXTRA       450
 
 
 #endif

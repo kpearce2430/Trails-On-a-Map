@@ -11,7 +11,7 @@
 
 @implementation TOMProperties
 
-@synthesize ptMapType, ptName, ptUserTrackingMode,ptDistanceFilter,ptLocationAccuracy, showLocations, showPictures, showStops, showNotes, showSounds, showInfoBar, showSpeedBar,ptDisplaySpeedType;
+@synthesize ptMapType, ptName, ptUserTrackingMode,ptDistanceFilter,ptLocationAccuracy, showLocations, showPictures, showStops, showNotes, showSounds, showOdoMeter, showTripMeter, showSlider, showSpeedOMeter, ptDisplaySpeedType;
 
 -(id) initWithTitle: (NSString *) title
 {
@@ -29,8 +29,10 @@
         [self setShowStops:YES];
         [self setShowNotes:YES];
         [self setShowSounds:YES];
-        [self setShowInfoBar:YES];
-        [self setShowSpeedBar:YES];
+        [self setShowOdoMeter:YES];
+        [self setShowTripMeter:YES];
+        [self setShowSlider:YES];
+        [self setShowSpeedOMeter:YES];
         [self setPtDisplaySpeedType:tomDSUnknown];
     }
     return self;

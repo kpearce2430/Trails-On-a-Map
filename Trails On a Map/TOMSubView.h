@@ -5,7 +5,10 @@
 //  Created by KEITH E PEARCE  on 4/6/14.
 //  Copyright (c) 2014 Pearce Software Solutions. All rights reserved.
 //
-
+//
+// This class allows all the subviews on the map to have a common
+// look and feel to them.
+//
 #import <UIKit/UIKit.h>
 #import "TOM.h"
 

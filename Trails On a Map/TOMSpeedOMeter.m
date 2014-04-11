@@ -39,60 +39,8 @@
     return self;
 }
 
-#pragma gesture_handlers
-
-#ifdef __FFU__
-- (void)handleDoubleTap:(UITapGestureRecognizer *)recognizer {
-    
-    //Do stuff here...
-    // CGPoint location = [recognizer locationInView:[recognizer.view superview]];
-    // NSLog(@"%s : Location(%.2f.%.2f)",__PRETTY_FUNCTION__,location.x, location.y);
-
-    UIDeviceOrientation currentOrientation = [[UIDevice currentDevice] orientation];
-    
-    if (currentOrientation != orientation) {
-        orientation = currentOrientation;
-        [self resetView];
-    }
-    
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    
-    CGFloat screenWidth = screenRect.size.width;
-    if (UIDeviceOrientationIsLandscape(orientation))
-        screenWidth = screenRect.size.height;
-
-    CGRect myframe = [self frame];
-
-    if (myframe.size.width <= TOM_SLIDER_MIN_X ) {
-        // increase
-        [self setDisplayup:YES];
-        if (UIDeviceOrientationIsLandscape(orientation)) {
-            myframe.origin.x = screenWidth - 200.0f;
-            myframe.size.width = 200.0f;
-        }
-        else
-            myframe.size.width = screenWidth;
-    }
-    else {
-        // decrease
-        [self setDisplayup:NO];
-        myframe.size.width = TOM_SLIDER_MIN_X;
-        if (UIDeviceOrientationIsLandscape(orientation)) {
-            myframe.origin.x = screenWidth - TOM_SLIDER_MIN_X;
-        }
-        myframe.size.width = TOM_SLIDER_MIN_X;
-    }
-
-    [self setFrame:myframe];
-    [self setNeedsDisplay];
-}
-
-#endif
-
-/*
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
- */
 - (void)drawRect:(CGRect)rect
 {
     // Drawing code
@@ -111,7 +59,7 @@
     CGFloat myHeight = rect.size.height;
     
     if ([self displayup]) {
-        [self setAlpha: 0.50];
+        [self setAlpha: 0.90];
         //  Build the outer box
         CGRect myFrame = CGRectMake( 0.00f , 0.00f, myWidth, myHeight);
         CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);

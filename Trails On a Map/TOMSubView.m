@@ -115,7 +115,7 @@
         if (UIDeviceOrientationIsLandscape(orientation))
             screenWidth = screenRect.size.height;
         
-        if (minRect.origin.x > (screenWidth / 2.0f))
+        if (minRect.origin.x >= (screenWidth / 2.0f))
             minRect.origin.x = screenWidth - TOM_SLIDER_MIN_X;
         else
             minRect.origin.x = 0.0f;
@@ -144,12 +144,12 @@
         [self resetView];
     }
     
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    
-    CGFloat screenWidth = screenRect.size.width;
-    if (UIDeviceOrientationIsLandscape(orientation))
-        screenWidth = screenRect.size.height;
-    
+    // CGRect screenRect = [[UIScreen mainScreen] bounds];
+    //
+    // CGFloat screenWidth = screenRect.size.width;
+    // if (UIDeviceOrientationIsLandscape(orientation))
+    //    screenWidth = screenRect.size.height;
+    //
     CGRect myframe;
     
     if (recognizer && [self displayup] == NO) {

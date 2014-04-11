@@ -78,20 +78,46 @@
         worldView = [[MKMapView alloc] initWithFrame:mapRect];
         [self.view addSubview:worldView];
         
+        
+        
+        // Note for all 4 subviews: Height and Width are reversed on the landscape view.
+        // Build the OdoMeter View
+        CGRect myOdoMeterPortraitRect = CGRectMake(0.0f, (screenHeight - TOM_ODOMETER_DEFAULT_PORTRAIT_Y),
+                                                   screenWidth/2.0f, TOM_ODOMETER_DEFAULT_HIEGHT );
+        CGRect myOdoMeterLandscapeRect = CGRectMake(0.0f, (screenWidth - TOM_ODOMETER_DEFAULT_LANDSCAPE_Y),
+                                                    screenHeight - TOM_SPEEDOMETER_DEFAULT_WIDTH, TOM_ODOMETER_DEFAULT_HIEGHT);
+        myOdoMeter = [[ TOMOdometer alloc] initWithFramePortrait:myOdoMeterPortraitRect Landscape:myOdoMeterLandscapeRect];
+        [self.view addSubview:myOdoMeter];
+        
+        CGRect myTripTimerPortraitRect = CGRectMake(screenWidth/2.0f, (screenHeight - TOM_ODOMETER_DEFAULT_PORTRAIT_Y),
+                                                    screenWidth/2.0f, TOM_ODOMETER_DEFAULT_HIEGHT);
+        
+        CGRect myTripTimerLandscapeRect = CGRectMake(screenHeight - TOM_SPEEDOMETER_DEFAULT_WIDTH, (screenWidth - TOM_ODOMETER_DEFAULT_LANDSCAPE_Y),
+                                                     TOM_SPEEDOMETER_DEFAULT_WIDTH, TOM_ODOMETER_DEFAULT_HIEGHT);
+        
+        myTripTimer = [[ TOMTripTimer alloc] initWithFramePortrait:myTripTimerPortraitRect Landscape:myTripTimerLandscapeRect];
+        [self.view addSubview:myTripTimer];
+        
         // Build the SpeedOMeter View
-        CGRect mySpeedOMeterPortraitRect = CGRectMake(0.0f, (screenHeight - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MAX_Y - 200 ), screenWidth, 200);
-        // note: Height and Width are reversed on the landscape view.
-        CGRect mySpeedOMeterLandscapeRect = CGRectMake(screenHeight-200.0f, (screenWidth - TOM_SLIDER_MAX_Y - TOM_TOOL_BAR_HEIGHT), 200.0f, TOM_SLIDER_MAX_Y);
+        CGRect mySpeedOMeterPortraitRect = CGRectMake(0.0f, (screenHeight - TOM_SPEEDOMETER_DEFAULT_Y ),
+                                                      screenWidth, TOM_SPEEDOMETER_DEFAULT_HEIGHT);
+        
+        
+        CGRect mySpeedOMeterLandscapeRect = CGRectMake(screenHeight-TOM_SPEEDOMETER_DEFAULT_HEIGHT, (screenWidth - TOM_SLIDER_DEFAULT_Y),
+                                                       TOM_SPEEDOMETER_DEFAULT_WIDTH, TOM_SLIDER_MAX_Y);
+        
         mySpeedOMeter = [[TOMSpeedOMeter alloc] initWithFramePortrait:mySpeedOMeterPortraitRect Landscape:mySpeedOMeterLandscapeRect ];
         [self.view addSubview:mySpeedOMeter];
-        
-        CGRect mySliderPortraitRect = CGRectMake( 0.0f , (screenHeight - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MAX_Y), screenWidth, TOM_SLIDER_MAX_Y );
-        // note: Height and Width are reversed on the landscape view.
-        CGRect mySliderLandScapeRect = CGRectMake( 0.0f , (screenWidth - TOM_TOOL_BAR_HEIGHT - TOM_SLIDER_MAX_Y), screenHeight - 200.0f, TOM_SLIDER_MAX_Y );
+
+        // Build the Slider View
+        CGRect mySliderPortraitRect = CGRectMake( 0.0f , (screenHeight - TOM_SLIDER_DEFAULT_Y),
+                                                 screenWidth, TOM_SLIDER_MAX_Y );
+        CGRect mySliderLandScapeRect = CGRectMake( 0.0f , (screenWidth - TOM_SLIDER_DEFAULT_Y),
+                                                  screenHeight - TOM_SPEEDOMETER_DEFAULT_WIDTH, TOM_SLIDER_MAX_Y );
         mySlider = [[TOMViewSlider alloc] initWithFramePortrait:mySliderPortraitRect Landscape:mySliderLandScapeRect];
         [self.view addSubview:mySlider];
 
-       
+        // Build out the tool bar
         CGRect toolbarRect;
         toolbarRect.origin.y = screenHeight - TOM_TOOL_BAR_HEIGHT;
         toolbarRect.origin.x = 0;
@@ -128,6 +154,7 @@
         [toolbar setItems:items];
         [self.view addSubview:toolbar];
 
+#ifdef __NUA__
         //  Create the speedBar
         CGRect speedBarFrame = CGRectMake( ((screenWidth / 2) - (TOM_LABEL_WIDTH/2)), ptTopMargin + 50 , TOM_LABEL_WIDTH, ptLabelHeight );
         speedTimeBar = [[UILabel alloc] initWithFrame:speedBarFrame ];
@@ -152,6 +179,8 @@
         distanceInfoBar.textAlignment = NSTextAlignmentCenter;
         [distanceInfoBar setFont:[UIFont fontWithName:@TOM_FONT size:11.0]];
         [self.view addSubview:distanceInfoBar];
+#endif
+        
         //
         // Initialize the variables
         //
@@ -181,6 +210,11 @@
         UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(scaleTheView:)];
         // [pinchGesture setDelegate:self];
         [self.view addGestureRecognizer:pinchGesture];
+        
+        UILongPressGestureRecognizer *longGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPress:)];
+        [longGesture setMinimumPressDuration:2.0];
+        [longGesture setAllowableMovement:1000.0];
+        [self.view addGestureRecognizer:longGesture];
         
 
     }
@@ -249,7 +283,7 @@
             for (NSURL *url in enumerator) {
                 
                 NSError *err = nil;
-                NSLog(@"%s URL:%@",__func__,[url path]);
+                // NSLog(@"%s URL:%@",__func__,[url path]);
                 NSString *path = [url path];
                 NSArray *parts = [path componentsSeparatedByString:@"/"];
                 NSString *fileName = [parts objectAtIndex:[parts count]-1];
@@ -291,7 +325,7 @@
     // Need to close any open documents here:
     if (![self.title isEqualToString:@TRAILS_DEFAULT_NAME]) {
         // Save document
-        NSLog(@"%s Saving trails", __func__ );
+        // NSLog(@"%s Saving trails", __func__ );
         // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
         [self saveTrails: NO]; // we are done?
     }
@@ -322,7 +356,9 @@
         //
         if ([newTitle isEqualToString:self.title]) {
             // Do nothing
+#ifdef DEBUG
             NSLog(@"%s Did not change title[%@]",__func__,newTitle);
+#endif
         }
         else if ([self.title isEqualToString:@TRAILS_DEFAULT_NAME]) {
             //
@@ -459,7 +495,51 @@
     
 }
 
-#pragma touch_methods
+#pragma gesture_methods
+
+-(void) longPress:(UILongPressGestureRecognizer *)longPressRecognizer
+{
+    UIView *theView = [longPressRecognizer view];
+    static TOMSubView *workingView = nil;
+    
+    if ([longPressRecognizer numberOfTouches] > 1) {
+        NSLog(@"%s Warning multiple touches found",__PRETTY_FUNCTION__);
+    }
+    
+    CGPoint locationOne = [longPressRecognizer locationOfTouch:0 inView:theView];
+    
+    if (workingView == nil) {
+        if (CGRectContainsPoint(mySlider.frame, locationOne)) {
+            workingView = mySlider;
+        }
+        else if (CGRectContainsPoint(mySpeedOMeter.frame, locationOne)) {
+            workingView = mySpeedOMeter;
+        }
+        else if (CGRectContainsPoint(myOdoMeter.frame, locationOne)) {
+            workingView = myOdoMeter;
+        }
+        else if (CGRectContainsPoint(myTripTimer.frame, locationOne)) {
+            workingView = myTripTimer;
+        }
+
+        else {
+            return;
+        }
+    }
+        
+    if (longPressRecognizer.state == UIGestureRecognizerStateEnded) {
+        // NSLog(@"Long press Ended .................");
+        workingView.center = locationOne;
+        [workingView saveFrame: workingView.frame];
+        workingView = nil;
+    }
+    else {
+        // NSLog(@"Long press detected .....................");
+        workingView.center = locationOne;
+    }
+}
+
+// * * * * * * * * * * *
 
 -(void) scaleTheView:(UIPinchGestureRecognizer *)pinchRecognizer
 {
@@ -479,14 +559,14 @@
         @catch (NSException *exception)
         {
             // Print exception information
-            NSLog( @"NSException caught" );
-            NSLog( @"Name: %@", exception.name);
-            NSLog( @"Reason: %@", exception.reason );
+            NSLog( @"%s NSException caught",__PRETTY_FUNCTION__ );
+            NSLog( @"%s Name: %@", __PRETTY_FUNCTION__, exception.name);
+            NSLog( @"%s Reason: %@",__PRETTY_FUNCTION__, exception.reason );
             return;
         }
-#ifdef __FFU__
+#ifdef __DEBUG__
         @finally {
-            NSLog(@"Finally block");
+            NSLog(@"%s Finally block",__PRETTY_FUNCTION__);
         }
 #endif
     }
@@ -506,6 +586,14 @@
                  CGRectContainsPoint(mySpeedOMeter.frame, locationTwo)) {
             workingView = mySpeedOMeter;
         }
+        else if (CGRectContainsPoint(myOdoMeter.frame, locationOne) &&
+                 (CGRectContainsPoint(myOdoMeter.frame, locationTwo))) {
+            workingView = myOdoMeter;
+        }
+        else if (CGRectContainsPoint(myTripTimer.frame, locationOne) &&
+                 (CGRectContainsPoint(myTripTimer.frame, locationTwo))) {
+            workingView = myTripTimer;
+        }
         else {
             return;
         }
@@ -517,26 +605,26 @@
                                  fabs(locationOne.y - locationTwo.y));
     
     if ([pinchRecognizer state] == UIGestureRecognizerStateBegan) {
-        NSLog(@"StateBegan");
+        // NSLog(@"StateBegan");
         self.worldView.zoomEnabled = NO;
         self.worldView.scrollEnabled = NO;
         self.worldView.userInteractionEnabled = NO;
     }
     else if ([pinchRecognizer state] == UIGestureRecognizerStateChanged) {
-         NSLog(@"StateChanged");
+         // NSLog(@"StateChanged");
         [workingView setFrame:myFrame];
         [workingView setNeedsDisplay];
 
     }
     else if ([pinchRecognizer state] == UIGestureRecognizerStateCancelled) {
-        NSLog(@"StateCancelled");
+        // NSLog(@"StateCancelled");
         self.worldView.zoomEnabled = YES;
         self.worldView.scrollEnabled = YES;
         self.worldView.userInteractionEnabled = YES;
     }
     else if ([pinchRecognizer state] == UIGestureRecognizerStateEnded )
     {
-        NSLog(@"StateEnded");
+        // NSLog(@"StateEnded");
         if (workingView) {
             [workingView setFrame:myFrame];
             [workingView saveFrame:myFrame];
@@ -552,123 +640,6 @@
     else {
         NSLog(@"%s Unrecognized UIGestureRecognizer State: %ld",__PRETTY_FUNCTION__,(long)[pinchRecognizer state]);
     }
-}
-
-
-/**
- Scales up a view slightly which makes the piece slightly larger, as if it is being picked up by the user.
- */
--(void)animateFirstTouchAtPoint:(CGPoint)touchPoint forView:(UIView *)theView
-{
-    NSLog(@"%s <-- Here",__PRETTY_FUNCTION__);
-#ifdef __FFU__
-	// Pulse the view by scaling up, then move the view to under the finger.
-	[UIView beginAnimations:nil context:nil];
-	[UIView setAnimationDuration:2.0];
-	theView.transform = CGAffineTransformMakeScale(1.2, 1.2);
-	[UIView commitAnimations];
-#endif
-}
-
--(void)dispatchFirstTouchAtPoint:(CGPoint)touchPoint forEvent:(UIEvent *)event
-{
-    NSLog(@"%s ",__PRETTY_FUNCTION__);
-	if (CGRectContainsPoint(mySlider.frame, touchPoint)) {
-		[self animateFirstTouchAtPoint:touchPoint forView:mySlider];
-	}
-    else if (CGRectContainsPoint(mySpeedOMeter.frame, touchPoint)) {
-		[self animateFirstTouchAtPoint:touchPoint forView:mySpeedOMeter];
-	}
-
-}
-
-
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-	NSUInteger numTaps = [[touches anyObject] tapCount];
-    NSLog(@"%s <-- Began %lu",__PRETTY_FUNCTION__,(unsigned long)numTaps);
-    
-    // Enumerate through all the touch objects.
-	NSUInteger touchCount = 0;
-	for (UITouch *touch in touches) {
-		// Send to the dispatch method, which will make sure the appropriate subview is acted upon.
-		[self dispatchFirstTouchAtPoint:[touch locationInView:self.view] forEvent:nil];
-		touchCount++;
-	}
-    
-
-}
-
--(void)dispatchTouchEvent:(UIView *)theView toPosition:(CGPoint)position
-{
-    NSLog(@"%s ",__PRETTY_FUNCTION__);
-    
-    if (CGRectContainsPoint([mySlider frame], position)) {
-		mySlider.center = position;
-	}
-	else if (CGRectContainsPoint([mySpeedOMeter frame], position)) {
-		mySpeedOMeter.center = position;
-	}
-    
-}
-
--(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    NSLog(@"%s <-- Moved",__PRETTY_FUNCTION__);
-    NSUInteger touchCount = 0;
-    
-    for (UITouch *touch in touches) {
-		// Send to the dispatch method, which will make sure the appropriate subview is acted upon
-		[self dispatchTouchEvent:[touch view] toPosition:[touch locationInView:self.view]];
-		touchCount++;
-	}
-    NSLog(@"%s Number of Touches: %ld",__PRETTY_FUNCTION__,(long)touchCount);
-}
-
-/**
- Scales down the view and moves it to the new position.
- */
--(void)animateView:(UIView *)theView toPosition:(CGPoint)thePosition
-{
-    NSLog(@"%s <-- here",__PRETTY_FUNCTION__);
-#ifdef __FFU__
-	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationDuration:2.0];
-#endif
-	// Set the center to the final postion.
-	theView.center = thePosition;
-
-    
-#ifdef __FFU__
-	// Set the transform back to the identity, thus undoing the previous scaling effect.
-	theView.transform = CGAffineTransformIdentity;
-	[UIView commitAnimations];
-#endif
-}
-
--(void)dispatchTouchEndEvent:(UIView *)theView toPosition:(CGPoint)position
-{
-    
-	// Check to see which view, or views, the point is in and then animate to that position.
-	if (CGRectContainsPoint([mySlider frame], position)) {
-		[self animateView:mySlider toPosition: position];
-        [mySlider saveFrame: theView.frame];
-	}
-	if (CGRectContainsPoint([mySpeedOMeter frame], position)) {
-		[self animateView:mySpeedOMeter toPosition: position];
-        [mySpeedOMeter saveFrame: theView.frame];
-	}
-}
-
--(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    NSLog(@"%s <--- Ended",__PRETTY_FUNCTION__);
-    NSUInteger touchCount = 0;
-    for (UITouch *touch in touches) {
-		// Sends to the dispatch method, which will make sure the appropriate subview is acted upon
-		[self dispatchTouchEndEvent:[touch view] toPosition:[touch locationInView:self.view]];
-    }
-    NSLog(@"%s Number of Touches: %ld",__PRETTY_FUNCTION__,(long)touchCount);
 }
 
 #pragma location_methods
@@ -736,7 +707,7 @@
         //
         // MKMapRect myMapRect = [theTrail updateMapRect];
         if (MKMapRectIsEmpty(updateRect)) {
-            NSLog(@"Still Empty");
+            // NSLog(@"%s Still Empty",__PRETTY_FUNCTION__);
             region = MKCoordinateRegionMakeWithDistance(coord, 1000, 1000);
         }
         else  {
@@ -755,6 +726,7 @@
     
     // NSLog(@"Straight Line Distance %.2f" ,[pebbleTrack distanceStraightLine]);
     // NSLog(@"Total Distance %.2f", [pebbleTrack distanceTotalMeters]);
+#ifdef __NUA__
     if ([myProperties showSpeedBar]) {
         NSString *speedDistance = [[NSString alloc] initWithFormat:@"SP: %.1f%@  T:%@",
                                     [TOMSpeed    displaySpeed:[newLocation speed]],[TOMSpeed displaySpeedUnits],
@@ -771,6 +743,8 @@
                                   [TOMDistance displayDistance:[theTrail distanceStraightLine]],[TOMDistance displayDistanceUnits]];
         [distanceInfoBar setText:infoBarText];
     }
+#endif
+    
 }
 
 //
@@ -797,7 +771,7 @@
     // NSLog(@"Speed: %.2f",[loc speed]);
     // NSLog(@"Time: %f", t);
     if (loc.speed < 0.00) {
-        NSLog(@"%s : Speed[%.2f] less than 0",__PRETTY_FUNCTION__,loc.speed);
+        // NSLog(@"%s : Speed[%.2f] less than 0",__PRETTY_FUNCTION__,loc.speed);
         return;
     }
     /*
@@ -813,6 +787,10 @@
         if (myDistance >= [TOMDistance distanceFilter] ||
             myDistance == 0.00) {
             [self processMyLocation: loc type:ptLocation];
+            [myOdoMeter setTrailDistance:[theTrail distanceTotalMeters]];
+            [myOdoMeter setNeedsDisplay];
+            [myTripTimer setDuration:[theTrail elapseTime]];
+            [myTripTimer setNeedsDisplay];
         }
 #ifdef __DEBUG__
         else {
@@ -868,7 +846,7 @@
                 break;
                 
             default:
-                NSLog(@"Error Unknown Pebble Type in update annotations");
+                NSLog(@"%s Error Unknown Pebble Type",__PRETTY_FUNCTION__);
                 break;
         }
     }
@@ -901,19 +879,25 @@
     [ mySlider setNeedsDisplay];
     [ mySpeedOMeter updateSpeed:[stopLoc speed]];
     [ mySpeedOMeter setNeedsDisplay];
-     
+    [ myOdoMeter setTrailDistance:[theTrail distanceTotalMeters]];
+    [ myOdoMeter setNeedsDisplay];
+    [myTripTimer setDuration:[theTrail elapseTime]];
+    [myTripTimer setNeedsDisplay];
+
      // Still Moving...
     if  ([stopLoc speed] > 0.0) {
         // NSLog(@"Moving %.2f",[stopLoc speed]);
         return;
     }
-    
+
+#ifdef __NUA__
     CLLocationCoordinate2D coord = [stopLoc coordinate];
     if ([myProperties showInfoBar]) {
         NSString *infoBarText = [[NSString alloc] initWithFormat:@"X:%.4f Y:%.4f S:%@ C:%lu", coord.latitude, coord.longitude, [theTrail elapseTimeString],(unsigned long)[theTrail.ptTrack count]];
         [distanceInfoBar setText:infoBarText];
     }
-
+#endif
+    
     // NSLog(@"Stopped?");
     
     //
@@ -1121,14 +1105,14 @@
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    NSLog(@"Button Index:%ld",(long)buttonIndex);
+    // NSLog(@"Button Index:%ld",(long)buttonIndex);
     NSInteger myTag = [actionSheet tag];
     
     if (myTag == 3) {
         // This is the actions for the iCloud check
         
         if (buttonIndex == 0 ) {
-            NSLog(@"User Selected to go to setting to STOP");
+            // NSLog(@"User Selected to go to setting to STOP");
             [self stopTrail];
         }
         return;
@@ -1396,6 +1380,13 @@
     [mySpeedOMeter setFrame:speedOMeterRect];
     [mySpeedOMeter setNeedsDisplay];
     
+    CGRect odoMeterRect = [myOdoMeter getFrame];
+    [myOdoMeter setFrame:odoMeterRect];
+    [myOdoMeter setNeedsDisplay];
+
+    CGRect tripMeterRect = [myTripTimer getFrame];
+    [myTripTimer setFrame:tripMeterRect];
+    [myTripTimer setNeedsDisplay];
     
     CGRect toolbarRect;
     toolbarRect.origin.x = 0;
@@ -1403,20 +1394,6 @@
     toolbarRect.size.height = TOM_TOOL_BAR_HEIGHT;
     toolbarRect.size.width = screenWidth;
     [toolbar setFrame:toolbarRect];
-
-    CGRect speedBarRect;
-    speedBarRect.origin.x = ((screenWidth / 2) - (TOM_LABEL_WIDTH/2));
-    speedBarRect.origin.y = ptTopMargin + 50;
-    speedBarRect.size.height = ptLabelHeight;
-    speedBarRect.size.width = TOM_LABEL_WIDTH;
-    [speedTimeBar setFrame:speedBarRect];
-    
-    CGRect infoBarRect;
-    infoBarRect.origin.x = ((screenWidth / 2) - (TOM_LABEL_WIDTH/2));
-    infoBarRect.origin.y = ptTopMargin +50  + ptLabelHeight + 10;
-    infoBarRect.size.height = ptLabelHeight;
-    infoBarRect.size.width = TOM_LABEL_WIDTH;
-    [distanceInfoBar setFrame:infoBarRect];
 }
 
 #pragma properties
@@ -1552,48 +1529,93 @@
         //
         [self.myProperties setShowSounds:YES];  // default
     }
-    
-    // KEY_PT_SHOW_SPEED_LABEL
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_SPEED_LABEL] != nil)
+
+    // @KEY_ODOMETER
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_ODOMETER] != nil)
     {
-        [self.myProperties setShowSpeedBar:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_SPEED_LABEL]];
+        [self.myProperties setShowOdoMeter:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_ODOMETER]];
     }
     else
     {   // we don't have a preference stored on this device,
         // use the default value in this case (YES)
         //
-        [self.myProperties setShowSpeedBar:YES];  // default
+        [self.myProperties setShowOdoMeter:YES];  // default
     }
+
     // Trigger the display
-    if ([self.myProperties showSpeedBar]) {
-        [speedTimeBar setHidden:NO];
+    if ([self.myProperties showOdoMeter]) {
+        [myOdoMeter setHidden:NO];
     }
     else
-        [speedTimeBar setHidden:YES];
+        [myOdoMeter setHidden:YES];
     
     
-    // KEY_PT_SHOW_SPEED_LABEL
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_INFO_LABEL] != nil)
+    // @KEY_TRIPMETER
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_TRIPMETER] != nil)
     {
-        [self.myProperties setShowInfoBar:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_INFO_LABEL]];
+        [self.myProperties setShowTripMeter:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_TRIPMETER]];
     }
     else
     {
         // we don't have a preference stored on this device,
         // use the default value in this case (YES)
         //
-        [self.myProperties setShowInfoBar:YES];  // default
+        [self.myProperties setShowTripMeter:YES];  // default
     }
     
     // Trigger the display
-    if ([self.myProperties showInfoBar]) {
-        [distanceInfoBar setHidden:NO];
+    if ([self.myProperties showTripMeter]) {
+        [myTripTimer setHidden:NO];
 
     }
     else {
-        [distanceInfoBar setHidden:YES];
+        [myTripTimer setHidden:YES];
     }
 
+    // @KEY_SLIDER
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SLIDER] != nil)
+    {
+        [self.myProperties setShowSlider:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SLIDER]];
+    }
+    else
+    {
+        // we don't have a preference stored on this device,
+        // use the default value in this case (YES)
+        //
+        [self.myProperties setShowSlider:YES];  // default
+    }
+    
+    // Trigger the display
+    if ([self.myProperties showSlider]) {
+        [mySlider setHidden:NO];
+        
+    }
+    else {
+        [mySlider setHidden:YES];
+    }
+    
+    // @KEY_SPEEDOMETER
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SPEEDOMETER] != nil)
+    {
+        [self.myProperties setShowSpeedOMeter:[[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SPEEDOMETER]];
+    }
+    else
+    {
+        // we don't have a preference stored on this device,
+        // use the default value in this case (YES)
+        //
+        [self.myProperties setShowSpeedOMeter:YES];  // default
+    }
+    
+    // Trigger the display
+    if ([self.myProperties showSpeedOMeter]) {
+        [mySpeedOMeter setHidden:NO];
+        
+    }
+    else {
+        [mySpeedOMeter setHidden:YES];
+    }
+    
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_DISTANCE_FILTER] != nil)
     {
         [self.myProperties setPtDistanceFilter:[[NSUserDefaults standardUserDefaults] floatForKey:@KEY_DISTANCE_FILTER]];
@@ -1647,7 +1669,7 @@
             {
                 //
                 tmp = [[NSUbiquitousKeyValueStore defaultStore] objectForKey:changedKey];
-                NSLog(@"%s: %@:%@",__func__,changedKey,tmp);
+                // NSLog(@"%s: %@:%@",__func__,changedKey,tmp);
                 // These are all stored as numbers
                 if ([changedKey isEqualToString:@KEY_MAP_TYPE]              ||
                     [changedKey isEqualToString:@KEY_USER_TRACKING_MODE]    ||

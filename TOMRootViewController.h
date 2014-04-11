@@ -18,6 +18,8 @@
 #import "TOMImageStore.h"
 #import "TOMViewSlider.h"
 #import "TOMSpeedOMeter.h"
+#import "TOMOdometer.h"
+#import "TOMTripTimer.h"
 
 @interface TOMRootViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIActionSheetDelegate >
 
@@ -25,14 +27,16 @@
 @private
     CLLocationManager *locationManager;
     IBOutlet MKMapView *worldView;
-    UIToolbar *toolbar;
-    TOMViewSlider *mySlider;
+    UIToolbar      *toolbar;
+    TOMViewSlider  *mySlider;
     TOMSpeedOMeter *mySpeedOMeter;
+    TOMOdometer    *myOdoMeter;
+    TOMTripTimer   *myTripTimer;
 
 @public
     IBOutlet UIActivityIndicatorView *activityIndicator;
-    IBOutlet UILabel *speedTimeBar;
-    IBOutlet UILabel *distanceInfoBar;
+    // IBOutlet UILabel *speedTimeBar;
+    // IBOutlet UILabel *distanceInfoBar;
     UIBarButtonItem *flexItem;
     UIBarButtonItem *cameraItem;
     UIBarButtonItem *startStopItem;

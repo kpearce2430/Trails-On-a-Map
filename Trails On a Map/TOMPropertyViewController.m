@@ -20,7 +20,7 @@
             displaySpeedLabel, displaySpeedSegmentedControl,displayDistanceLabel, displayDistanceSegmentedControl, distanceFilterLabel,
             distanceFilterSliderCtl, accuracyFilterLabel, accuracyFilterSegmentedControl,
             toggleLabel, locationLabel, locationSwitch, pictureLabel, pictureSwitch,
-            stopLabel, stopSwitch, infoBarLabel, infoBarSwitch, speedBarSwitch, speedBarLabel,
+            stopLabel, stopSwitch, odoMeterLabel, odoMeterSwitch, tripMeterLabel,tripMeterSwitch, sliderLabel,sliderSwitch, speedOMeterLabel, speedOMeterSwitch,
             syncLabel, syncSwitch, iCloudLabel, iCloudSwitch, resetButton;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -354,24 +354,25 @@
             break;
         
         case 6:
-            keyvalue = @KEY_SHOW_SPEED_LABEL;
+            keyvalue = @KEY_ODOMETER;
             break;
             
         case 7:
-            keyvalue = @KEY_SHOW_INFO_LABEL;
+            keyvalue = @KEY_TRIPMETER;
             break;
     
         case 8:
+            keyvalue = @KEY_SLIDER;
+            break;
+            
+        case 9:
+            keyvalue = @KEY_SPEEDOMETER;
+            break;
+            
+        case 10:
             keyvalue = @KEY_PROPERTIES_SYNC;
             break;
 
-#ifdef __FFU__
-        case 9: // This is the iCloud property -
-            // it does not get synced in the NSUbiquitousKeyValueStore
-            keyvalue = @KEY_ICLOUD;
-            isIcloud = YES;
-            break;
-#endif
         default:
             NSLog(@"ERROR: %s Unknown Sender Tag for pt types",__func__);
             break;
@@ -452,7 +453,8 @@
     NSArray *segmentMapTypeContent  = [NSArray arrayWithObjects: @"Standard", @"Satellite", @"Hybrid", nil];
     NSArray *segmentUserTracking = [NSArray arrayWithObjects: @"None", @"Follow", @"Heading", nil];
     NSArray *accuracyTextContent = [NSArray arrayWithObjects: @"Nav", @"Best", @"10m", @"100m", @"1km", @"3km" , nil];
-    NSArray *pebbleTypeText = [NSArray arrayWithObjects: @"Locations:",@"Pictures:", @"Stops:", @"Notes", @"Sounds", @"Speed Time:",@"Distance Info:", @"Sync Properties:", @"Sync Trails on iCloud",nil];
+    NSArray *pebbleTypeText = [NSArray arrayWithObjects: @"Locations:",@"Pictures:", @"Stops:", @"Notes", @"Sounds", @"Odometer:",@"Trip Meter:",
+                                                         @"Histograph:",@"SpeedOMeter:", @"Sync Properties:", @"Sync Trails on iCloud",nil];
     NSArray *displaySpeedText = [NSArray arrayWithObjects:@"M P H",@"K P H",@"M P M",@"M P S", nil]; // Miles per Hour, KM per Hour, Min / Mile, Meters / Sec
     NSArray *displayDistanceText = [NSArray arrayWithObjects:@"Miles",@"Kilometers", @"Meters", @"Feet", nil];
     
@@ -812,7 +814,7 @@
     [scrollView addSubview:toggleLabel];
     
     // for (POMType pt = ptLocation; pt <= ptSound; pt++ )
-    for (NSInteger pt = 1; pt < 9 ; pt++)
+    for (NSInteger pt = 1; pt < 11  ; pt++)
     {
         if (pt == ptNote || pt == ptSound) {
             continue;
@@ -889,10 +891,10 @@
                 break;
             
             case 6: // SpeedBar
-                speedBarSwitch = ptSwitch;
-                if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_SPEED_LABEL] != nil)
+                odoMeterSwitch = ptSwitch;
+                if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_ODOMETER] != nil)
                 {
-                    yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_SPEED_LABEL];
+                    yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_ODOMETER];
                 }
                 else
                 {   //
@@ -901,17 +903,17 @@
                     yn = YES;  // default
                 }
                 frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
-                speedBarLabel = [TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]];
-                [speedBarLabel setFont:myLabelFont];
-                [speedBarLabel setTextAlignment:NSTextAlignmentRight];
-                [scrollView addSubview:speedBarLabel];
+                odoMeterLabel = [TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]];
+                [odoMeterLabel setFont:myLabelFont];
+                [odoMeterLabel setTextAlignment:NSTextAlignmentRight];
+                [scrollView addSubview:odoMeterLabel];
                 break;
                 
             case 7:
-                infoBarSwitch = ptSwitch;
-                if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SHOW_INFO_LABEL] != nil)
+                tripMeterSwitch = ptSwitch;
+                if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_TRIPMETER] != nil)
                 {
-                    yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SHOW_INFO_LABEL];
+                    yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_TRIPMETER];
                 }
                 else
                 {   //
@@ -920,13 +922,48 @@
                     yn =YES;  // default
                 }
                 frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
-                infoBarLabel = [TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]];
-                [infoBarLabel setFont:myLabelFont];
-                [infoBarLabel setTextAlignment:NSTextAlignmentRight];
-                [scrollView addSubview:infoBarLabel];
+                tripMeterLabel = [TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]];
+                [tripMeterLabel setFont:myLabelFont];
+                [tripMeterLabel setTextAlignment:NSTextAlignmentRight];
+                [scrollView addSubview:tripMeterLabel];
                 break;
-            
             case 8:
+                sliderSwitch = ptSwitch;
+                if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SLIDER] != nil)
+                {
+                    yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SLIDER];
+                }
+                else
+                {   //
+                    // we don't have a preference stored on this device,use the YES as default.
+                    //
+                    yn =YES;  // default
+                }
+                frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
+                sliderLabel = [TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]];
+                [sliderLabel setFont:myLabelFont];
+                [sliderLabel setTextAlignment:NSTextAlignmentRight];
+                [scrollView addSubview:sliderLabel];
+                break;
+            case 9:
+                speedOMeterSwitch = ptSwitch;
+                if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_SPEEDOMETER] != nil)
+                {
+                    yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_SPEEDOMETER];
+                }
+                else
+                {   //
+                    // we don't have a preference stored on this device,use the YES as default.
+                    //
+                    yn =YES;  // default
+                }
+                frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
+                speedOMeterLabel = [TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]];
+                [speedOMeterLabel setFont:myLabelFont];
+                [speedOMeterLabel setTextAlignment:NSTextAlignmentRight];
+                [scrollView addSubview:speedOMeterLabel];
+                break;
+            case 10:
                 syncSwitch = ptSwitch;
                 if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_PROPERTIES_SYNC] != nil)
                 {
@@ -941,26 +978,7 @@
                 [syncLabel setTextAlignment:NSTextAlignmentRight];
                 [scrollView addSubview:syncLabel];
                 break;
-#ifdef __FFU__
-                //
-                // Apple doesn't want the application to control if files are saved to
-                // iCloud.   I'm leaving the case statement in for future use.
-            case 9:
-                iCloudSwitch = ptSwitch;
-                if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_ICLOUD] != nil)
-                {
-                    yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_ICLOUD];
-                }
-                else {
-                    yn = NO; // User must request iCloud storage of Documents
-                }
-                frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
-                iCloudLabel = [TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]];
-                [iCloudLabel setFont:myLabelFont];
-                [iCloudLabel setTextAlignment:NSTextAlignmentRight];
-                [scrollView addSubview:iCloudLabel];
-                break;
-#endif
+
             default:
                 yn = NO;  // default
                 break;
@@ -1137,24 +1155,43 @@
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [stopSwitch setFrame:myrect];
         
-        // Speed Bar Label
+        // Odometer Label
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
-        [speedBarLabel setFrame:myrect];
+        [odoMeterLabel setFrame:myrect];
         
-        // Speed Bar Switch
+        // Odometer Switch
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
-        [speedBarSwitch setFrame:myrect];
-        
-        // Info Bar Label
+        [odoMeterSwitch setFrame:myrect];
+
+
+        // Trip Meter Label
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
-        [infoBarLabel setFrame:myrect];
+        [tripMeterLabel setFrame:myrect];
         
-        // Info Bar Switch
+        // Trip meter Switch
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
-        [infoBarSwitch setFrame:myrect];
+        [tripMeterSwitch setFrame:myrect];
+
+        // Slider (Histograph) Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [sliderLabel setFrame:myrect];
         
+        // Slider Switch
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [sliderSwitch setFrame:myrect];
+
+        // SpeedOMeter Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [speedOMeterLabel setFrame:myrect];
+        
+        // SpeedOMeter Switch
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [speedOMeterSwitch setFrame:myrect];
+
         // Sync Properties Switch Label
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
@@ -1164,16 +1201,6 @@
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [syncSwitch setFrame:myrect];
 
-#ifdef __FFU__
-        // iCloud Switch Label
-        myY += ptSegmentedControlHeight + SPACING;
-        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
-        [iCloudLabel setFrame:myrect];
-        
-        // iCloud Switch
-        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
-        [iCloudSwitch setFrame:myrect];
-#endif
         
         // Reset Button
         CGFloat buttonX = (screenWidth - (myX + ptRightMargin + 100.0)) / 2.0;
@@ -1287,43 +1314,50 @@
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [stopSwitch setFrame:myrect];
         
-        // Speed Bar Switch Label
+        // OdoMeter Label
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
-        [speedBarLabel setFrame:myrect];
+        [odoMeterLabel setFrame:myrect];
         
-        // Speed Bar Switch
+        // Odometer Switch
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
-        [speedBarSwitch setFrame:myrect];
-        
-        // Info Bar Switch Label
+        [odoMeterSwitch setFrame:myrect];
+
+        // Trip Meter Label
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
-        [infoBarLabel setFrame:myrect];
+        [tripMeterLabel setFrame:myrect];
         
-        // Info Bar Switch
+        // Trip Meter  Switch
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
-        [infoBarSwitch setFrame:myrect];
+        [tripMeterSwitch setFrame:myrect];
+
+        // Slider Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [sliderLabel setFrame:myrect];
+        
+        // Slider  Switch
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [sliderSwitch setFrame:myrect];
+
+        // SpeedOMeter Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [speedOMeterLabel setFrame:myrect];
+        
+        // SpeedOMeter  Switch
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [speedOMeterSwitch setFrame:myrect];
         
         // Propeties Sync Switch Label
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
         [syncLabel setFrame:myrect];
-        
+
         // Propeties Sync Switch
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [syncSwitch setFrame:myrect];
-
-#ifdef __FFU__
-        // Propeties Sync Switch Label
-        myY += ptSegmentedControlHeight + SPACING;
-        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
-        [iCloudLabel setFrame:myrect];
-        
-        // Propeties Sync Switch
-        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
-        [iCloudSwitch setFrame:myrect];
-#endif
 
         // Reset Button
         CGFloat buttonX = (screenWidth - (myX + ptRightMargin + 100.0)) / 2.0;

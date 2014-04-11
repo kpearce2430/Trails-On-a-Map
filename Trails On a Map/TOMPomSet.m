@@ -70,9 +70,10 @@
         NSLog(@"%s %@",__func__, [error localizedDescription]);
         ptTrack = [[ NSMutableArray alloc] init ];
         return NO;
-    } else {
-        NSLog(@"%s Data has loaded successfully.",__func__);
     }
+    // else {
+    //     NSLog(@"%s Data has loaded successfully.",__func__);
+    // }
     
     ptTrack = [NSKeyedUnarchiver unarchiveObjectWithData:data];
     
@@ -128,7 +129,7 @@
     TOMPointOnAMap *mp;
     CLLocationCoordinate2D coord;
     CLLocationDistance alt;
-    CLHeading *hdng;
+    // CLHeading *hdng;
     
     // NSLog(@"%@ Count[%ld]", [ptProperties ptName], (unsigned long)[ptTrack count] );
     
@@ -137,7 +138,7 @@
         mp = [ptTrack objectAtIndex: i];
         coord = [ mp coordinate ];
         alt = [mp altitude];
-        hdng = [mp heading];
+        // hdng = [mp heading];
         
         NSLog(@"T<%@> LL<%.4f %.4f> Alt:%.1f", mp.timestamp, coord.latitude, coord.longitude, alt  );
         // NSLog(@"%@",[hdng description]);
@@ -402,22 +403,24 @@
     double maxX;
     double maxY;
     
-    MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * [ptTrack count]);
-    
+ 
     if ([ptTrack count] < 2) {
         return ptMapRect;
     }
-    
+
+#ifdef __DEBUG__
     if (MKMapRectIsEmpty(ptMapRect)) {
         //
         NSLog(@"Ha! ptMapRect is empty");
     }
+#endif
     
+    // MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * [ptTrack count]);
     TOMPointOnAMap *p = [ptTrack objectAtIndex:0];
     MKMapPoint newPoint = MKMapPointForCoordinate([p coordinate]);
     maxX = minX = newPoint.x;
     maxY = minY = newPoint.y;
-    pointArr[0] = newPoint;
+    // pointArr[0] = newPoint;
     for (int i = 1; i < [ptTrack count]; i++ )
     {
         p = [ptTrack objectAtIndex:i];
@@ -428,7 +431,7 @@
         minY = MIN(minY, newPoint.y);
         maxX = MAX(maxX, newPoint.x);
         maxY = MAX(maxY, newPoint.y);
-        pointArr[i] = newPoint;
+        // pointArr[i] = newPoint;
     }
     
     // self.routeLine = [ MKPolyline polylineWithPoints:pointArr count:[pebbleTrack count]];
