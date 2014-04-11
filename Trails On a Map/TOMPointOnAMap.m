@@ -233,7 +233,7 @@
 {
     double mylat,mylong;
     NSInteger myType;
-    UIImage *myImage = nil;
+
     
     // NSString *myYN;
 
@@ -257,19 +257,44 @@
         [self setTimestamp:[aDecoder decodeObjectForKey:@"timestamp"]];
         coordinate.latitude = mylat;
         coordinate.longitude = mylong;
-        myImage = [aDecoder decodeObjectForKey:@"image"];
+
+#ifdef __FFU__
+        UIImage *myImage = [aDecoder decodeObjectForKey:@"image"];
         
         // to take images out of the core data trail
         if (image) {
             [TOMImageStore saveImage:myImage title:title key:key];
             image = nil;
         }
-        
-        // myYN = [aDecoder decodeObjectForKey:@"isTrailIcon"];
-        // isTrailIcon = [myYN isEqualToString:@YES_STRING];
+#endif
     }
     return self;
 }
 
+- (NSString *) pomCSV
+{
+    // @"Type,Title,Altitude,Heading,Date,Time,Horizontal,Vertical,Latitude,Longitude";
+    static NSDateFormatter *dateFormatter = nil;
+    static NSDateFormatter *timeFormatter = nil;
+    NSArray *typeStrs = [NSArray arrayWithObjects:@"Unknown",@"Location",@"Picture",@"Stop",@"Note",@"Sound",nil];
+    
+    if (!dateFormatter) {
+        dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"YYYY-MM-dd"];
+    }
+    
+    if (!timeFormatter) {
+        timeFormatter = [[NSDateFormatter alloc] init];
+        [timeFormatter setDateFormat:@"HH:mm:ss"];
+    }
+    
+    NSString *dateStr = [dateFormatter stringFromDate:timestamp];
+    NSString *timeStr = [timeFormatter stringFromDate:timestamp];
+    
+    NSString *theString = [[NSString alloc] initWithFormat:@"%@,%@,%.2f,%.2f,%@,%@,%.2f,%.2f,%.2f,%.8f,%.8f",
+                           typeStrs[type],title,altitude,[heading trueHeading],dateStr,timeStr,[TOMSpeed displaySpeed:speed],horizontal,vertical,coordinate.latitude,coordinate.longitude];
+    
+    return theString;
+}
 
 @end

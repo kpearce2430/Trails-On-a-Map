@@ -154,33 +154,6 @@
         [toolbar setItems:items];
         [self.view addSubview:toolbar];
 
-#ifdef __NUA__
-        //  Create the speedBar
-        CGRect speedBarFrame = CGRectMake( ((screenWidth / 2) - (TOM_LABEL_WIDTH/2)), ptTopMargin + 50 , TOM_LABEL_WIDTH, ptLabelHeight );
-        speedTimeBar = [[UILabel alloc] initWithFrame:speedBarFrame ];
-        speedTimeBar.layer.borderColor = TOM_LABEL_BORDER_COLOR;
-        speedTimeBar.layer.borderWidth = TOM_LABEL_BORDER_WIDTH;
-        speedTimeBar.layer.cornerRadius  = TOM_LABEL_BORDER_CORNER_RADIUS;
-        speedTimeBar.backgroundColor = TOM_LABEL_BACKGROUND_COLOR;
-        speedTimeBar.textColor = TOM_LABEL_TEXT_COLOR;
-        speedTimeBar.textAlignment = NSTextAlignmentCenter;
-        [speedTimeBar setFont:[UIFont fontWithName:@TOM_FONT size:11.0]];
-        speedTimeBar.text = @TRAILS_ON_A_MAP;
-        [self.view addSubview:speedTimeBar];
-        
-        //  Create the infoBar
-        CGRect infoBarFrame = CGRectMake(((screenWidth / 2) - (TOM_LABEL_WIDTH/2)), ptTopMargin +50  + ptLabelHeight + 10, TOM_LABEL_WIDTH, ptLabelHeight );
-        distanceInfoBar = [[UILabel alloc] initWithFrame:infoBarFrame];
-        distanceInfoBar.layer.borderColor = TOM_LABEL_BORDER_COLOR;
-        distanceInfoBar.layer.borderWidth = TOM_LABEL_BORDER_WIDTH;
-        distanceInfoBar.layer.cornerRadius  = TOM_LABEL_BORDER_CORNER_RADIUS;
-        distanceInfoBar.backgroundColor = TOM_LABEL_BACKGROUND_COLOR;
-        distanceInfoBar.textColor = TOM_LABEL_TEXT_COLOR;
-        distanceInfoBar.textAlignment = NSTextAlignmentCenter;
-        [distanceInfoBar setFont:[UIFont fontWithName:@TOM_FONT size:11.0]];
-        [self.view addSubview:distanceInfoBar];
-#endif
-        
         //
         // Initialize the variables
         //
@@ -424,7 +397,7 @@
             //
             //  Save off the old track             //
             if (amiUpdatingLocation == YES) {
-                NSLog(@"Saving[%@]",self.title);
+                // NSLog(@"Saving[%@]",self.title);
                 // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
                 [self saveTrails: NO]; //
                 amiUpdatingLocation = NO;
@@ -564,7 +537,7 @@
             NSLog( @"%s Reason: %@",__PRETTY_FUNCTION__, exception.reason );
             return;
         }
-#ifdef __DEBUG__
+#ifdef DEBUG
         @finally {
             NSLog(@"%s Finally block",__PRETTY_FUNCTION__);
         }
@@ -885,7 +858,7 @@
     [myTripTimer setNeedsDisplay];
 
      // Still Moving...
-    if  ([stopLoc speed] > 0.0) {
+    if  ([stopLoc speed] != 0.0) {
         // NSLog(@"Moving %.2f",[stopLoc speed]);
         return;
     }

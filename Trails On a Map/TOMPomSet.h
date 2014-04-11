@@ -47,10 +47,11 @@
 - (TOMPointOnAMap *)lastPom;
 
 - (NSTimeInterval) elapseTime;
-- (NSString *) elapseTimeString;
-- (NSInteger) numPics;
-- (double) averageSpeed;
-- (double) averageSpeedStraightLine;
+- (NSString *)     elapseTimeString;
+- (NSInteger)      numPics;
+- (double)         averageSpeed;
+- (double)         averageSpeedStraightLine;
+- (BOOL) trailCSVtoURL: (NSURL *) theURL;
 
 // @property (nonatomic, weak) id <TOMPomSetDelegate> delegate;
 

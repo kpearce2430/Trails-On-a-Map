@@ -55,5 +55,6 @@ typedef enum  { ptError = -1, ptUnknown, ptLocation, ptPicture, ptStop, ptNote, 
 - (void) copyLocation:(CLLocation *) loc;
 - (double) distanceFromLocation:(CLLocation *)loc;
 - (CLLocation *) location;
+- (NSString *) pomCSV;
 
 @end

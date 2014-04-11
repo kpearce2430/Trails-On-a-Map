@@ -192,17 +192,37 @@
         if (!speedDict)
             speedDict = [[NSDictionary alloc] initWithObjectsAndKeys: font, NSFontAttributeName, [UIColor greenColor], NSForegroundColorAttributeName, style, NSParagraphStyleAttributeName, nil];
 
-        NSString *maxText = [[NSString alloc] initWithFormat:@"%.0f",[TOMSpeed displaySpeed: maxSpeed]];
-        NSString *minText = [[NSString alloc] initWithFormat:@"%.0f",[TOMSpeed displaySpeed: minSpeed]];
-
+        NSString *maxText = nil;
+        NSString *minText = nil;
+        
+        if (maxSpeed > 0.00f)
+            maxText = [[NSString alloc] initWithFormat:@"%.0f",[TOMSpeed displaySpeed: maxSpeed]];
+        else
+            maxText = @"0";
+        
+        if (minSpeed < 1000.f && minSpeed > 0.00f)
+            minText = [[NSString alloc] initWithFormat:@"%.0f",[TOMSpeed displaySpeed: minSpeed]];
+        else
+            minText =  @"0";
+        
         [maxText drawAtPoint:CGPointMake(5.0f, 10.0f ) withAttributes:speedDict];
         [minText drawAtPoint:CGPointMake(5.0f, (myHeight -((3*oneSegY)/2.0))) withAttributes:speedDict];
 
         if (!altDict)
             altDict = [[NSDictionary alloc] initWithObjectsAndKeys: font, NSFontAttributeName, [UIColor redColor], NSForegroundColorAttributeName, style, NSParagraphStyleAttributeName, nil];
         
-        NSString *altMaxText = [[NSString alloc] initWithFormat:@"%.0f",maxAltitude];
-        NSString *altMinText = [[NSString alloc] initWithFormat:@"%.0f",minAltitude];
+        NSString *altMaxText = nil;
+        NSString *altMinText = nil;
+        
+        if (maxAltitude > 0.00)
+            altMaxText = [[NSString alloc] initWithFormat:@"%.0f",maxAltitude];
+        else
+            altMaxText = @"0";
+        
+        if (minAltitude < 13500 && minAltitude > 0.00)  // 13500m is higher than most commercial airliners fly
+            altMinText = [[NSString alloc] initWithFormat:@"%.0f",minAltitude];
+        else
+            altMinText = @"0";
         
         [altMaxText drawAtPoint:CGPointMake(myWidth-oneSegX, 10.0f ) withAttributes:altDict];
         [altMinText drawAtPoint:CGPointMake(myWidth-oneSegX, (myHeight -((3*oneSegY)/2.0))) withAttributes:altDict];

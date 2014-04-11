@@ -547,7 +547,57 @@
 }
 
 
+- (BOOL) trailCSVtoURL: (NSURL *) theURL
+{
+    BOOL result = YES;
+    NSString *header = @"Type,Title,Altitude,Heading,Date,Time,Speed,Horizontal,Vertical,Latitude,Longitude";
+    NSError *err = nil;
+    
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    if ([fileManager fileExistsAtPath:[theURL path]]) {
+        // clear
+        [fileManager removeItemAtURL:theURL error:&err];
+    }
+    [fileManager createFileAtPath:[theURL path] contents:nil attributes:nil];
+    
+    //
+    NSFileHandle *myHandle = [NSFileHandle fileHandleForWritingToURL:theURL error:&err ];
+    if (myHandle == nil) {
+        NSLog(@"%s ERROR Failed to open file %@",__PRETTY_FUNCTION__,err);
+        return NO;
+    }
+    
+    NSString *trailCSV = [[NSString alloc] initWithFormat:@"%@\n",header];
+    NSData *theData =[trailCSV dataUsingEncoding:NSUTF8StringEncoding];
+    [myHandle seekToEndOfFile];
+    [myHandle writeData:theData];
 
+    @try {
+        for (int i = 0 ; i < [ptTrack count]; i++ ) {
+            TOMPointOnAMap *p = [ptTrack objectAtIndex:i];
+            
+            NSString *csvRow = [[NSString alloc] initWithFormat:@"%@\n",[p pomCSV]];
+            
+            theData = [csvRow dataUsingEncoding:NSUTF8StringEncoding];
+            [myHandle seekToEndOfFile];
+            [myHandle writeData:theData];
+        }
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%s Exception Occured",__PRETTY_FUNCTION__);
+        NSLog( @"%s Name: %@", __PRETTY_FUNCTION__, exception.name);
+        NSLog( @"%s Reason: %@",__PRETTY_FUNCTION__, exception.reason );
+        trailCSV = nil;
+        result = NO;
+    }
+#ifdef DEBUG
+    @finally {
+        NSLog(@"%s Finally Block",__PRETTY_FUNCTION__);
+    }
+#endif
+    [myHandle closeFile];
+    return result;
+}
 
 
 #ifdef __NUA__

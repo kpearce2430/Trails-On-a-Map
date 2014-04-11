@@ -545,10 +545,16 @@
     
     [gpxString writeToURL:documentURL atomically:YES encoding:NSUTF8StringEncoding error:&err];
     if (err) {
-        NSLog(@"%s ERROR WRITE GPX FILE: %@",__func__,err);
+        NSLog(@"%s ERROR WRITING GPX FILE: %@",__func__,err);
     }
-    }); // end dispatch
     
+#ifdef DEBUG
+    NSString *csvFileName = [NSString stringWithFormat:@"%@.csv",self.title];
+    NSURL *csvDocURL = [docsdirURL URLByAppendingPathComponent:csvFileName isDirectory:NO];
+    [theTrail trailCSVtoURL:csvDocURL];
+#endif
+        
+    }); // end dispatch
     return;
 }
 
