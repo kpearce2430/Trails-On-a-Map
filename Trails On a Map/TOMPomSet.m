@@ -600,19 +600,4 @@
 }
 
 
-#ifdef __NUA__
-+ (UIImage *) icon:(NSString *) title
-{
-    NSString *iconName = [[NSString alloc] initWithFormat:@"%@.icon",title];
-    
-    UIImage *trailIcon  = [TOMImageStore loadImage:iconName warn:NO];
-    if (!trailIcon) {
-        trailIcon = [UIImage imageNamed:@"pt114x114.png"];
-    }
-    
-    return trailIcon;
-
-}
-#endif
-
 @end
