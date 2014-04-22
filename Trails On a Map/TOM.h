@@ -42,6 +42,8 @@ typedef enum  { tomDDError = -1, tomDDUnknown, tomDDMiles, tomDDKilometers, tomD
 #define TOM_KML_EXT              ".kml"
 #define TOM_KMZ_EXT              ".kmz"
 #define TOM_JPG_EXT              ".jpg"
+#define TOM_CSV_EXT              ".csv"
+
 #define TOM_TOOL_BAR_HEIGHT      35
 #define TOM_LABEL_WIDTH          200
 
