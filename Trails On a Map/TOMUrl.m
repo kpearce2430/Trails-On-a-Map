@@ -233,7 +233,7 @@
     
     if (err)
     {
-        NSLog(@"ERROR: %s %@",__func__,err);
+        NSLog(@"%s ERROR: %@",__PRETTY_FUNCTION__ ,err);
         return NO;
     }
     else
