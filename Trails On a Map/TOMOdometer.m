@@ -10,7 +10,7 @@
 
 @implementation TOMOdometer
 
-@synthesize trailDistance,totalDistance;
+@synthesize trailDistance; // ,totalDistance;
 
 - (id)initWithFramePortrait:(CGRect)pFrame Landscape:(CGRect) lFrame
 {
