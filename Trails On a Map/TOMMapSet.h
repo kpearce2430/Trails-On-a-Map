@@ -40,8 +40,8 @@
 // via lockForReading.  Once you're done accessing the points, release the
 // read lock with unlockForReading.
 //
-@property (readonly) MKMapPoint *points;
-@property (readonly) NSUInteger pointCount;
+@property (nonatomic,readonly) MKMapPoint *points;
+@property (nonatomic,readonly) NSUInteger pointCount;
 
 - (void)unlockForReading;
 - (void)lockForReading;
