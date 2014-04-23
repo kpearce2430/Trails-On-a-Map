@@ -20,7 +20,7 @@
 }
 
 @property (nonatomic,readwrite) CGFloat trailDistance;
-@property (nonatomic,readwrite) CGFloat totalDistance;
+// @property (nonatomic,readwrite) CGFloat totalDistance;
 
 -(void) resetView;
 
