@@ -345,7 +345,7 @@
 //
 - (void) addSpeed: (CLLocationSpeed) sp Altitude: (CLLocationDistance) alt
 {
-    // NSLog(@"ADDING:%.2f",sp);
+    // NSLog(@"ADDING: sp: %.2f alt:%.2f",sp,alt   );
     NSNumber *mySpeed = nil;
     NSNumber *myAltitude = nil; // [[NSNumber alloc] initWithDouble:alt];
 
@@ -371,11 +371,11 @@
     }
     else
 #endif
-        myAltitude = [[NSNumber alloc] initWithDouble:alt];
+    myAltitude = [[NSNumber alloc] initWithDouble:alt];
     
     [displayAltitudes addObject:myAltitude];
     
-      if ([mySpeed doubleValue] > maxSpeed) {
+    if ([mySpeed doubleValue] > maxSpeed) {
         maxSpeed = [mySpeed doubleValue];
         // NSLog(@"SPEED MAX:%.2f",minSpeed);
     }
@@ -396,7 +396,8 @@
         minAltitude = [myAltitude doubleValue] ;
         // NSLog(@"ALT MIN:%.2f",minAltitude);
     }
-    
+
+#ifdef __DEBUG
     if ([displaySpeeds count] > TOM_SLIDER_NUM_PTS*10) {
         [displaySpeeds removeObjectAtIndex:0];
     }
@@ -404,6 +405,7 @@
     if ([displayAltitudes count] > TOM_SLIDER_NUM_PTS*10) {
         [displayAltitudes removeObjectAtIndex:0];
     }
+#endif
 
 }
 
