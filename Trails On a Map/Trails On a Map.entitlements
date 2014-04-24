@@ -4,13 +4,13 @@
 <dict>
 	<key>com.apple.developer.ubiquity-container-identifiers</key>
 	<array>
-		<string>HV9L49AFR8.com.pearcesoftwaresolutions.trailsonamap.Trails-On-a-Map</string>
+		<string>HV9L49AFR8.com.pearcesoftwaresolutions.Trails-On-a-Map</string>
 	</array>
 	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
 	<string>$(TeamIdentifierPrefix)$(CFBundleIdentifier)</string>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)HV9L49AFR8.com.pearcesoftwaresolutions.trailsonamap</string>
+		<string>HV9L49AFR8.com.pearcesoftwaresolutions.Trails-On-a-Map</string>
 	</array>
 </dict>
 </plist>
