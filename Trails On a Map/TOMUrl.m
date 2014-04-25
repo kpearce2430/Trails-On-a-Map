@@ -16,7 +16,7 @@
     NSString *containerID = [[NSBundle mainBundle] bundleIdentifier];
     NSString *teamIDandContainerID = [NSString stringWithFormat:@"%@.%@",teamID,containerID];
     
-#ifdef DEBUG
+#ifdef __DEBUG
     NSLog(@"Team ID: %@",teamID);
     NSLog(@"Container ID: %@",containerID);
     NSLog(@"Team and Container ID: %@",teamIDandContainerID);
