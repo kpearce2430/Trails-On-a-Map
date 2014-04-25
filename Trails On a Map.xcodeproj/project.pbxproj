@@ -25,6 +25,13 @@
 		AD63EBE5190AB92A004FDE02 /* TomIcon-Small-40@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBE1190AB92A004FDE02 /* TomIcon-Small-40@2x.png */; };
 		AD63EBE6190AB92A004FDE02 /* TomIcon-Small.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBE2190AB92A004FDE02 /* TomIcon-Small.png */; };
 		AD63EBE7190AB92A004FDE02 /* TomIcon-Small@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBE3190AB92A004FDE02 /* TomIcon-Small@2x.png */; };
+		AD63EBE9190AF49D004FDE02 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD63EBE8190AF49D004FDE02 /* StoreKit.framework */; };
+		AD63EBEC190B0044004FDE02 /* TomLaunch-640x960.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBEB190B0044004FDE02 /* TomLaunch-640x960.png */; };
+		AD63EBEE190B0053004FDE02 /* TomLaunch-640x1136.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBED190B0053004FDE02 /* TomLaunch-640x1136.png */; };
+		AD63EBF3190B0529004FDE02 /* Tomlaunch-768x1024.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBEF190B0529004FDE02 /* Tomlaunch-768x1024.png */; };
+		AD63EBF4190B0529004FDE02 /* TomLaunch-1024x768.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBF0190B0529004FDE02 /* TomLaunch-1024x768.png */; };
+		AD63EBF5190B0529004FDE02 /* Tomlaunch-1536x2048.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBF1190B0529004FDE02 /* Tomlaunch-1536x2048.png */; };
+		AD63EBF6190B0529004FDE02 /* TomLaunch-2048x1536.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBF2190B0529004FDE02 /* TomLaunch-2048x1536.png */; };
 		AD69E67718F70C4C00819996 /* TOMTripTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = AD69E67618F70C4C00819996 /* TOMTripTimer.m */; };
 		AD6CD7E818244814005A0699 /* TOMDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD6CD7E618244814005A0699 /* TOMDetailViewController.m */; };
 		AD6CD7E918244814005A0699 /* TOMDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD6CD7E718244814005A0699 /* TOMDetailViewController.xib */; };
@@ -110,6 +117,13 @@
 		AD63EBE1190AB92A004FDE02 /* TomIcon-Small-40@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomIcon-Small-40@2x.png"; sourceTree = "<group>"; };
 		AD63EBE2190AB92A004FDE02 /* TomIcon-Small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomIcon-Small.png"; sourceTree = "<group>"; };
 		AD63EBE3190AB92A004FDE02 /* TomIcon-Small@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomIcon-Small@2x.png"; sourceTree = "<group>"; };
+		AD63EBE8190AF49D004FDE02 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		AD63EBEB190B0044004FDE02 /* TomLaunch-640x960.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomLaunch-640x960.png"; sourceTree = "<group>"; };
+		AD63EBED190B0053004FDE02 /* TomLaunch-640x1136.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomLaunch-640x1136.png"; sourceTree = "<group>"; };
+		AD63EBEF190B0529004FDE02 /* Tomlaunch-768x1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Tomlaunch-768x1024.png"; sourceTree = "<group>"; };
+		AD63EBF0190B0529004FDE02 /* TomLaunch-1024x768.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomLaunch-1024x768.png"; sourceTree = "<group>"; };
+		AD63EBF1190B0529004FDE02 /* Tomlaunch-1536x2048.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Tomlaunch-1536x2048.png"; sourceTree = "<group>"; };
+		AD63EBF2190B0529004FDE02 /* TomLaunch-2048x1536.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomLaunch-2048x1536.png"; sourceTree = "<group>"; };
 		AD69E67518F70C4C00819996 /* TOMTripTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMTripTimer.h; sourceTree = "<group>"; };
 		AD69E67618F70C4C00819996 /* TOMTripTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMTripTimer.m; sourceTree = "<group>"; };
 		AD6CD7E518244814005A0699 /* TOMDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDetailViewController.h; sourceTree = "<group>"; };
@@ -182,6 +196,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ADA35AB018E7609700C1A099 /* libz.dylib in Frameworks */,
+				AD63EBE9190AF49D004FDE02 /* StoreKit.framework in Frameworks */,
 				ADA35AC018E76DD800C1A099 /* pssZipKit.framework in Frameworks */,
 				ADBF322F18BD454A00EBEF1D /* iAd.framework in Frameworks */,
 				AD6F03571857DCC700753144 /* ImageIO.framework in Frameworks */,
@@ -215,6 +230,12 @@
 			isa = PBXGroup;
 			children = (
 				ADC70DCB190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png */,
+				AD63EBEB190B0044004FDE02 /* TomLaunch-640x960.png */,
+				AD63EBED190B0053004FDE02 /* TomLaunch-640x1136.png */,
+				AD63EBEF190B0529004FDE02 /* Tomlaunch-768x1024.png */,
+				AD63EBF0190B0529004FDE02 /* TomLaunch-1024x768.png */,
+				AD63EBF1190B0529004FDE02 /* Tomlaunch-1536x2048.png */,
+				AD63EBF2190B0529004FDE02 /* TomLaunch-2048x1536.png */,
 				AD63EBDA190AB91C004FDE02 /* TomIcon-60@2x.png */,
 				AD63EBDB190AB91C004FDE02 /* TomIcon-76.png */,
 				AD63EBDC190AB91C004FDE02 /* TomIcon-76@2x.png */,
@@ -249,6 +270,7 @@
 		AD7BEC7C180E22910003187D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AD63EBE8190AF49D004FDE02 /* StoreKit.framework */,
 				ADA35AAF18E7609700C1A099 /* libz.dylib */,
 				ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */,
 				ADA35A1318E4D29100C1A099 /* pssKML.framework */,
@@ -406,6 +428,7 @@
 				AD7BEC76180E22910003187D /* Sources */,
 				AD7BEC77180E22910003187D /* Frameworks */,
 				AD7BEC78180E22910003187D /* Resources */,
+				AD63EBEA190AF5F7004FDE02 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -448,6 +471,9 @@
 						DevelopmentTeam = HV9L49AFR8;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.InAppPurchase = {
 								enabled = 1;
 							};
 							com.apple.Keychain = {
@@ -497,13 +523,19 @@
 				AD63EBE7190AB92A004FDE02 /* TomIcon-Small@2x.png in Resources */,
 				AD63EBDE190AB91C004FDE02 /* TomIcon-76.png in Resources */,
 				AD7BECBA180E23220003187D /* TOMRootViewController.xib in Resources */,
+				AD63EBF4190B0529004FDE02 /* TomLaunch-1024x768.png in Resources */,
 				AD63EBE6190AB92A004FDE02 /* TomIcon-Small.png in Resources */,
+				AD63EBEC190B0044004FDE02 /* TomLaunch-640x960.png in Resources */,
 				ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */,
 				AD7BEC95180E22910003187D /* Images.xcassets in Resources */,
 				AD6F03621858074F00753144 /* TOMPhotoAlbumViewController.xib in Resources */,
 				AD63EBDD190AB91C004FDE02 /* TomIcon-60@2x.png in Resources */,
 				AD63EBE4190AB92A004FDE02 /* TomIcon-Small-40.png in Resources */,
+				AD63EBF5190B0529004FDE02 /* Tomlaunch-1536x2048.png in Resources */,
+				AD63EBF3190B0529004FDE02 /* Tomlaunch-768x1024.png in Resources */,
+				AD63EBEE190B0053004FDE02 /* TomLaunch-640x1136.png in Resources */,
 				AD4501141812E74100E76DE0 /* TOMPropertyViewController.xib in Resources */,
+				AD63EBF6190B0529004FDE02 /* TomLaunch-2048x1536.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -516,6 +548,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AD63EBEA190AF5F7004FDE02 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#Update build number with number of git commits if in release mode\nif [ ${CONFIGURATION} == \"Release\" ]; then\nbuildNumber=$(git rev-list HEAD | wc -l | tr -d ' ')\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\nfi;\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AD7BEC76180E22910003187D /* Sources */ = {
@@ -605,8 +653,8 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: KEITH PEARCE (X2N7ETQ96P)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: KEITH PEARCE (X2N7ETQ96P)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -649,8 +697,8 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: KEITH PEARCE (HV9L49AFR8)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: KEITH PEARCE (HV9L49AFR8)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -677,8 +725,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: KEITH PEARCE (X2N7ETQ96P)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: KEITH PEARCE (X2N7ETQ96P)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,
@@ -691,6 +739,7 @@
 					"$(inherited)",
 					/Users/pearcek,
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -703,8 +752,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: KEITH PEARCE (HV9L49AFR8)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: KEITH PEARCE (HV9L49AFR8)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,
@@ -717,6 +766,7 @@
 					"$(inherited)",
 					/Users/pearcek,
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
