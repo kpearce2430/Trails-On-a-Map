@@ -90,6 +90,8 @@
 
 @property (nonatomic, readwrite) UIButton *resetButton;
 
+@property (nonatomic, readwrite) UILabel *versionLabel;
+
 - (BOOL) textFieldShouldReturn:(UITextField *)textField;
 - (void) createControls;
 + (UILabel *)labelWithFrame:(CGRect)frame title:(NSString *)title;

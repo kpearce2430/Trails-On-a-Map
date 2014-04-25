@@ -10,7 +10,7 @@
 #import "TOM.h"
 
 #ifndef TOM_TEAM_ID
-#define TOM_TEAM_ID "HV9L49AFR8.com.pearcesoftwaresolutions.trailsonamap"
+#define TOM_TEAM_ID "HV9L49AFR8"
 #endif
 
 @interface TOMUrl : NSObject

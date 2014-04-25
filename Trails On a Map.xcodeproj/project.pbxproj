@@ -16,9 +16,15 @@
 		AD45010F1811A77800E76DE0 /* TOMPomSet.m in Sources */ = {isa = PBXBuildFile; fileRef = AD45010E1811A77800E76DE0 /* TOMPomSet.m */; };
 		AD4501131812E74100E76DE0 /* TOMPropertyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */; };
 		AD4501141812E74100E76DE0 /* TOMPropertyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */; };
-		AD5993B818D607920094045F /* cloudDownload.png in Resources */ = {isa = PBXBuildFile; fileRef = AD5993B718D607920094045F /* cloudDownload.png */; };
 		AD5CC56A18F1A53C00393BC1 /* TOMSubView.m in Sources */ = {isa = PBXBuildFile; fileRef = AD5CC56918F1A53C00393BC1 /* TOMSubView.m */; };
 		AD5CC56D18F6D77D00393BC1 /* TOMOdometer.m in Sources */ = {isa = PBXBuildFile; fileRef = AD5CC56C18F6D77D00393BC1 /* TOMOdometer.m */; };
+		AD63EBDD190AB91C004FDE02 /* TomIcon-60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBDA190AB91C004FDE02 /* TomIcon-60@2x.png */; };
+		AD63EBDE190AB91C004FDE02 /* TomIcon-76.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBDB190AB91C004FDE02 /* TomIcon-76.png */; };
+		AD63EBDF190AB91C004FDE02 /* TomIcon-76@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBDC190AB91C004FDE02 /* TomIcon-76@2x.png */; };
+		AD63EBE4190AB92A004FDE02 /* TomIcon-Small-40.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBE0190AB92A004FDE02 /* TomIcon-Small-40.png */; };
+		AD63EBE5190AB92A004FDE02 /* TomIcon-Small-40@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBE1190AB92A004FDE02 /* TomIcon-Small-40@2x.png */; };
+		AD63EBE6190AB92A004FDE02 /* TomIcon-Small.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBE2190AB92A004FDE02 /* TomIcon-Small.png */; };
+		AD63EBE7190AB92A004FDE02 /* TomIcon-Small@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBE3190AB92A004FDE02 /* TomIcon-Small@2x.png */; };
 		AD69E67718F70C4C00819996 /* TOMTripTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = AD69E67618F70C4C00819996 /* TOMTripTimer.m */; };
 		AD6CD7E818244814005A0699 /* TOMDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD6CD7E618244814005A0699 /* TOMDetailViewController.m */; };
 		AD6CD7E918244814005A0699 /* TOMDetailViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD6CD7E718244814005A0699 /* TOMDetailViewController.xib */; };
@@ -59,10 +65,8 @@
 		ADA6C32818B8063600F64E59 /* TOMUrl.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA6C32718B8063600F64E59 /* TOMUrl.m */; };
 		ADA795DE18205AD1004E383D /* TOMOrganizerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */; };
 		ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */; };
-		ADA795E31820988D004E383D /* pt57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E01820988D004E383D /* pt57x57.png */; };
-		ADA795E41820988D004E383D /* pt114x114.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E11820988D004E383D /* pt114x114.png */; };
-		ADA795E51820988D004E383D /* pt120x120.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA795E21820988D004E383D /* pt120x120.png */; };
 		ADBF322F18BD454A00EBEF1D /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBF322E18BD454A00EBEF1D /* iAd.framework */; };
+		ADC70DCC190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png in Resources */ = {isa = PBXBuildFile; fileRef = ADC70DCB190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png */; };
 		ADDE2927184A456F00CBB238 /* TOMSpeed.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDE2926184A456F00CBB238 /* TOMSpeed.m */; };
 		ADDE292A184A4C2000CBB238 /* TOMDistance.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDE2929184A4C2000CBB238 /* TOMDistance.m */; };
 		ADDE292C184D29F500CBB238 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADDE292B184D29F500CBB238 /* AssetsLibrary.framework */; };
@@ -95,11 +99,17 @@
 		AD4501101812E74100E76DE0 /* TOMPropertyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPropertyViewController.h; sourceTree = "<group>"; };
 		AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMPropertyViewController.m; sourceTree = "<group>"; };
 		AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMPropertyViewController.xib; sourceTree = "<group>"; };
-		AD5993B718D607920094045F /* cloudDownload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cloudDownload.png; path = ../../../../Downloads/cloudDownload.png; sourceTree = "<group>"; };
 		AD5CC56818F1A53C00393BC1 /* TOMSubView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMSubView.h; sourceTree = "<group>"; };
 		AD5CC56918F1A53C00393BC1 /* TOMSubView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSubView.m; sourceTree = "<group>"; };
 		AD5CC56B18F6D77D00393BC1 /* TOMOdometer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMOdometer.h; sourceTree = "<group>"; };
 		AD5CC56C18F6D77D00393BC1 /* TOMOdometer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMOdometer.m; sourceTree = "<group>"; };
+		AD63EBDA190AB91C004FDE02 /* TomIcon-60@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomIcon-60@2x.png"; sourceTree = "<group>"; };
+		AD63EBDB190AB91C004FDE02 /* TomIcon-76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomIcon-76.png"; sourceTree = "<group>"; };
+		AD63EBDC190AB91C004FDE02 /* TomIcon-76@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomIcon-76@2x.png"; sourceTree = "<group>"; };
+		AD63EBE0190AB92A004FDE02 /* TomIcon-Small-40.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomIcon-Small-40.png"; sourceTree = "<group>"; };
+		AD63EBE1190AB92A004FDE02 /* TomIcon-Small-40@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomIcon-Small-40@2x.png"; sourceTree = "<group>"; };
+		AD63EBE2190AB92A004FDE02 /* TomIcon-Small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomIcon-Small.png"; sourceTree = "<group>"; };
+		AD63EBE3190AB92A004FDE02 /* TomIcon-Small@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TomIcon-Small@2x.png"; sourceTree = "<group>"; };
 		AD69E67518F70C4C00819996 /* TOMTripTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMTripTimer.h; sourceTree = "<group>"; };
 		AD69E67618F70C4C00819996 /* TOMTripTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMTripTimer.m; sourceTree = "<group>"; };
 		AD6CD7E518244814005A0699 /* TOMDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDetailViewController.h; sourceTree = "<group>"; };
@@ -157,10 +167,8 @@
 		ADA795DB18205AD1004E383D /* TOMOrganizerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMOrganizerViewController.h; sourceTree = "<group>"; };
 		ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMOrganizerViewController.m; sourceTree = "<group>"; };
 		ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMOrganizerViewController.xib; sourceTree = "<group>"; };
-		ADA795E01820988D004E383D /* pt57x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt57x57.png; sourceTree = "<group>"; };
-		ADA795E11820988D004E383D /* pt114x114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt114x114.png; sourceTree = "<group>"; };
-		ADA795E21820988D004E383D /* pt120x120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pt120x120.png; sourceTree = "<group>"; };
 		ADBF322E18BD454A00EBEF1D /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
+		ADC70DCB190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-ios7-cloud-download-outline-128.png"; sourceTree = "<group>"; };
 		ADDE2925184A456F00CBB238 /* TOMSpeed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMSpeed.h; sourceTree = "<group>"; };
 		ADDE2926184A456F00CBB238 /* TOMSpeed.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSpeed.m; sourceTree = "<group>"; };
 		ADDE2928184A4C2000CBB238 /* TOMDistance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDistance.h; sourceTree = "<group>"; };
@@ -203,6 +211,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AD743E2A18F9969500053D13 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				ADC70DCB190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png */,
+				AD63EBDA190AB91C004FDE02 /* TomIcon-60@2x.png */,
+				AD63EBDB190AB91C004FDE02 /* TomIcon-76.png */,
+				AD63EBDC190AB91C004FDE02 /* TomIcon-76@2x.png */,
+				AD63EBE0190AB92A004FDE02 /* TomIcon-Small-40.png */,
+				AD63EBE1190AB92A004FDE02 /* TomIcon-Small-40@2x.png */,
+				AD63EBE2190AB92A004FDE02 /* TomIcon-Small.png */,
+				AD63EBE3190AB92A004FDE02 /* TomIcon-Small@2x.png */,
+				AD7BECBF180F1AC10003187D /* settings.png */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
 		AD7BEC71180E22910003187D = {
 			isa = PBXGroup;
 			children = (
@@ -247,6 +271,7 @@
 			isa = PBXGroup;
 			children = (
 				AD778D3518141F0A008E1D06 /* Trails On a Map.entitlements */,
+				AD743E2A18F9969500053D13 /* Images */,
 				AD7BECBB180E239E0003187D /* TOM.h */,
 				AD7BEC8E180E22910003187D /* TOMAppDelegate.h */,
 				AD7BEC8F180E22910003187D /* TOMAppDelegate.m */,
@@ -264,10 +289,6 @@
 		AD7BEC86180E22910003187D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				AD5993B718D607920094045F /* cloudDownload.png */,
-				ADA795E01820988D004E383D /* pt57x57.png */,
-				ADA795E11820988D004E383D /* pt114x114.png */,
-				ADA795E21820988D004E383D /* pt120x120.png */,
 				AD6CD7E718244814005A0699 /* TOMDetailViewController.xib */,
 				AD72939E18D65D6E0095FE53 /* TOMImageViewController.xib */,
 				ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */,
@@ -279,7 +300,6 @@
 				AD7BEC88180E22910003187D /* InfoPlist.strings */,
 				AD7BEC8B180E22910003187D /* main.m */,
 				AD7BEC8D180E22910003187D /* Trails On a Map-Prefix.pch */,
-				AD7BECBF180F1AC10003187D /* settings.png */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -466,19 +486,23 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ADA795E41820988D004E383D /* pt114x114.png in Resources */,
-				ADA795E31820988D004E383D /* pt57x57.png in Resources */,
+				ADC70DCC190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png in Resources */,
 				AD6F03671858A88900753144 /* TOMPhotoGroupViewController.xib in Resources */,
 				AD6CD7E918244814005A0699 /* TOMDetailViewController.xib in Resources */,
-				AD5993B818D607920094045F /* cloudDownload.png in Resources */,
 				AD7293A018D65D6E0095FE53 /* TOMImageViewController.xib in Resources */,
+				AD63EBE5190AB92A004FDE02 /* TomIcon-Small-40@2x.png in Resources */,
 				AD7BECC0180F1AC10003187D /* settings.png in Resources */,
+				AD63EBDF190AB91C004FDE02 /* TomIcon-76@2x.png in Resources */,
 				AD7BEC8A180E22910003187D /* InfoPlist.strings in Resources */,
-				ADA795E51820988D004E383D /* pt120x120.png in Resources */,
+				AD63EBE7190AB92A004FDE02 /* TomIcon-Small@2x.png in Resources */,
+				AD63EBDE190AB91C004FDE02 /* TomIcon-76.png in Resources */,
 				AD7BECBA180E23220003187D /* TOMRootViewController.xib in Resources */,
+				AD63EBE6190AB92A004FDE02 /* TomIcon-Small.png in Resources */,
 				ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */,
 				AD7BEC95180E22910003187D /* Images.xcassets in Resources */,
 				AD6F03621858074F00753144 /* TOMPhotoAlbumViewController.xib in Resources */,
+				AD63EBDD190AB91C004FDE02 /* TomIcon-60@2x.png in Resources */,
+				AD63EBE4190AB92A004FDE02 /* TomIcon-Small-40.png in Resources */,
 				AD4501141812E74100E76DE0 /* TOMPropertyViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -581,7 +605,8 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: KEITH PEARCE (X2N7ETQ96P)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: KEITH PEARCE (X2N7ETQ96P)";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -624,7 +649,8 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: KEITH PEARCE (HV9L49AFR8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: KEITH PEARCE (HV9L49AFR8)";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -651,8 +677,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: KEITH PEARCE (X2N7ETQ96P)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: KEITH PEARCE (X2N7ETQ96P)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,
@@ -677,8 +703,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: KEITH PEARCE (HV9L49AFR8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: KEITH PEARCE (HV9L49AFR8)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,

@@ -26,7 +26,7 @@
 {
 @private
     CLLocationManager *locationManager;
-    IBOutlet MKMapView *worldView;
+    // IBOutlet MKMapView *worldView;
     UIToolbar      *toolbar;
     TOMViewSlider  *mySlider;
     TOMSpeedOMeter *mySpeedOMeter;

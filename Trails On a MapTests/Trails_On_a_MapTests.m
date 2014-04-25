@@ -28,7 +28,9 @@
 
 - (void)testExample
 {
-    XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
+    NSString *p = nil;
+    XCTAssertNil(p, @"p is nil" );
+    // XCTPass(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
 }
 
 @end

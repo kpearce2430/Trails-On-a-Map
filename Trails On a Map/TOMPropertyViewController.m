@@ -21,7 +21,7 @@
             distanceFilterSliderCtl, accuracyFilterLabel, accuracyFilterSegmentedControl,
             toggleLabel, locationLabel, locationSwitch, pictureLabel, pictureSwitch,
             stopLabel, stopSwitch, odoMeterLabel, odoMeterSwitch, tripMeterLabel,tripMeterSwitch, sliderLabel,sliderSwitch, speedOMeterLabel, speedOMeterSwitch,
-            syncLabel, syncSwitch, iCloudLabel, iCloudSwitch, resetButton;
+            syncLabel, syncSwitch, iCloudLabel, iCloudSwitch, resetButton, versionLabel;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -422,7 +422,7 @@
 
 - (void)resetTOM:(UIButton*)button
 {
-    NSLog(@"Button  clicked.");
+    // NSLog(@"Button  clicked.");
     NSString *theTitle = [[NSUserDefaults standardUserDefaults] stringForKey:@KEY_NAME];
     if  (![theTitle isEqualToString:@TRAILS_ON_A_MAP])
         {
@@ -460,7 +460,7 @@
     
     UIFont *myLabelFont = [UIFont fontWithName: @TOM_FONT size: 12.0 ];
     UIFont *myTitleFont = [UIFont fontWithName: @TOM_FONT size: 12.0 ];
-
+    UIFont *myVersionFont = [UIFont fontWithName: @TOM_FONT size: 10.0 ];
     //  A better way to do this...
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     CGRect myrect = CGRectMake(0, 0, screenRect.size.width, screenRect.size.height);
@@ -473,7 +473,7 @@
     // The key to making the scrollable window now bounce is these next two lines of code.
     // The size (mysize.y in this case) has to be bigger than the CGRect created for scrollView.
     //
-    CGSize mysize = CGSizeMake(screenRect.size.width, screenRect.size.height+TOM_PVC_EXTRA);
+    CGSize mysize = CGSizeMake(screenRect.size.width, 775 ); //  screenRect.size.height+TOM_PVC_EXTRA);
     [scrollView setContentSize:mysize];
     // features...
     [scrollView setAlwaysBounceVertical:YES];
@@ -1005,15 +1005,26 @@
      forControlEvents:UIControlEventTouchDown];
     [resetButton.layer setBorderColor:TOM_LABEL_BORDER_COLOR];
     [resetButton.layer setBorderWidth:TOM_LABEL_BORDER_WIDTH];
-    // [resetButton.layer setShadowOffset:CGSizeMake(5, 5)];
-    // [resetButton.layer setShadowColor:TOM_LABEL_BORDER_COLOR];
-    // [resetButton.layer setShadowOpacity:0.5];
     [resetButton.layer setCornerRadius:TOM_LABEL_BORDER_CORNER_RADIUS];
     
     [scrollView addSubview:resetButton];
 
-    NSLog( @"Height So Far: %.2f", yPlacement);
-    //
+    NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+    NSString *shortVersionString = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    NSString *myVersion = [[NSString alloc] initWithFormat:@"Version: %@.%@",shortVersionString,version];
+    
+    frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
+    versionLabel = [TOMPropertyViewController labelWithFrame:frame title:myVersion];
+    versionLabel.font = myVersionFont;
+    [versionLabel setTextAlignment:NSTextAlignmentLeft];
+    [scrollView addSubview:versionLabel];
+    
+#ifdef DEBUG
+    NSLog( @"%s Height So Far: %.2f",__PRETTY_FUNCTION__, yPlacement);
+    NSLog(@"CFBundleVersion is: %@",version);
+    NSLog(@"CFBundleShortVersionString: %@",shortVersionString);
+#endif
+    
 }
 
 
@@ -1201,12 +1212,16 @@
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [syncSwitch setFrame:myrect];
 
-        
         // Reset Button
         CGFloat buttonX = (screenWidth - (myX + ptRightMargin + 100.0)) / 2.0;
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(buttonX, myY+myYSpacer, 100.0, ptSegmentedControlHeight);
         [resetButton setFrame:myrect];
+        
+        // Version Label
+        myY += ptSegmentedControlHeight + (SPACING * 2);
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [versionLabel setFrame:myrect];
         
     }
     else {
@@ -1364,8 +1379,14 @@
         myY += ptSegmentedControlHeight + SPACING;
         myrect= CGRectMake(buttonX, myY+myYSpacer, 100.0, ptSegmentedControlHeight);
         [resetButton setFrame:myrect];
+        
+        // Version Label
+        myY += ptSegmentedControlHeight + (SPACING * 2);
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [versionLabel setFrame:myrect];
+
     }
-    
+
 
     return;
 }

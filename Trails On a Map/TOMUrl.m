@@ -15,8 +15,16 @@
     NSString *teamID = @TOM_TEAM_ID;
     NSString *containerID = [[NSBundle mainBundle] bundleIdentifier];
     NSString *teamIDandContainerID = [NSString stringWithFormat:@"%@.%@",teamID,containerID];
+    
+#ifdef DEBUG
+    NSLog(@"Team ID: %@",teamID);
+    NSLog(@"Container ID: %@",containerID);
+    NSLog(@"Team and Container ID: %@",teamIDandContainerID);
+#endif
+
     NSFileManager *fileManager = [[NSFileManager alloc] init];
     NSURL *theURL = [fileManager URLForUbiquityContainerIdentifier:teamIDandContainerID];
+
     return theURL;
 }
 

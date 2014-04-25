@@ -29,10 +29,14 @@ static NSString *detailViewCellIdentifier = @"detaiViewCells";
 
 @interface TOMDetailViewController :  UIViewController <UITableViewDataSource, UITableViewDelegate>
 {
+    @private
+    UIDeviceOrientation orientation;
+    
     @public
     TOMPomSet *theTrail;
 }
 
+@property (atomic, strong) NSMetadataQuery *query;
 @property (nonatomic, strong) TOMPomSet *theTrail;
 @property (nonatomic, strong) UITableView *detailTable;
 @property (nonatomic, strong) NSString *myName;

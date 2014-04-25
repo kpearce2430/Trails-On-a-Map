@@ -34,13 +34,21 @@
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_NAME] != nil)
     {
         [self setTitle:[[NSUserDefaults standardUserDefaults] stringForKey:@KEY_NAME]];
+        NSLog(@"%s Using %@ from standardUserDefaults",__PRETTY_FUNCTION__,self.title);
     }
     else
     {   //
         // we don't have a preference stored on this device, use the map type standard as default.
         //
         [self setTitle:@TRAILS_DEFAULT_NAME]; // default
+        NSLog(@"%s Assigning %@ As Default",__PRETTY_FUNCTION__,self.title);
     }
+    
+    if  ([self.title isEqualToString:@"0"]) {
+        NSLog(@"%s : Title %@",__PRETTY_FUNCTION__,self.title);
+        [self setTitle:@TRAILS_DEFAULT_NAME]; // default
+    }
+    
     
     self.cells = [NSMutableArray array];
     
@@ -51,11 +59,13 @@
     [self.view addSubview:organizerTable];
 
     // Push an orientation change on the the view to set the presentation of the screen correctly.
+    orientation = UIDeviceOrientationUnknown;
     [self orientationChanged:NULL]; // orientationChanged
     
     UIBarButtonItem *anotherButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
     self.navigationItem.rightBarButtonItem = anotherButton;
     amIediting = NO;
+     
     [self prepareFiles];
 }
 
@@ -77,6 +87,21 @@
 //
 -(void) viewDidDisappear {
     // Request to stop receiving accelerometer events and turn off accelerometer
+    
+    if (query) {
+        if ([query isStarted] || [query isGathering]) {
+            [query stopQuery];
+        }
+        [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:NSMetadataQueryDidFinishGatheringNotification
+                                                      object:nil];
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:NSMetadataQueryDidUpdateNotification
+                                                      object:nil];
+        
+    }
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
@@ -125,12 +150,12 @@
         NSString *iconName = [NSString stringWithFormat:@"%@.icon",myLabel];
         theImage = [TOMImageStore loadImage:myLabel key:iconName warn:NO];
         if (!theImage) {
-            theImage = [UIImage imageNamed:@"pt114x114.png"];
+            theImage = [UIImage imageNamed:@"TomIcon-60@2x.png"];
         }
     }
     else {
         cell.accessoryType = UITableViewCellAccessoryNone;
-        theImage = [UIImage imageNamed:@"cloudDownloading.png"];
+        theImage = [UIImage imageNamed:@"Icon-ios7-cloud-download-outline-128.png"];
     }
     
     [cell.textLabel setText:myLabel];
@@ -193,35 +218,31 @@
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //
 - (void)orientationChanged:(NSNotification *)notification {
+    
     // Respond to changes in device orientation
     //  NSLog(@"Orientation Changed!");
+    UIDeviceOrientation currentOrientation = [[UIDevice currentDevice] orientation];
 
-    static UIDeviceOrientation currentOrientation = UIDeviceOrientationUnknown;
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
-    
-    if (orientation == UIDeviceOrientationFaceUp ||
-        orientation == UIDeviceOrientationFaceDown ||
-        orientation == UIDeviceOrientationUnknown ||
-        orientation == UIDeviceOrientationPortraitUpsideDown ||
-        currentOrientation == orientation) {
+    if (currentOrientation == orientation) {
         return;
     }
+
     
     if ((UIDeviceOrientationIsPortrait(currentOrientation) && UIDeviceOrientationIsPortrait(orientation)) ||
         (UIDeviceOrientationIsLandscape(currentOrientation) && UIDeviceOrientationIsLandscape(orientation))) {
+        //
         //still saving the current orientation
-        currentOrientation = orientation;
-        return;
+        orientation = currentOrientation;
+        // return;
     }
-    
-    currentOrientation = orientation;
+
+    orientation = currentOrientation;
     
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     CGFloat screenHeight = screenRect.size.height;
     CGFloat screenWidth = screenRect.size.width;
     
-    if (UIDeviceOrientationIsLandscape(currentOrientation) ||
-        currentOrientation == UIDeviceOrientationPortraitUpsideDown) {
+    if (UIDeviceOrientationIsLandscape(orientation)) {
         screenHeight = screenRect.size.width;
         screenWidth = screenRect.size.height;
     }
@@ -289,17 +310,22 @@
             }
         }
 
+#ifdef __DEBUG
         [self deleteDocument:theTrail withCompletionBlock:^{
             // insert code for next action
-            NSLog(@"Deleted Document");
+            NSLog(@"%s Deleted Document",__PRETTY_FUNCTION__);
         }];
-
+#else
+        [self deleteDocument:theTrail withCompletionBlock:nil];
+#endif
         [cells removeObjectAtIndex:indexPath.row];
         
         [tableView deleteRowsAtIndexPaths:[[NSArray alloc] initWithObjects:&indexPath count:1] withRowAnimation:UITableViewRowAnimationLeft];
         
     }
 }
+
+#pragma __trail_managment__
 
 -(void) prepareFiles
 {
@@ -327,11 +353,16 @@
                                                  selector:@selector(processFiles:)
                                                      name:NSMetadataQueryDidUpdateNotification
                                                    object:nil];
-        [query startQuery]; // off we go:
+        
+        BOOL startedQuery = [query startQuery]; // off we go:
+        
+        if (!startedQuery) {
+            NSLog(@"%s Query Not Started",__PRETTY_FUNCTION__);
+        }
     }
     else {
         //
-        // This game unexpected results for me.
+        // This gave unexpected results for me.
         // I got a list of all the files under the directory tree.
         // It works out since I'm only looking for .tom files and the URL
         // that comes along with it.
@@ -393,6 +424,7 @@
     // NSMutableArray *files = [NSMutableArray array];
     
     [query disableUpdates]; // Disable Updates while processing
+    [cells removeAllObjects];
     
     NSArray *queryResults = [query results];
     
@@ -417,16 +449,36 @@
             [cells addObject:myCell];
         }
         else {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                NSFileManager *fm = [[NSFileManager alloc] init];
-                [fm startDownloadingUbiquitousItemAtURL:fileURL error:nil];
-            });
+            NSNumber *isDownLoading = [result valueForKey:NSMetadataUbiquitousItemIsDownloadingKey];
+            // NSNumber *percentDownloaded = [result valueForKey:NSMetadataUbiquitousItemPercentDownloadedKey];
+            
+            //NSLog(@"ItemIsDownloadingKey:%s",downLoadingStatus);
+            // if (percentDownloaded)
+            //    NSLog(@"ItemPercentDownloaded:%@",percentDownloaded); // FFU
+            
+            NSError *err = [result valueForKey:NSMetadataUbiquitousItemDownloadingErrorKey];
+            if (err) {
+                NSLog(@"%s Error In Downloading: %@",__PRETTY_FUNCTION__,err);
+                isDownloaded = (BOOL) 0;
+            }
+            
+            if (![isDownLoading boolValue]) {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    NSFileManager *fm = [[NSFileManager alloc] init];
+                    NSError *err = nil;
+                    [fm startDownloadingUbiquitousItemAtURL:fileURL error:&err];
+                    if (err)
+                        NSLog(@"%s ERROR: %@",__PRETTY_FUNCTION__,err);
+                });
+            }
             [myCell setTitle:fileName];
             [myCell setDate:fileDate];
             [myCell setUrl:nil];
             [cells addObject:myCell];
         }
     }
+    
+    [query enableUpdates];
     [self sortCells];
     [organizerTable reloadData];
 }
@@ -451,13 +503,57 @@
                 NSLog(@"Error: %@", error);
                 // TODO handle the error
             }
-            
+            //
+            // This will be remove the directory that will get rid
+            // of the pictures.
             NSURL *trailURL = [newURL URLByDeletingLastPathComponent];
             // NSLog(@"TRAIL URL:%@",trailURL);
             // Delete the whole directory:
             if (![fileManager removeItemAtURL:trailURL error:&error]) {
                 NSLog(@"Error: %@", error);
                 // TODO handle the error
+            }
+            
+            // Need to check if there is a KMZ, GPX, and CSV files
+            NSString *path = [trailURL path];
+            NSArray *parts = [path componentsSeparatedByString:@"/"];
+            NSString *fileName = [parts objectAtIndex:[parts count]-1];
+            NSString *gpxName = [fileName stringByAppendingString:@TOM_GPX_EXT];
+            
+            NSURL *dirURL = [trailURL URLByDeletingLastPathComponent];
+            NSURL *gpxURL = [dirURL URLByAppendingPathComponent:gpxName isDirectory:NO];
+            
+            error = nil;
+            if ([fileManager fileExistsAtPath:[gpxURL path] isDirectory:NO]) {
+                [fileManager removeItemAtURL:gpxURL error:&error];
+            }
+            
+            if (error) {
+                NSLog(@"%s : Error Removing GPX File %@",__PRETTY_FUNCTION__,error);
+            }
+            
+            NSString *kmzName = [fileName stringByAppendingString:@TOM_KMZ_EXT];
+            NSURL *kmzURL = [dirURL URLByAppendingPathComponent:kmzName isDirectory:NO];
+            
+            error = nil;
+            if ([fileManager fileExistsAtPath:[kmzURL path] isDirectory:NO]) {
+                [fileManager removeItemAtURL:kmzURL error:&error];
+            }
+            
+            if (error) {
+                NSLog(@"%s : Error Removing KMZ File %@",__PRETTY_FUNCTION__,error);
+            }
+            
+            NSString *csvName = [fileName stringByAppendingString:@TOM_CSV_EXT];
+            NSURL *csvURL = [dirURL URLByAppendingPathComponent:csvName isDirectory:NO];
+            
+            error = nil;
+            if ([fileManager fileExistsAtPath:[csvURL path] isDirectory:NO]) {
+                [fileManager removeItemAtURL:csvURL error:&error];
+            }
+            
+            if (error) {
+                NSLog(@"%s : Error Removing CSV File %@",__PRETTY_FUNCTION__,error);
             }
             
             if (completionBlock) {
@@ -480,5 +576,6 @@
     }];
 
 }
+
 
 @end

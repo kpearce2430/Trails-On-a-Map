@@ -18,7 +18,7 @@
 
 @implementation TOMDetailViewController
 
-@synthesize theTrail,detailTable, footerLabelFont, headerLabelFont, picCount, imagesSet, /* imageStore,*/ gpxSwitch, kmlSwitch; // trailCollectionList, trailCollectionView;
+@synthesize theTrail,detailTable, footerLabelFont, headerLabelFont, picCount, imagesSet, gpxSwitch, kmlSwitch, query;
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -44,29 +44,7 @@
         headerLabelFont = [UIFont fontWithName: @TOM_FONT size: 14.0 ];
         footerLabelFont = [UIFont fontWithName: @TOM_FONT size: 10.0 ];
         
-#ifdef __NUA__
-        //  Left over from when I tried to implement this as a UICollectionView - That will be after the initial release.
-        CGRect screenRect = [[UIScreen mainScreen] bounds];
-        UICollectionViewFlowLayout *layout=[[UICollectionViewFlowLayout alloc] init];
-
-
-        trailCollectionView=[[UICollectionView alloc] initWithFrame:screenRect collectionViewLayout:layout];
-        [trailCollectionView setDataSource:self];
-        [trailCollectionView setDelegate:self];
-        
-        [trailCollectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cellIdentifier"];
-        [trailCollectionView setBackgroundColor:[UIColor blackColor]];
-        [trailCollectionView setAllowsSelection:YES];
-        [trailCollectionView setAllowsMultipleSelection:NO];
-        [self.view addSubview:trailCollectionView];
-
-        
-        UITapGestureRecognizer *doubleTapFolderGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(processDoubleTap:)];
-        [doubleTapFolderGesture setNumberOfTapsRequired:2];
-        [doubleTapFolderGesture setNumberOfTouchesRequired:1];
-        [self.view addGestureRecognizer:doubleTapFolderGesture];
-#endif
-        
+       
     }
     return self;
 }
@@ -78,6 +56,18 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    BOOL usingIcloud = NO;
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_ICLOUD] != nil)
+    {
+        usingIcloud = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_ICLOUD];
+    }
+    else // If we don't know, we're not.
+        usingIcloud = NO;
+    
+    if (usingIcloud) {
+        [self prepareImageFiles];
+    }
     
     //
     // load the selected map
@@ -107,12 +97,14 @@
             [myCell setUrl:[TOMUrl urlForImageFile:self.title key:[p key]]];
              
             if (myImage == NULL) {
-                myImage = [UIImage imageNamed:@"pt114x114.png"];
+                if (usingIcloud)
+                    myImage = [UIImage imageNamed:@"Icon-ios7-cloud-download-outline-128.png"];
+                else
+                    myImage = [UIImage imageNamed:@"TomIcon-60@2x.png"];
                 [myCell setImage:myImage];
-                
             }
             else {
-                CGSize destinationSize = CGSizeMake(120.0f, 120.0f);
+                CGSize destinationSize = CGSizeMake(128.0f, 128.0f);
                 UIGraphicsBeginImageContext(destinationSize);
                 [myImage drawInRect:CGRectMake(0,0,destinationSize.width,destinationSize.height)];
                 UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -123,8 +115,6 @@
         }
     }
 
-    // NSLog(@"%s Image Count:%ld  I:%ld",__PRETTY_FUNCTION__,(long)[theTrail numPics],(unsigned long)[imagesSet count]);
-    
     // Do any additional setup after loading the view from its nib.
     // CGRect screenRect = [[UIScreen mainScreen] bounds];
     self.detailTable = [[ UITableView alloc] initWithFrame: self.view.bounds style:UITableViewStyleGrouped];
@@ -138,12 +128,12 @@
     
     // Make sure the table resizes correctly
     // detailTable.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    
     // finally attach it to the view
     
     [self.view addSubview: detailTable ];
     
     // Push an orientation change call now
+    orientation = UIDeviceOrientationUnknown;
     [self orientationChanged:NULL];
 
 }
@@ -167,6 +157,19 @@
     // Request to stop receiving accelerometer events and turn off accelerometer
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    if (query) {
+        if ([query isStarted] || [query isGathering]) {
+            [query stopQuery];
+        }
+        [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:NSMetadataQueryDidFinishGatheringNotification
+                                                      object:nil];
+            
+        [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:NSMetadataQueryDidUpdateNotification
+                                                       object:nil];
+
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -183,7 +186,7 @@
         return 3;
     }
     else {
-        NSLog(@"ERROR: %s:%d Invalid table view passed:%@", __func__, __LINE__ , tableView);
+        NSLog(@"ERROR: %s:%d Invalid table view passed:%@", __PRETTY_FUNCTION__, __LINE__ , tableView);
         return 0;
     }
 }
@@ -270,7 +273,7 @@
                     }
                 }
                 else {
-                    NSLog(@"%s ERROR FFU Cell Reached",__func__);
+                    NSLog(@"%s ERROR FFU Cell Reached",__PRETTY_FUNCTION__);
                     cell.textLabel.text = [ NSString stringWithFormat:@"FFU Section %ld, Cell %ld",(long)indexPath.section,(long)indexPath.row];
                 }
                 break;
@@ -411,32 +414,26 @@
 - (void)orientationChanged:(NSNotification *)notification {
     // Respond to changes in device orientation
     //  NSLog(@"Orientation Changed!");
-    static UIDeviceOrientation currentOrientation = UIDeviceOrientationUnknown;
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    UIDeviceOrientation currentOrientation = [[UIDevice currentDevice] orientation];
     
-    if (orientation == UIDeviceOrientationFaceUp ||
-        orientation == UIDeviceOrientationFaceDown ||
-        orientation == UIDeviceOrientationUnknown ||
-        orientation == UIDeviceOrientationPortraitUpsideDown ||
-        currentOrientation == orientation) {
+    if (currentOrientation == orientation) {
         return;
     }
     
     if ((UIDeviceOrientationIsPortrait(currentOrientation) && UIDeviceOrientationIsPortrait(orientation)) ||
         (UIDeviceOrientationIsLandscape(currentOrientation) && UIDeviceOrientationIsLandscape(orientation))) {
         //still saving the current orientation
-        currentOrientation = orientation;
+        orientation = currentOrientation;
         return;
     }
     
-    currentOrientation = orientation;
+    orientation = currentOrientation;
     
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     CGFloat screenHeight = screenRect.size.height;
     CGFloat screenWidth = screenRect.size.width;
     
-    if (UIDeviceOrientationIsLandscape(currentOrientation) ||
-        currentOrientation == UIDeviceOrientationPortraitUpsideDown) {
+    if (UIDeviceOrientationIsLandscape(orientation)) {
         screenHeight = screenRect.size.width;
         screenWidth = screenRect.size.height;
     }
@@ -455,10 +452,9 @@
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
 {
     // NSLog(@"Picked %@",indexPath);
-    NSLog(@"Selected: %@",indexPath);
     
     TOMOrganizerViewCell *thisCell = [imagesSet objectAtIndex:indexPath.row];
-    NSLog(@"%s Title:%@ URL:%@",__func__,thisCell.title,thisCell.url);
+    // NSLog(@"%s Title:%@ URL:%@",__func__,thisCell.title,thisCell.url);
     
     UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameWithKeyAndImage:@"TOMImageViewController" bundle:nil key:thisCell.title url:thisCell.url];
     
@@ -786,4 +782,113 @@
     }); // end dispatch
 }
 
+//
+// Check to see if we need to download from the iCloud to this device
+//
+-(void) prepareImageFiles
+{
+
+
+    self.query = [[NSMetadataQuery alloc] init];
+    
+    if (query) {
+        //
+        // Trying to limit what is downloaded here but it kept running into problems
+        //
+        // NSURL *icloudURL = [TOMUrl urlForICloudDocuments];
+        // NSURL *trailDirURL = [icloudURL URLByAppendingPathComponent:self.title isDirectory:YES];
+        // NSString *trailDir = [NSString stringWithFormat:@"Documents/%@/", self.title]; // Directory name
+        // NSURL *documentPath = [[[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:trailDir];
+        // NSLog(@"Document Path: %@", trailDirURL);
+        //
+        // [query setSearchScopes:[NSArray arrayWithObject:trailDirURL]];
+        //
+        [query setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
+        [query setPredicate:[NSPredicate predicateWithFormat:@"%K ENDSWITH %@", NSMetadataItemFSNameKey, @TOM_JPG_EXT]];
+        
+    }
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(processImageFiles:)
+                                                 name:NSMetadataQueryDidFinishGatheringNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(processImageFiles:)
+                                                 name:NSMetadataQueryDidUpdateNotification
+                                               object:nil];
+    BOOL startedQuery = [query startQuery]; // off we go:
+    
+    if (!startedQuery) {
+        NSLog(@"%s ERROR Query Not Started",__PRETTY_FUNCTION__);
+    }
+}
+
+-(void) processImageFiles:(NSNotification *)notification
+{
+
+    [query disableUpdates]; // Disable Updates while processing
+    
+    NSArray *queryResults = [query results];
+    
+    for (NSMetadataItem *result in queryResults) {
+        
+        NSURL *fileURL = [result valueForAttribute:NSMetadataItemURLKey];
+        // NSLog(@"File URL:%@",fileURL);
+        
+        NSString *path = [fileURL path];
+        NSArray *parts = [path componentsSeparatedByString:@"/"];
+        NSString *trailName = [parts objectAtIndex:[parts count]-2];
+        
+        //
+        // to speed up downloadning I only want this trails pictures
+        if (![trailName isEqualToString:self.title]) {
+            continue;
+        }
+        
+        // NSString *fileName = [parts objectAtIndex:[parts count]-1];
+        
+        NSString *isDownloaded = [result valueForAttribute:NSMetadataUbiquitousItemDownloadingStatusKey];
+        // NSLog(@"%s %@ is %@",__func__,fileName,isDownloaded);
+        // NSDate *fileDate = [result valueForAttribute:NSMetadataItemFSContentChangeDateKey];
+        // TOMOrganizerViewCell *myCell = [[TOMOrganizerViewCell alloc] init];
+        
+        if (![isDownloaded isEqualToString:@"NSMetadataUbiquitousItemDownloadingStatusCurrent"] &&
+            ![isDownloaded isEqualToString:@"NSMetadataUbiquitousItemDownloadingStatusDownloaded"]) {
+
+            //NSLog(@"ItemIsDownloadingKey:%s",downLoadingStatus);
+#ifdef DEBUG
+            NSNumber *percentDownloaded = [result valueForKey:NSMetadataUbiquitousItemPercentDownloadedKey];
+            if (percentDownloaded)
+                NSLog(@"ItemPercentDownloaded:%@",percentDownloaded); // FFU
+
+            NSError *err = [result valueForKey:NSMetadataUbiquitousItemDownloadingErrorKey];
+            if (err) {
+                NSLog(@"%s Error In Downloading: %@",__PRETTY_FUNCTION__,err);
+                isDownloaded = (BOOL) 0;
+            }
+#endif
+            
+            NSNumber *isDownLoading = [result valueForKey:NSMetadataUbiquitousItemIsDownloadingKey];
+            if (![isDownLoading boolValue]) {
+                //
+                // Send a request to download the file locally
+                //
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    NSFileManager *fm = [[NSFileManager alloc] init];
+                    NSError *err=nil;
+                    NSLog(@"Starting to download %@",fileURL);
+                    [fm startDownloadingUbiquitousItemAtURL:fileURL error:&err];
+                    if (err)
+                        NSLog(@"%s Error %@",__PRETTY_FUNCTION__,err);
+                });
+            }
+        }
+    }
+    [query enableUpdates];
+
+    [detailTable beginUpdates];
+    [detailTable endUpdates];
+    [detailTable reloadData];
+}
 @end

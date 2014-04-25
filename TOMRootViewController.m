@@ -229,7 +229,7 @@
             yn = YES;
             [[NSUserDefaults standardUserDefaults] setBool:yn forKey:@KEY_ICLOUD];
             
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            // dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
             NSURL *icloudURL = [TOMUrl urlForICloudDocuments];
             
@@ -255,25 +255,59 @@
             
             for (NSURL *url in enumerator) {
                 
+                BOOL isDirectory;
                 NSError *err = nil;
-                // NSLog(@"%s URL:%@",__func__,[url path]);
-                NSString *path = [url path];
-                NSArray *parts = [path componentsSeparatedByString:@"/"];
-                NSString *fileName = [parts objectAtIndex:[parts count]-1];
-                if ([fileName hasSuffix:@TOM_FILE_EXT]) {
-                    NSURL *destinationURL = [icloudURL URLByAppendingPathComponent:fileName isDirectory:NO];
+                NSLog(@"Source URL:%@",[url path]);
                 
-                    if (![fileManager fileExistsAtPath:[destinationURL path] isDirectory:NO]) {
-                        [fileManager copyItemAtURL:url toURL:destinationURL error:&err];
-                        if (err) {
-                            NSLog(@"%s : Error copy to icloud: %@",__func__,err);
+                BOOL fileExistsAtPath = [fileManager fileExistsAtPath:[url path] isDirectory:&isDirectory];
+                if (fileExistsAtPath) {
+                    NSString *path = [url path];
+                    NSArray *parts = [path componentsSeparatedByString:@"/"];
+                    NSString *trailName = [parts objectAtIndex:[parts count]-2]; // Trail Name if it's not a Directory
+                    NSString *fileName = [parts objectAtIndex:[parts count]-1];
+                    if (isDirectory)
+                    {
+                        //It's a Directory.
+                        NSURL *destinationURL = [icloudURL URLByAppendingPathComponent:fileName isDirectory:YES];
+                        if (![fileManager fileExistsAtPath:[destinationURL path]]) {
+                            NSLog(@"Dest URL:%@",[destinationURL path]);
+                            [fileManager copyItemAtURL:url toURL:destinationURL error:&err];
+                            if (err) {
+                                NSLog(@"%s : Error copy to icloud: %@",__func__,err);
+                            }
                         }
                     }
-                }
-            }
-            });
+                    else if ([fileName hasSuffix:@TOM_FILE_EXT] || [fileName hasSuffix:@TOM_JPG_EXT] ) {
+                        NSURL *destinationDir = [icloudURL URLByAppendingPathComponent:trailName isDirectory:YES];
+                        NSURL *destinationURL = [destinationDir URLByAppendingPathComponent:fileName isDirectory:NO];
+                        
+                        if (![fileManager fileExistsAtPath:[destinationURL path] isDirectory:NO]) {
+                            NSLog(@"Dest URL:%@",[destinationURL path]);
+                            [fileManager copyItemAtURL:url toURL:destinationURL error:&err];
+                            if (err) {
+                                NSLog(@"%s : Error copy to icloud: %@",__func__,err);
+                            }
+                        }
+                    }
+                    else if ([fileName hasSuffix:@TOM_KML_EXT] || [fileName hasSuffix:@TOM_GPX_EXT] || [fileName hasSuffix:@TOM_CSV_EXT] ) {
+                        // User Created Files
+                        NSURL *destinationURL = [icloudURL URLByAppendingPathComponent:fileName isDirectory:NO];
+                        if (![fileManager fileExistsAtPath:[destinationURL path]]) {
+                            NSLog(@"Dest URL:%@",[destinationURL path]);
+                            [fileManager copyItemAtURL:url toURL:destinationURL error:&err];
+                            if (err) {
+                                NSLog(@"%s : Error copy to icloud: %@",__func__,err);
+                            }
+                        }
+                    }
+                    else {
+                        NSLog(@"%s ERROR Unknown File: %@",__PRETTY_FUNCTION__,fileName);
+                    }
+                } // fileExistsAtPath
+            }    // for NSURL
+            // });
         }
-    }
+    }  // if (y/n)
     //
     // iCloud was available, let see if it still is
     //
@@ -330,7 +364,7 @@
         if ([newTitle isEqualToString:self.title]) {
             // Do nothing
 #ifdef DEBUG
-            NSLog(@"%s Did not change title[%@]",__func__,newTitle);
+            NSLog(@"%s INFO Did not change title[%@]",__func__,newTitle);
 #endif
         }
         else if ([self.title isEqualToString:@TRAILS_DEFAULT_NAME]) {
@@ -380,9 +414,11 @@
                 theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
                 [self loadTrails:fileURL];
                 [self processMyLocation:userCoordinate type:ptUnknown];
-                [mySlider clearSpeedsAndAltitudes];
+                // [mySlider clearSpeedsAndAltitudes];
+                // [myTripTimer setDuration:[theTrail elapseTime]];
+                // [myOdoMeter setTotalDistance:[theTrail distanceTotalMeters]];
             }
-            else {
+            else { // no file exests at path:
                 //    the points of the trail will be kept as the new name
                 //    no action required.
                 theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
@@ -407,6 +443,7 @@
                 [ptTimer invalidate]; // Stop the timer
             }
 
+            [theTrail closeWithCompletionHandler:nil];
             //
             // Clean it up
             //
@@ -429,14 +466,31 @@
             NSURL *fileURL = [TOMUrl urlForFile:newTitle key:newTitle];
             theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
             myProperties = [[TOMProperties alloc]initWithTitle:newTitle];
-            
             [self setTitle:newTitle];
             [myProperties setPtName:newTitle];
             
-            NSFileManager *fm = [NSFileManager new];
-            if ([fm fileExistsAtPath:[fileURL path]]) {
+            if  (![newTitle isEqual: @TRAILS_DEFAULT_NAME]) {
+                NSFileManager *fm = [NSFileManager new];
+                if ([fm fileExistsAtPath:[fileURL path]]) {
                     [self loadTrails:fileURL];
+                }
             }
+            else {
+                [worldView setDelegate:self];
+                [mySlider resetView];
+                [mySlider clearSpeedsAndAltitudes];
+                [mySlider setNeedsDisplay];
+                
+                [mySpeedOMeter resetSpeedOMeter];
+                [mySpeedOMeter setNeedsDisplay];
+                
+                [myTripTimer setDuration:0.0f];
+                [myTripTimer setNeedsDisplay];
+                
+                [myOdoMeter setTrailDistance:0.0f];
+                [myOdoMeter setNeedsDisplay];
+            }
+            // [myTripTimer setDuration:[theTrail elapseTime]];
         }
     }
     else
@@ -537,7 +591,7 @@
             NSLog( @"%s Reason: %@",__PRETTY_FUNCTION__, exception.reason );
             return;
         }
-#ifdef DEBUG
+#ifdef __DEBUG
         @finally {
             NSLog(@"%s Finally block",__PRETTY_FUNCTION__);
         }
@@ -1217,19 +1271,10 @@
     {
         //
         // Check to see if the other objects like pictures are there
-        //
-        for (int i = 0 ; i < [theTrail.ptTrack count]; i++)
-        {
-            TOMPointOnAMap *mp = [theTrail.ptTrack objectAtIndex:i];
-            if ([mp type] == ptPicture) {
-                NSString *key = [mp key];
-                if  (![TOMImageStore imageExists:self.title key:key warn:YES]) {
-                    [theTrail.ptTrack removeObjectAtIndex:i];
-                }
-            }
-        }
+        // I removed this since it is possible to load the trail stored
+        // in the icloud where the picture doesn't exists yet.
 
-        
+
         if (!mapPoms) {
             mapPoms = [[TOMMapSet alloc] init];
         }
@@ -1242,6 +1287,29 @@
 
         [worldView setDelegate:self];
         
+        [mySlider resetView];
+        [mySlider clearSpeedsAndAltitudes];
+        [mySpeedOMeter resetSpeedOMeter];
+        for (int i = 0 ; i < [theTrail.ptTrack count]; i++)
+        {
+            TOMPointOnAMap *mp = [theTrail.ptTrack objectAtIndex:i];
+            
+            if ([mp type] == ptLocation) {
+                [mySpeedOMeter  updateSpeed:[mp speed]];
+                [mySlider addSpeed:[mp speed] Altitude:[mp altitude]];
+            }
+        }
+        
+        [mySlider setNeedsDisplay];
+        [mySpeedOMeter setNeedsDisplay];
+        
+        [myTripTimer setDuration:[theTrail elapseTime]];
+        [myTripTimer setNeedsDisplay];
+        
+        [myOdoMeter setTrailDistance:[theTrail distanceTotalMeters]];
+        [myOdoMeter setNeedsDisplay];
+        
+        
         result = YES;
     }
     
@@ -1250,8 +1318,9 @@
     return result;
 }
 
-//  * * * * * * * *
-
+//
+//  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+//
 - (BOOL) saveTrailAs: (NSString *) newTitle warn:(BOOL)yn{
 
     BOOL result = NO;

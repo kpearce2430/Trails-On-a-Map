@@ -14,6 +14,9 @@ static NSString *orgainizerViewCellIdentifier = @"organizerViewCells";
 
 @interface TOMOrganizerViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 {
+@private
+    UIDeviceOrientation orientation;
+
 @public
     UITableView *organizerTable;
     BOOL amIediting;
