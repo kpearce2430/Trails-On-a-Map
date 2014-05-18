@@ -18,5 +18,6 @@
 + (CLLocationSpeed) speedToMPS: (CLLocationSpeed) s;
 + (NSString *) displaySpeedUnits;
 + (TOMDisplaySpeedType) speedType;
++ (void) setSpeedType: (TOMDisplaySpeedType) speedUnit;
 
 @end

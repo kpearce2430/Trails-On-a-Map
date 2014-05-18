@@ -128,4 +128,22 @@
     return myDisplayUnits;
 }
 
++ (void) setSpeedType: (TOMDisplaySpeedType) speedUnit
+{
+    if (speedUnit == tomDSMilesPerHour ||
+        speedUnit == tomDSKmPerHour ||
+        speedUnit == tomDSMinutesPerMile ||
+        speedUnit == tomDSMetersPerSecond ) {
+        [[NSUserDefaults standardUserDefaults] setInteger: speedUnit forKey:@KEY_SPEED_UNITS];
+
+        // set the new value for the cloud.  Note, I dont syncronize until I leave this for the controllers
+        NSString *tmp = [[NSString alloc] initWithFormat:@"%d", speedUnit];
+        NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
+        [kvStore setString:tmp forKey:@KEY_SPEED_UNITS];
+    }
+    else {
+        NSLog(@"Invalid speed Unit: %ld",(long) speedUnit);
+    }
+}
+
 @end
