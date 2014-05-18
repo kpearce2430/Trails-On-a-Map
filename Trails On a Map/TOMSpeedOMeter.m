@@ -228,6 +228,10 @@
 
 -(void) updateSpeed: (CGFloat) sp
 {
+    if (sp < 0.0f) {
+        sp = 0.0f;
+    }
+    
     if( maximumSpeed < sp )
         maximumSpeed = sp;
     
@@ -236,7 +240,7 @@
         lastType = [TOMSpeed speedType];
     }
 
-    if (maximumSpeed  > maximumDisplay ) {
+    if (maximumSpeed + 1  >= maximumDisplay ) {
         
         if (lastType != tomDSMinutesPerMile) {
             CLLocationSpeed maxDisplayInDisplayUnits = [TOMSpeed displaySpeed:maximumSpeed];
