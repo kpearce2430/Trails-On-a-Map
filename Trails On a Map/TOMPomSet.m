@@ -584,7 +584,7 @@
         }
     }
     @catch (NSException *exception) {
-        NSLog(@"%s Exception Occured",__PRETTY_FUNCTION__);
+        NSLog( @"%s Exception Occured",__PRETTY_FUNCTION__);
         NSLog( @"%s Name: %@", __PRETTY_FUNCTION__, exception.name);
         NSLog( @"%s Reason: %@",__PRETTY_FUNCTION__, exception.reason );
         trailCSV = nil;
