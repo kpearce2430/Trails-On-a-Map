@@ -50,7 +50,7 @@
         return YES;
 }
 
-+ (NSURL *) urlForDefaultDocuments {
++ (NSURL *) urlForLocalDocuments {
     NSArray *URLs = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
     NSURL *documentsFolderURL = URLs[0];
     return documentsFolderURL;

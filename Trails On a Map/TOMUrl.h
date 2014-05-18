@@ -21,7 +21,7 @@
 
 + (NSURL *) urlForICloud;
 + (NSURL *) urlForICloudDocuments;
-+ (NSURL *) urlForDefaultDocuments;
++ (NSURL *) urlForLocalDocuments;
 + (NSURL *) urlForImageDirectory :(NSString *) title;
 + (NSURL *) urlForImageFile:(NSString *) title key:(NSString *) key;
 + (NSURL *) urlForFile:(NSString *) title key:(NSString *) filename;
