@@ -227,15 +227,11 @@
             myDisplaySpeedUnit = tomDSMetersPerSecond;
             break;
         default:
+            myDisplaySpeedUnit = tomDSUnknown;
             break;
     }
-    
-    [[NSUserDefaults standardUserDefaults] setInteger: myDisplaySpeedUnit forKey:@KEY_SPEED_UNITS];
-    
-    // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
-    NSString *tmp = [[NSString alloc] initWithFormat:@"%d", myDisplaySpeedUnit];
-    NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
-    [kvStore setString:tmp forKey:@KEY_SPEED_UNITS];
+
+    [TOMSpeed setSpeedType:myDisplaySpeedUnit];
 }
 
 //
