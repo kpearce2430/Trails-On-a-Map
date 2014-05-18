@@ -23,6 +23,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+        firstPass = TRUE;
     }
     return self;
 }
@@ -116,13 +117,35 @@
 }
 
 //3</pre>
+
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     
-    return [self.cells count];
+    if (!firstPass && [self.cells count] == 0)
+        return 1;
+    else
+        return [self.cells count];
 }
 
 //4
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:orgainizerViewCellIdentifier];
+    
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:orgainizerViewCellIdentifier];
+    }
+    
+    if ([self.cells count] == 0) {
+        // Set the values for No Trails Available
+        [cell.textLabel setText:@"No Trails Available"];
+        [cell.detailTextLabel setText:@""];
+        [cell.imageView setImage:nil];
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        if (amIediting)
+            [self editClicked:nil];
+        return cell;
+    }
+    
     //5
     TOMOrganizerViewCell *thisCell = [self.cells objectAtIndex:indexPath.row];
     NSDate *fileDate = thisCell.date;
@@ -134,11 +157,7 @@
     }
     
     NSString *dateStr = [dateFormatter stringFromDate:fileDate];
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:orgainizerViewCellIdentifier];
-    
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:orgainizerViewCellIdentifier];
-    }
+
 
     NSString *myLabel = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
     //6
@@ -318,10 +337,14 @@
 #else
         [self deleteDocument:theTrail withCompletionBlock:nil];
 #endif
+        //
+        // Save the last cell for 'No Trails Available'
+        //
         [cells removeObjectAtIndex:indexPath.row];
-        
-        [tableView deleteRowsAtIndexPaths:[[NSArray alloc] initWithObjects:&indexPath count:1] withRowAnimation:UITableViewRowAnimationLeft];
-        
+        if ([cells count] != 0)
+            [tableView deleteRowsAtIndexPaths:[[NSArray alloc] initWithObjects:&indexPath count:1] withRowAnimation:UITableViewRowAnimationLeft];
+        else
+            [organizerTable reloadData];
     }
 }
 
@@ -414,6 +437,7 @@
             }
         } // for enumerator
         [self sortCells];
+        firstPass = FALSE;
         
     } // else (!usingIcloud)
 
@@ -481,6 +505,7 @@
     [query enableUpdates];
     [self sortCells];
     [organizerTable reloadData];
+    firstPass = FALSE;
 }
 
 

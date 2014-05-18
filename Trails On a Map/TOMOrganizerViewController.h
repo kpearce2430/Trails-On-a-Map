@@ -16,6 +16,7 @@ static NSString *orgainizerViewCellIdentifier = @"organizerViewCells";
 {
 @private
     UIDeviceOrientation orientation;
+    BOOL firstPass;
 
 @public
     UITableView *organizerTable;
