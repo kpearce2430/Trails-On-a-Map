@@ -533,8 +533,8 @@
     }
     
     NSString *gpxString = gpx.gpx;
-    
-    NSURL *docsdirURL = [TOMUrl urlForDocumentsDirectory];
+    // Store locally generated files locally, not on iCloud
+    NSURL *docsdirURL = [TOMUrl urlForLocalDocuments];
     NSString *fileName = [NSString stringWithFormat:@"%@.gpx",self.title];
     NSURL *documentURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
     NSError *err;
@@ -736,7 +736,7 @@
     }
     
     NSString *kmlString = kml.kml;
-    NSURL *docsdirURL = [TOMUrl urlForDocumentsDirectory];
+    NSURL *docsdirURL = [TOMUrl urlForLocalDocuments];
     NSString *fileName = [NSString stringWithFormat:@"%@.kml",self.title];
     NSURL *documentURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
     NSError *err;
@@ -746,7 +746,7 @@
         NSLog(@"%s ERROR WRITE KML FILE: %@",__func__,err);
     }
 
-    NSURL *zipdirURL = [TOMUrl urlForDocumentsDirectory];
+    NSURL *zipdirURL = [TOMUrl urlForLocalDocuments];
     NSString *zipName = [NSString stringWithFormat:@"%@.kmz",self.title];
     NSURL *zipFullURL = [zipdirURL URLByAppendingPathComponent:zipName isDirectory:NO];
 
@@ -861,15 +861,16 @@
             NSNumber *percentDownloaded = [result valueForKey:NSMetadataUbiquitousItemPercentDownloadedKey];
             if (percentDownloaded)
                 NSLog(@"ItemPercentDownloaded:%@",percentDownloaded); // FFU
-
+#endif
             NSError *err = [result valueForKey:NSMetadataUbiquitousItemDownloadingErrorKey];
+            NSNumber *isDownLoading;
             if (err) {
                 NSLog(@"%s Error In Downloading: %@",__PRETTY_FUNCTION__,err);
                 isDownloaded = (BOOL) 0;
             }
-#endif
-            
-            NSNumber *isDownLoading = [result valueForKey:NSMetadataUbiquitousItemIsDownloadingKey];
+            else
+                isDownLoading = [result valueForKey:NSMetadataUbiquitousItemIsDownloadingKey];
+
             if (![isDownLoading boolValue]) {
                 //
                 // Send a request to download the file locally
