@@ -20,7 +20,7 @@
 
 @implementation TOMRootViewController
 
-@synthesize amiUpdatingLocation,locationManager, worldView, theTrail, currentHeading, myProperties, imagePicker;
+@synthesize amiUpdatingLocation,locationManager, worldView, theTrail, currentHeading, myProperties, imagePicker, updatedTrail;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -189,7 +189,7 @@
         [longGesture setAllowableMovement:1000.0];
         [self.view addGestureRecognizer:longGesture];
         
-
+        [self setUpdatedTrail:NO];
     }
     [self checkProperties];
     return self;
@@ -235,7 +235,7 @@
             
             // Look for local files on the device's documents directory and copy them
             // to the iCloud.
-            NSURL *defaultURL = [TOMUrl urlForDefaultDocuments];
+            NSURL *defaultURL = [TOMUrl urlForLocalDocuments];
             
             NSArray *keys = [NSArray arrayWithObjects:
                              NSURLIsDirectoryKey, NSURLIsPackageKey, NSURLLocalizedNameKey, nil];
@@ -289,8 +289,12 @@
                             }
                         }
                     }
+#ifdef __NUA__
+                    // Not used anymore - KML,GPX, and CSV files will only be available in the
+                    // local directory
                     else if ([fileName hasSuffix:@TOM_KML_EXT] || [fileName hasSuffix:@TOM_GPX_EXT] || [fileName hasSuffix:@TOM_CSV_EXT] ) {
-                        // User Created Files
+                        // User Created Files remain on the device
+
                         NSURL *destinationURL = [icloudURL URLByAppendingPathComponent:fileName isDirectory:NO];
                         if (![fileManager fileExistsAtPath:[destinationURL path]]) {
                             NSLog(@"Dest URL:%@",[destinationURL path]);
@@ -300,8 +304,9 @@
                             }
                         }
                     }
+#endif
                     else {
-                        NSLog(@"%s ERROR Unknown File: %@",__PRETTY_FUNCTION__,fileName);
+                        NSLog(@"%s Skipping File: %@",__PRETTY_FUNCTION__,fileName);
                     }
                 } // fileExistsAtPath
             }    // for NSURL
@@ -414,6 +419,7 @@
                 theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
                 [self loadTrails:fileURL];
                 [self processMyLocation:userCoordinate type:ptUnknown];
+                [self setUpdatedTrail:NO];
                 // [mySlider clearSpeedsAndAltitudes];
                 // [myTripTimer setDuration:[theTrail elapseTime]];
                 // [myOdoMeter setTotalDistance:[theTrail distanceTotalMeters]];
@@ -425,6 +431,7 @@
                 myProperties = [[TOMProperties alloc]initWithTitle:newTitle];
                 
                 [self setTitle:newTitle];
+                [self setUpdatedTrail:YES];
                 [myProperties setPtName:newTitle];
             }
             //
@@ -435,7 +442,8 @@
             if (amiUpdatingLocation == YES) {
                 // NSLog(@"Saving[%@]",self.title);
                 // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-                [self saveTrails: NO]; //
+                if ([self updatedTrail] == YES)
+                    [self saveTrails: NO]; //
                 amiUpdatingLocation = NO;
                 startStopItem.title = @TOM_ON_TEXT;
                 [locationManager stopUpdatingLocation];
@@ -443,7 +451,9 @@
                 [ptTimer invalidate]; // Stop the timer
             }
 
-            [theTrail closeWithCompletionHandler:nil];
+            if ([self updatedTrail] == YES) {
+                [theTrail closeWithCompletionHandler:nil];
+            }
             //
             // Clean it up
             //
@@ -469,6 +479,7 @@
             [self setTitle:newTitle];
             [myProperties setPtName:newTitle];
             
+            
             if  (![newTitle isEqual: @TRAILS_DEFAULT_NAME]) {
                 NSFileManager *fm = [NSFileManager new];
                 if ([fm fileExistsAtPath:[fileURL path]]) {
@@ -490,6 +501,7 @@
                 [myOdoMeter setTrailDistance:0.0f];
                 [myOdoMeter setNeedsDisplay];
             }
+            [self setUpdatedTrail:NO];
             // [myTripTimer setDuration:[theTrail elapseTime]];
         }
     }
@@ -665,7 +677,7 @@
         self.worldView.userInteractionEnabled = YES;
     }
     else {
-        NSLog(@"%s Unrecognized UIGestureRecognizer State: %ld",__PRETTY_FUNCTION__,(long)[pinchRecognizer state]);
+        NSLog(@"%s Warning - Unrecognized UIGestureRecognizer State: %ld",__PRETTY_FUNCTION__,(long)[pinchRecognizer state]);
     }
 }
 
@@ -688,7 +700,8 @@
         pt != ptError ) {
         TOMPointOnAMap *mp = [[TOMPointOnAMap alloc] initWithLocationHeadingType:newLocation heading:currentHeading type:pt];
         [ theTrail addPointOnMap:mp ];
-
+        [ self setUpdatedTrail:YES];
+        
         // [ mySlider setNeedsDisplay ];
         if ((pt == ptLocation && [self.myProperties showLocations]) ||
             (pt == ptStop && [self.myProperties showStops]) ||
@@ -788,45 +801,62 @@
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
     CLLocation *loc = [locations lastObject ];
+    CLLocationDistance myDistance = 0.00f;
     
-    // NSLog(@"Did recieve %d locations",[locations count]);
-    // NSLog(@"Location %@", [loc description]);
     [worldView setShowsUserLocation:YES];
-    
-    // NSTimeInterval t = [[ loc timestamp ] timeIntervalSinceNow];
-    
-    // NSLog(@"Speed: %.2f",[loc speed]);
-    // NSLog(@"Time: %f", t);
+  
     if (loc.speed < 0.00) {
         // NSLog(@"%s : Speed[%.2f] less than 0",__PRETTY_FUNCTION__,loc.speed);
         return;
     }
-    /*
-    else if ( t < -0.05 ) {
-        // This is cached data, dont want it, keep looking
-        NSLog(@"Cached Loc %@@",loc);
-        return;
-    } */
-    else {
-        // NSLog(@"Using Loc %@@",loc);
-        TOMPointOnAMap *lastPoint = [theTrail lastPom];
-        CLLocationDistance myDistance = [lastPoint distanceFromLocation:loc];
-        if (myDistance >= [TOMDistance distanceFilter] ||
-            myDistance == 0.00) {
-            [self processMyLocation: loc type:ptLocation];
-            [myOdoMeter setTrailDistance:[theTrail distanceTotalMeters]];
-            [myOdoMeter setNeedsDisplay];
-            [myTripTimer setDuration:[theTrail elapseTime]];
-            [myTripTimer setNeedsDisplay];
-        }
+
+    TOMPointOnAMap *lastPoint = [theTrail lastPom];
+    
+    if (lastPoint) {
+        //
+        // Let's to an acceleration test to verify that
+        // there wasn't a 'bump' or something else
+        // that sent a number that is off.  It early version
+        // I had a couple of values come in that went from a speed of
+        // 70mph to 0mph to 100mph and then back to 70mph.  This is an attempt
+        // skip these types of values.
+        
+        double deltaVel = [loc speed] - [lastPoint speed];
+    
+        NSTimeInterval t = [loc.timestamp timeIntervalSinceDate:[lastPoint timestamp]];
+    
+        double accelration = deltaVel / t;
 #ifdef __DEBUG__
-        else {
-            NSLog(@"%s Distance %.2f",__PRETTY_FUNCTION__,myDistance);
-        }
+        NSLog(@"Acceleration %.2f - %.2f / %.2f = %.2f",[loc speed],[lastPoint speed],t,accelration);
 #endif
+        accelration = ABS(accelration);
+        //
+        // I'm using 10.0 because it's just a bit higher than some performance drag racers.
+        //
+        if (accelration > 10.0)
+        {
+            NSLog(@"Acceleration too high, returning");
+            return;
+        }
+        myDistance = [lastPoint distanceFromLocation:loc];
+    }
+    
+    if ( myDistance >= [TOMDistance distanceFilter] || !lastPoint) {
+        
+        [ self processMyLocation: loc type:ptLocation];
+        
+        [ myOdoMeter setTrailDistance:[theTrail distanceTotalMeters]];
+        [ myOdoMeter setNeedsDisplay];
+        
+        [ myTripTimer setDuration:[theTrail elapseTime]];
+        [ myTripTimer setNeedsDisplay];
+        
+        [ mySlider addSpeed:[loc speed] Altitude:[loc altitude] ];
+        [ mySlider setNeedsDisplay];
+        
+
     }
 }
-
 
 -(void) updateAnnotations
 {
@@ -902,14 +932,9 @@
         return;
     
     CLLocation *stopLoc = [locationManager location];
-    [ mySlider addSpeed:[stopLoc speed] Altitude:[stopLoc altitude] ];
-    [ mySlider setNeedsDisplay];
-    [ mySpeedOMeter updateSpeed:[stopLoc speed]];
-    [ mySpeedOMeter setNeedsDisplay];
-    [ myOdoMeter setTrailDistance:[theTrail distanceTotalMeters]];
-    [ myOdoMeter setNeedsDisplay];
-    [myTripTimer setDuration:[theTrail elapseTime]];
-    [myTripTimer setNeedsDisplay];
+
+    [mySpeedOMeter updateSpeed:[stopLoc speed]];
+    [mySpeedOMeter setNeedsDisplay];
 
      // Still Moving...
     if  ([stopLoc speed] != 0.0) {
@@ -917,16 +942,6 @@
         return;
     }
 
-#ifdef __NUA__
-    CLLocationCoordinate2D coord = [stopLoc coordinate];
-    if ([myProperties showInfoBar]) {
-        NSString *infoBarText = [[NSString alloc] initWithFormat:@"X:%.4f Y:%.4f S:%@ C:%lu", coord.latitude, coord.longitude, [theTrail elapseTimeString],(unsigned long)[theTrail.ptTrack count]];
-        [distanceInfoBar setText:infoBarText];
-    }
-#endif
-    
-    // NSLog(@"Stopped?");
-    
     //
     // Figure out how far since the last location
     //
@@ -934,15 +949,20 @@
     if (!lastOne) { // or the first location:
         [self processMyLocation:stopLoc type:ptStop];
     }
-    if ([lastOne type] != ptStop )
+    else if ([lastOne type] != ptStop )
     {
         CLLocationDistance myDist = [lastOne distanceFromLocation:stopLoc];
         // NSLog(@"Distance: %.2f",myDist);
-        if (myDist > 0.0) {
+        if  (myDist > 0.0) {
             [self processMyLocation:stopLoc type:ptStop];
+            [mySlider addSpeed:[stopLoc speed] Altitude:[stopLoc altitude]];
+            [mySlider setNeedsDisplay];
+            [myOdoMeter setTrailDistance:[theTrail distanceTotalMeters]];
+            [myOdoMeter setNeedsDisplay];
+            [myTripTimer setDuration:[theTrail elapseTime]];
+            [myTripTimer setNeedsDisplay];
         }
     }
-    
     return;
 }
 
@@ -1063,9 +1083,8 @@
     [locationManager stopUpdatingLocation];
     [locationManager stopUpdatingHeading];
     
-    //  This will need to be changed to handing the UIDocument Class:
-    // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-    [self saveTrails:NO];
+    if ([self updatedTrail] == YES)
+        [self saveTrails:NO];
 }
 
 //
@@ -1225,7 +1244,8 @@
     
     // Good place to mark the file to save it.
     // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-    [self saveTrails:YES];
+    if ([self updatedTrail] == YES)
+        [self saveTrails:YES];
     
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -1238,7 +1258,8 @@
 {
     if (![self.title isEqual: @TRAILS_DEFAULT_NAME]   ) {
         // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-        [self saveTrails:NO];
+        if ([self updatedTrail] == YES)
+            [self saveTrails:NO];
     }
     
     UIViewController *ptController = [[TOMOrganizerViewController alloc] initWithNibName:@"TOMOrganizerViewController" bundle:nil ];

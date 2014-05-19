@@ -59,7 +59,7 @@
 
 @property (nonatomic, readwrite) BOOL amiUpdatingLocation;
 @property (nonatomic, readwrite) BOOL hidden;
-@property (nonatomic, readwrite) BOOL amiDeffered;
+@property (nonatomic, readwrite) BOOL updatedTrail;
 
 @property (nonatomic, strong)    UIImagePickerController *imagePicker;
 
