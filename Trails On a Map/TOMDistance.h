@@ -17,5 +17,6 @@
 + (NSString *) displayDistanceUnits;
 + (TOMDisplayDistanceType) distanceType;
 + (CLLocationDistance) distanceFilter;
++ (CLLocationDistance) distanceFrom: (CLLocation *) loc1 To:(CLLocation *) loc2;
 
 @end

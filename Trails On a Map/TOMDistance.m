@@ -8,6 +8,10 @@
 
 #import "TOMDistance.h"
 
+#ifndef DEG2RAD
+#define DEG2RAD(degrees) (degrees * 0.01745327) // degrees * pi over 180
+#endif
+
 @implementation TOMDistance
 
 //
@@ -119,6 +123,41 @@
         myDistance = 50.0;
         }
     return myDistance;
+}
+
+
+//
+// Based on:  http://answers.google.com/answers/threadview/id/326655.html
+//
+//
+// I noticed some invalid numbers coming from the iphone where altitudes jumped.
+// This function will compute the distance in 3D.
+//
++ (CLLocationDistance) distanceFrom: (CLLocation *) loc1 To:(CLLocation *) loc2
+{
+    CGFloat lat1Rad = DEG2RAD(loc1.coordinate.latitude);
+    CGFloat long1Rad = DEG2RAD(loc1.coordinate.longitude);
+    CGFloat lat2Rad = DEG2RAD(loc2.coordinate.latitude);
+    CGFloat long2Rad = DEG2RAD(loc2.coordinate.longitude);
+    
+    CGFloat p1X = ([loc1 altitude] + 6370000.0) * cos(lat1Rad) * sin(long1Rad);
+    CGFloat p2X = ([loc2 altitude] + 6370000.0) * cos(lat2Rad) * sin(long2Rad);
+    CGFloat deltaX = p2X - p1X;
+    deltaX *= deltaX;
+    
+    CGFloat p1Y = ([loc1 altitude] + 6370000.0) * sin(lat1Rad);
+    CGFloat p2Y = ([loc2 altitude] + 6370000.0) * sin(lat2Rad);
+    CGFloat deltaY = p2Y - p1Y;
+    deltaY *= deltaY;
+
+    CGFloat p1Z = ([loc1 altitude] + 6370000.0) * cos(lat1Rad) * cos(long1Rad);
+    CGFloat p2Z = ([loc2 altitude] + 6370000.0) * cos(lat2Rad) * cos(long2Rad);
+    CGFloat deltaZ = p2Z - p1Z;
+    deltaZ *= deltaZ;
+    
+    CLLocationDistance distance = deltaX + deltaY + deltaZ;
+    distance = sqrt(distance);
+    return distance;
 }
 
 @end
