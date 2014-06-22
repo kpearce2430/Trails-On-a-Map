@@ -58,16 +58,22 @@
     //
     // If there is a track and there is one or more poms
     //
+    NSURL *theURL = contents;
+    
+    if ([TOMUrl isValidURL:theURL] == NO) {
+        NSLog(@"%s received an invalid url",__PRETTY_FUNCTION__);
+        return NO;
+    }
+    
     if  (ptTrack && [ptTrack count] > 0)
         [self.ptTrack removeAllObjects];
     
-    NSError *error;
-    NSURL *theURL = contents;
-    
+    NSError *error = nil;
+
     NSData *data = [[NSData alloc] initWithContentsOfURL:theURL options:NSDataReadingUncached error:&error];
     
     if (error) {
-        NSLog(@"%s %@",__func__, [error localizedDescription]);
+        NSLog(@"%s %@",__PRETTY_FUNCTION__ , [error localizedDescription]);
         ptTrack = [[ NSMutableArray alloc] init ];
         return NO;
     }
@@ -408,13 +414,7 @@
         return ptMapRect;
     }
 
-#ifdef __DEBUG__
-    if (MKMapRectIsEmpty(ptMapRect)) {
-        //
-        NSLog(@"Ha! ptMapRect is empty");
-    }
-#endif
-    
+   
     // MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * [ptTrack count]);
     TOMPointOnAMap *p = [ptTrack objectAtIndex:0];
     MKMapPoint newPoint = MKMapPointForCoordinate([p coordinate]);
@@ -434,7 +434,6 @@
         // pointArr[i] = newPoint;
     }
     
-    // self.routeLine = [ MKPolyline polylineWithPoints:pointArr count:[pebbleTrack count]];
     ptMapRect = MKMapRectMake(minX, minY, (maxX-minX), (maxY-minY));
     return ptMapRect;
     
@@ -468,7 +467,6 @@
     else
         myTimeString = [[NSString alloc] initWithFormat:@"%d",seconds];
     
-    // NSLog(@"%s %@",__func__, myTimeString);
     return myTimeString;
 }
 //
@@ -479,9 +477,6 @@
     NSDate  *mystart = NULL;
     NSDate  *myend = NULL;
     
-    // [self listPoms];
-    
-    // NSTimeInterval i;
     for (int i = 0 ; i < [ptTrack count]; i++ ) {
         TOMPointOnAMap *p = [ptTrack objectAtIndex:i];
         if (!mystart) {
@@ -590,14 +585,11 @@
         trailCSV = nil;
         result = NO;
     }
-#ifdef DEBUG
     @finally {
-        NSLog(@"%s Finally Block",__PRETTY_FUNCTION__);
+        // NSLog(@"%s Finally Block",__PRETTY_FUNCTION__);
+        [myHandle closeFile];
     }
-#endif
-    [myHandle closeFile];
     return result;
 }
-
 
 @end

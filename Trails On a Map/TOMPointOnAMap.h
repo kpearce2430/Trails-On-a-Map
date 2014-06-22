@@ -51,6 +51,7 @@ typedef enum  { ptError = -1, ptUnknown, ptLocation, ptPicture, ptStop, ptNote, 
 - (id) initWithLocationHeading:(CLLocation *)loc heading:(CLHeading *) hdng;
 - (id) initWithLocationHeadingType:(CLLocation *)loc heading:(CLHeading *)hdng type:(POMType)pt;
 - (id) initWithImage: (UIImage*)image location:(CLLocation *)loc heading:(CLHeading *) hdng;
+- (id) initWithImage: (UIImage *) myImage title:(NSString *) imageTitle location:(CLLocation *)loc heading:(CLHeading *) hdng;
 
 - (void) copyLocation:(CLLocation *) loc;
 - (double) distanceFromLocation:(CLLocation *)loc;

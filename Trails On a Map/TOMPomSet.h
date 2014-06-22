@@ -53,14 +53,6 @@
 - (double)         averageSpeedStraightLine;
 - (BOOL) trailCSVtoURL: (NSURL *) theURL;
 
-// @property (nonatomic, weak) id <TOMPomSetDelegate> delegate;
-
-// + (UIImage *) icon;
-// - (NSMutableArray *) pictureSet;
-// - (NSInteger) numStops;
-
 @end
 
-// @protocol TOMPomSetDelegate <NSObject>
-// -(void)noteDocumentContentsUpdated:(TOMPomSetDelegate*)noteDocument;
-// @end
+

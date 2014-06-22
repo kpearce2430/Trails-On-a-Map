@@ -97,6 +97,21 @@
     return self;
 }
 
+-(id) initWithImage: (UIImage *) myImage title:(NSString *) imageTitle location:(CLLocation *)loc heading:(CLHeading *) hdng
+{
+    self = [super init];
+    if (self)
+    {
+        [self copyLocation:loc];
+        [self setHeading:hdng];
+        [self setType:ptPicture];
+        [self generateMyKey:0];
+        [self setTitle:imageTitle];
+        [self setImage:myImage];
+    }
+    return self;
+}
+
 -(id) initWithImage: (UIImage *) myImage location:(CLLocation *)loc heading:(CLHeading *) hdng
 {
     self = [super init];
@@ -106,7 +121,7 @@
         [self setHeading:hdng];
         [self setType:ptPicture];
         [self generateMyKey:0];
-        // [self setImage:myImage];
+        [self setImage:myImage];
 
         title = [NSString stringWithFormat:@"%@: %.4f %.4f", @POM_TYPE_PICTURE, self.coordinate.latitude, self.coordinate.longitude ];
     }
@@ -221,12 +236,12 @@
     
     image = nil;
     [aCoder encodeObject:image forKey:@"image"];
-    
+
     // NSString tmp;
-    // if (isTrailIcon)
-    //     [aCoder encodeObject:@YES_STRING forKey:@"isTrailIcon"];
-    // else
-    //    [aCoder encodeObject:@NO_STRING forKey:@"isTrailIcon"];
+    if  (isTrailIcon)
+        [aCoder encodeObject:@YES_STRING forKey:@"isTrailIcon"];
+    else
+        [aCoder encodeObject:@NO_STRING forKey:@"isTrailIcon"];
 }
 
 -(id) initWithCoder:(NSCoder *) aDecoder
@@ -257,17 +272,14 @@
         [self setTimestamp:[aDecoder decodeObjectForKey:@"timestamp"]];
         coordinate.latitude = mylat;
         coordinate.longitude = mylong;
-
-#ifdef __FFU__
-        UIImage *myImage = [aDecoder decodeObjectForKey:@"image"];
-        
-        // to take images out of the core data trail
-        if (image) {
-            [TOMImageStore saveImage:myImage title:title key:key];
-            image = nil;
-        }
-#endif
+        image = nil;
+        NSString *tmp = [aDecoder decodeObjectForKey:@"isTrailIcon"];
+        if ([tmp isEqualToString:@YES_STRING])
+            isTrailIcon = YES;
+        else
+            isTrailIcon = NO;
     }
+    
     return self;
 }
 
@@ -291,6 +303,9 @@
     NSString *dateStr = [dateFormatter stringFromDate:timestamp];
     NSString *timeStr = [timeFormatter stringFromDate:timestamp];
     
+    //
+    // If you change this format, make sure you update the title row in TOMDetailViewController.m
+    //
     NSString *theString = [[NSString alloc] initWithFormat:@"%@,%@,%.2f,%.2f,%@,%@,%.2f,%.2f,%.2f,%.8f,%.8f",
                            typeStrs[type],title,altitude,[heading trueHeading],dateStr,timeStr,[TOMSpeed displaySpeed:speed],horizontal,vertical,coordinate.latitude,coordinate.longitude];
     
