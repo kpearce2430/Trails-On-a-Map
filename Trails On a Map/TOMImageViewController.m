@@ -14,18 +14,20 @@
 
 @implementation TOMImageViewController
 
-@synthesize scrollView,imageView,image,key,url;
+@synthesize url,mp;
 
-- (id)initWithNibNameWithKeyAndImage:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil key:(NSString *)k url:(NSURL *)u
+- (id)initWithNibNameAndPom:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil POM: (TOMPointOnAMap *) p url:(NSURL *)u
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        key = k;
+        mp = p;
+        self.title = p.title;
         url = u;
     }
     return self;
 }
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -35,6 +37,7 @@
     }
     return self;
 }
+
 
 - (void)viewDidLoad
 {
@@ -60,13 +63,25 @@
     }
 }
 
-//
-//
--(void) viewDidDisappear {
-    
-    // Request to stop receiving accelerometer events and turn off accelerometer
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+}
+
+-(void) viewWillDisappear:(BOOL)animated {
+
+#ifdef __FFU__
+    if ([self.navigationController.viewControllers indexOfObject:self]==NSNotFound) {
+        // back button was pressed.  We know this is true because self is no longer
+        // in the navigation stack.
+        NSLog(@"in %s",__PRETTY_FUNCTION__);
+    }
+#endif
+
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    
+    [super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning
@@ -77,58 +92,45 @@
 
 - (void)createControls
 {
-
+    self.edgesForExtendedLayout = UIRectEdgeNone;
+    
+    //  A better way to do this...
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    imageScrollView = [[UIScrollView alloc] initWithFrame:screenRect];
+    imageScrollView.delegate = self;
+    imageScrollView.showsVerticalScrollIndicator = YES;
+    imageScrollView.showsHorizontalScrollIndicator = YES;
+    [imageScrollView setContentOffset:CGPointMake(0.0f, 0.0f)];
+    [imageScrollView setBounces:NO];
+    [imageScrollView setScrollEnabled:YES];
+    [imageScrollView setClipsToBounds:YES];
+    [imageScrollView setBackgroundColor:[UIColor blackColor]];
+    [imageScrollView setContentSize:image.size];
+    
     imageView = [[UIImageView alloc] initWithImage:image];
     [imageView setUserInteractionEnabled:YES];
     [imageView setBackgroundColor:[UIColor clearColor]];
     [imageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
     imageView.contentMode = UIViewContentModeScaleAspectFit;
- 
-    //  A better way to do this...
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    
-    // screenRect.origin.y = 0; // take into account the nav bar.
-    scrollView = [[UIScrollView alloc] initWithFrame:screenRect];
-    scrollView.delegate = self;
-    scrollView.showsVerticalScrollIndicator = YES;
-    scrollView.showsHorizontalScrollIndicator = YES;
-    [scrollView setContentOffset:CGPointMake(0.0f, 0.0f)];
-    [scrollView setBounces:NO];
-    [scrollView setScrollEnabled:YES];
-    [scrollView setClipsToBounds:YES];
-    [scrollView addSubview:imageView];
-    [scrollView setBackgroundColor:[UIColor blackColor]];
-    [scrollView setMaximumZoomScale:5.0];
-    [scrollView setMinimumZoomScale:0.1];
-    CGSize mySize = CGSizeMake(image.size.width, image.size.height);
-    [scrollView setContentSize:mySize];
-    
     [imageView sizeToFit];
-    [self.view addSubview:scrollView];
     
-    CGFloat scaleH = 1.0;
-    CGFloat scaleW = 1.0;
+    [imageScrollView setMaximumZoomScale:25.0];
     
-    if (image.size.height > (screenRect.size.height - 44)) {
-        scaleH = screenRect.size.height / image.size.height;
-        if (scaleH < 0.1)
-            scaleH = 0.1;
-    }
+    // calculate minimum scale to perfectly fit image width, and begin at that scale
+    float minimumScale = [imageScrollView frame].size.width  / [imageView frame].size.width;
+    [imageScrollView setMinimumZoomScale:minimumScale];
+    [imageScrollView setZoomScale:minimumScale];
     
-    if (image.size.width > screenRect.size.width) {
-        scaleW = screenRect.size.width / image.size.width;
-        if (scaleW < 0.1)
-            scaleW   = 0.1;
-    }
-    
-    if (scaleH < 1.0 || scaleW < 1.0) {
-        if (scaleH < scaleW)
-            [scrollView setZoomScale:scaleH];
-        else
-            [scrollView setZoomScale:scaleW];
-    }
+    [imageScrollView addSubview:imageView];
+    [self.view addSubview:imageScrollView];
+
+    CGPoint centerPoint = CGPointMake(CGRectGetMidX(imageScrollView.bounds),
+                                      CGRectGetMidY(imageScrollView.bounds));
+ 
+    [self view:imageView setCenter:centerPoint];
     return;
 }
+
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
@@ -137,17 +139,14 @@
 
 - (void)scrollViewDidEndZooming:(UIScrollView *)scrollV withView:(UIView *)view atScale:(CGFloat)scale
 {
-    [scrollView setContentSize:CGSizeMake(scale*(image.size.width), scale*(image.size.height))];
+    [imageScrollView setContentSize:CGSizeMake(scale*(image.size.width), scale*(image.size.height))];
 }
+
 
 - (void)orientationPropertiesChanged:(NSNotification *)notification
 {
     // Respond to changes in device orientation
-    // if (notification)
-    //    NSLog(@"Orientation Changed! %@",notification);
-    // else
-    //    NSLog(@"Orientation Changed! (nil)");
-    
+   
     UIInterfaceOrientation uiOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     
     if ((UIInterfaceOrientationIsLandscape(currentInterfaceOrientation) && UIInterfaceOrientationIsLandscape(uiOrientation)) ||
@@ -168,40 +167,74 @@
     
     // update the rest of the items on the screen with the now rect
     CGRect myScreenRect = CGRectMake(0, 0, screenWidth, screenHeight);
-    [self.view setFrame:myScreenRect];
+    [imageScrollView setFrame:myScreenRect];
+    // [imageView setFrame:myScreenRect];
     
-    CGRect myViewRect = CGRectMake(0, 0, screenWidth, screenHeight);
-    [scrollView setFrame:myViewRect];
-    
-    CGSize mySize = CGSizeMake(image.size.width, image.size.height);
-    [scrollView setContentSize:mySize];
-    
-    [imageView setFrame:myViewRect];
+    // CGSize mySize = CGSizeMake(image.size.width, image.size.height);
+    [imageScrollView setContentSize:image.size];
     [imageView sizeToFit];
-    
-    CGFloat scaleH = 1.0;
-    CGFloat scaleW = 1.0;
-    
-    if (image.size.height > (screenHeight)) {
-        scaleH = screenHeight / image.size.height;
-        if (scaleH < 0.1)
-            scaleH = 0.1;
-    }
-    
-    if (image.size.width > screenWidth) {
-        scaleW = screenWidth / image.size.width;
-        if (scaleW < 0.1)
-            scaleW   = 0.1;
-    }
-    
-    if (scaleH < 1.0 || scaleW < 1.0) {
-        if (scaleH < scaleW)
-            [scrollView setZoomScale:scaleH];
-        else
-            [scrollView setZoomScale:scaleW];
-    }
     return;
     
 }
+//
+//  These functions thanks to:
+//  http://iosdeveloperzone.com/2012/07/07/tutorial-all-about-images-part-2-panning-zooming-with-uiscrollview/
+//  The center points need to be set for the view and the scroll view or else the image is
+//  messed up.
+//
+- (void)view:(UIView*)view setCenter:(CGPoint)centerPoint
+{
+    CGRect vf = view.frame;
+    CGPoint co = imageScrollView.contentOffset;
+    
+    CGFloat x = centerPoint.x - vf.size.width / 2.0;
+    CGFloat y = centerPoint.y - vf.size.height / 2.0;
+    
+    if(x < 0)
+    {
+        co.x = -x;
+        vf.origin.x = 0.0;
+    }
+    else
+    {
+        vf.origin.x = x;
+    }
+    if(y < 0)
+    {
+        co.y = -y;
+        vf.origin.y = 0.0;
+    }
+    else
+    {
+        vf.origin.y = y;
+    }
+    
+    view.frame = vf;
+    imageScrollView.contentOffset = co;
+}
+
+- (void)scrollViewDidZoom:(UIScrollView *)sv
+{
+    UIView* zoomView = [sv.delegate viewForZoomingInScrollView:sv];
+    CGRect zvf = zoomView.frame;
+    if(zvf.size.width < sv.bounds.size.width)
+    {
+        zvf.origin.x = (sv.bounds.size.width - zvf.size.width) / 2.0;
+    }
+    else
+    {
+        zvf.origin.x = 0.0;
+    }
+    if(zvf.size.height < sv.bounds.size.height)
+    {
+        zvf.origin.y = (sv.bounds.size.height - zvf.size.height) / 2.0;
+    }
+    else
+    {
+        zvf.origin.y = 0.0;
+    }
+    zoomView.frame = zvf;
+}
+
 
 @end

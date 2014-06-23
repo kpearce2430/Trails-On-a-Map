@@ -7,19 +7,21 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TOMPointOnAMap.h"
 
 @interface TOMImageViewController : UIViewController <UITextFieldDelegate, UIScrollViewDelegate, UIActionSheetDelegate>
 {
     @private
     UIInterfaceOrientation currentInterfaceOrientation;
+    IBOutlet UIScrollView *imageScrollView;
+    IBOutlet UIImageView  *imageView;
+    UIImage *image;
 }
 
-@property (nonatomic, readwrite) UIScrollView *scrollView;
-@property (nonatomic, readwrite) UIImageView *imageView;
-@property (nonatomic, readwrite) UIImage *image;
-@property (nonatomic, readwrite) NSString *key;
-@property (nonatomic, readwrite) NSURL *url;
+@property (nonatomic, readwrite) NSURL *url;      // URL to the Image File
+@property (nonatomic, readonly)  TOMPointOnAMap *mp;
 
-- (id)initWithNibNameWithKeyAndImage:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil key:(NSString *)k url:(NSURL *)u;
+- (id)initWithNibNameAndPom:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil POM: (TOMPointOnAMap *) p url:(NSURL *)u;
+- (void)view:(UIView*)view setCenter:(CGPoint)centerPoint;
 
 @end
