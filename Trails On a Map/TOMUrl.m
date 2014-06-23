@@ -16,10 +16,10 @@
     NSString *containerID = [[NSBundle mainBundle] bundleIdentifier];
     NSString *teamIDandContainerID = [NSString stringWithFormat:@"%@.%@",teamID,containerID];
     
-#ifdef DEBUG
+#ifdef __DEBUG
     // NSLog(@"Team ID: %@",teamID);
     // NSLog(@"Container ID: %@",containerID);
-    NSLog(@"Team and Container ID: %@",teamIDandContainerID);
+    NSLog(@"%s Team and Container ID: %@",__PRETTY_FUNCTION__,teamIDandContainerID);
 #endif
 
     NSFileManager *fileManager = [[NSFileManager alloc] init];
@@ -121,12 +121,12 @@
 {
     // No title, NO URL
     if (!title) {
-        NSLog(@"ERROR: %s with empty title",__func__);
+        NSLog(@"ERROR: %s with empty title",__PRETTY_FUNCTION__);
         return nil;
     }
     
     if (!filename) {
-         NSLog(@"ERROR: %s with empty filename",__func__);
+         NSLog(@"ERROR: %s with empty filename",__PRETTY_FUNCTION__);
         return nil;
     }
     
@@ -170,6 +170,28 @@
         return nil;
 }
 
++ (BOOL) checkTrailExists:(NSString *) title {
+
+    // No title, NO URL
+    if (!title) {
+        NSLog(@"ERROR: %s with empty title",__PRETTY_FUNCTION__);
+        return NO;
+    }
+    
+    // The default name should not get here, so return nil
+    if ([title isEqualToString:@TRAILS_ON_A_MAP]) {
+        return NO;
+    }
+    
+    NSURL *documentsURL = [TOMUrl urlForDocumentsDirectory];
+    NSURL *rootURL = [documentsURL URLByAppendingPathComponent:title isDirectory:YES];
+    
+    if ([TOMUrl checkDirectory:rootURL create:NO])
+        return YES;
+    // else
+    return NO;
+}
+
 + (BOOL) checkDirectory: (NSURL *) theURL create: (BOOL) yn
 {
     // BOOL result = NO;
@@ -189,9 +211,11 @@
                     // NSLog(@"%s: Successfully Created %@",__func__,theURL);
                     return YES;
                 }
+#ifdef DEBUG
                 else {
-                    NSLog(@"%s: FAILED to create %@: %@",__func__,theURL, err);
+                    NSLog(@"%s: FAILED to create %@: %@",__PRETTY_FUNCTION__,theURL, err);
                 }
+#endif
             }
         }
     else {
@@ -232,13 +256,7 @@
     if ([fileManager fileExistsAtPath:[targetURL path]] == YES )  {
         removeSuccess = [fileManager removeItemAtURL:targetURL error:&err];
     }
-#ifdef DEBUG
-    else {
-        NSLog(@"%s Warning - No File at URL %@",__PRETTY_FUNCTION__,targetURL);
-        // removeSuccess = NO;
-    }
-#endif
-    
+   
     if (err)
     {
         NSLog(@"%s ERROR: %@",__PRETTY_FUNCTION__ ,err);
@@ -248,4 +266,13 @@
         return removeSuccess;
 }
 
++(BOOL) isValidURL:(NSURL *) theURL
+{
+    NSString *path = [theURL path];
+    if (!path)
+        return NO;
+    
+    return YES;
+    
+}
 @end

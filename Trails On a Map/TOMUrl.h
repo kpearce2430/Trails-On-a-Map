@@ -27,8 +27,10 @@
 + (NSURL *) urlForFile:(NSString *) title key:(NSString *) filename;
 + (NSURL *) urlForTrail:(NSString *) title;
 
++ (BOOL) checkTrailExists:(NSString *) title;
 + (BOOL) checkDirectory: (NSURL *) theURL create:(BOOL)yn;
 + (BOOL) removeURL:(NSURL *)targetURL;
 + (NSURL *) temporaryDir: (NSString *) ext;
++ (BOOL) isValidURL:(NSURL *) theURL;
 
 @end
