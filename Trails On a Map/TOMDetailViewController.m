@@ -18,8 +18,7 @@
 
 @implementation TOMDetailViewController
 
-@synthesize theTrail,detailTable, footerLabelFont, headerLabelFont, picCount, imagesSet, gpxSwitch, kmlSwitch, query;
-
+@synthesize theTrail, titleField, gpxSwitch, kmlSwitch, query, activityIndicator;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -69,6 +68,13 @@
         [self prepareImageFiles];
     }
     
+    if (![self isActiveTrail]) {
+        editAndDoneButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
+        self.navigationItem.rightBarButtonItem = editAndDoneButton;
+    }
+    
+    amIediting = NO;
+    
     //
     // load the selected map
     //
@@ -82,8 +88,6 @@
         [theTrail loadFromContents:fileURL ofType:nil error:nil];
     }
     
-    // imageStore = [[TOMImageStore alloc] init];
-    
     imagesSet = [[NSMutableArray alloc] init];
     
     for (int i = 0 ; i < [theTrail.ptTrack count]; i++ ) {
@@ -91,36 +95,33 @@
         if ([p type] == ptPicture) {
             
             UIImage *myImage = [TOMImageStore loadImage:self.title key:[p key] warn:NO];
-            
+
             TOMOrganizerViewCell *myCell = [[TOMOrganizerViewCell alloc] init];
             [myCell setTitle:[p key]];
             [myCell setUrl:[TOMUrl urlForImageFile:self.title key:[p key]]];
-             
+
             if (myImage == NULL) {
                 if (usingIcloud)
                     myImage = [UIImage imageNamed:@"Icon-ios7-cloud-download-outline-128.png"];
                 else
                     myImage = [UIImage imageNamed:@"TomIcon-60@2x.png"];
-                [myCell setImage:myImage];
+                // [myCell setImage:myImage];
             }
             else {
-                CGSize destinationSize = CGSizeMake(128.0f, 128.0f);
-                UIGraphicsBeginImageContext(destinationSize);
-                [myImage drawInRect:CGRectMake(0,0,destinationSize.width,destinationSize.height)];
-                UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-                UIGraphicsEndImageContext();
-                [myCell setImage:newImage];
-            }
-        [imagesSet addObject:myCell];
-        }
+                myImage = [TOMImageStore loadIcon:theTrail.title key:[p key] size:CGSizeMake(120.0f, 120.0f)];
+            } // else
+            
+        [p setImage:myImage];
+        [imagesSet addObject:p];
+        } // for
     }
 
     // Do any additional setup after loading the view from its nib.
     // CGRect screenRect = [[UIScreen mainScreen] bounds];
-    self.detailTable = [[ UITableView alloc] initWithFrame: self.view.bounds style:UITableViewStyleGrouped];
+    detailTable = [[ UITableView alloc] initWithFrame: self.view.bounds style:UITableViewStyleGrouped];
  
     // basics
-    self.detailTable.delegate = self;
+    detailTable.delegate = self;
    
     // register the class
     [detailTable registerClass:[UITableViewCell class] forCellReuseIdentifier:detailViewCellIdentifier];
@@ -132,16 +133,24 @@
     
     [self.view addSubview: detailTable ];
     
+    activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    // CGFloat screenWidth = screenRect.size.width;
+    self.activityIndicator.center = self.view.center;
+    [activityIndicator hidesWhenStopped];
+    [activityIndicator setFrame:CGRectMake(140, 240, 40, 40)];
+    [self.view addSubview:activityIndicator];
+    [self.view bringSubviewToFront:activityIndicator];
+    
     // Push an orientation change call now
     orientation = UIDeviceOrientationUnknown;
-    [self orientationChanged:NULL];
+
 
 }
 
 -(void) viewDidAppear:(BOOL)animated {
     
     [super viewDidAppear:animated];
-  
+    [self orientationChanged:NULL];
     //
     // Set up notifications
     //
@@ -153,8 +162,24 @@
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //
--(void) viewDidDisappear {
-    // Request to stop receiving accelerometer events and turn off accelerometer
+-(void) viewWillDisappear:(BOOL)animated {
+    
+    if ([self.navigationController.viewControllers indexOfObject:self]==NSNotFound) {
+        // back button was pressed.  We know this is true because self is no longer
+        // in the navigation stack.
+        if ([theTrail hasUnsavedChanges]) {
+            [activityIndicator startAnimating];  // this is a non op since activtyIndicator is on the screen that's about to disappear.
+            [theTrail closeWithCompletionHandler:^(BOOL success) {
+                // NSLog(@"Success: %d",success);
+                [activityIndicator stopAnimating];
+            } ];
+        //    NSLog(@"%s Yes There were unsaved Changes",__PRETTY_FUNCTION__);
+        }
+        // else {
+        //    NSLog(@"%s No There are no unsaved changes",__PRETTY_FUNCTION__);
+        // }
+    }
+   
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
     if (query) {
@@ -164,12 +189,13 @@
         [[NSNotificationCenter defaultCenter] removeObserver:self
                                                         name:NSMetadataQueryDidFinishGatheringNotification
                                                       object:nil];
-            
+        
         [[NSNotificationCenter defaultCenter] removeObserver:self
                                                         name:NSMetadataQueryDidUpdateNotification
-                                                       object:nil];
-
+                                                      object:nil];
     }
+
+    [super viewWillDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning
@@ -197,11 +223,13 @@
 
     if ([tableView isEqual:detailTable]) {
         switch (section) {
-            case 0: // Trail Flags
-                return 2;
+            case 0: // Trail Properties (currently Name, GPX, KML)
+                return 3;
                 break;
             case 1: // Trail Pictures;
+
                 picCount = [theTrail numPics];
+                // NSLog(@"%s Num Pics: %d",__PRETTY_FUNCTION__,(int)picCount);
                 if (picCount == 0 )
                     return 1;
                 else
@@ -215,7 +243,7 @@
         }
     }
 
-    NSLog(@"ERROR: %s:%d Invalid table view passed:%@", __func__, __LINE__ , tableView);
+    NSLog(@"ERROR: %s:%d Invalid table view passed:%@", __PRETTY_FUNCTION__, __LINE__ , tableView);
     return 0;
     
 }
@@ -239,13 +267,50 @@
         cell.accessoryView = nil;
         cell.textLabel.font = headerLabelFont;
         
-        CGRect switchFrame = CGRectMake( 0.0f, 0.0f, 150.0f, 25.0f );
-        UISwitch *aSwitch = [[UISwitch alloc] initWithFrame:switchFrame];
-        [aSwitch setOn:NO];
-        [aSwitch addTarget:self action:@selector(dvcSwitchSelector:) forControlEvents:UIControlEventValueChanged];
+        CGRect screenRect = [[UIScreen mainScreen] bounds];
+        CGFloat screenWidth = screenRect.size.width;
+        
+        if (UIDeviceOrientationIsLandscape(orientation)) {
+            screenWidth = screenRect.size.height;
+        }
+        
         switch (indexPath.section)  {
             case 0:
-                if (indexPath.row == 0) {
+            {
+                if (indexPath.row == 0 ) {
+                    // Text edit box to rename the trail
+                    cell.textLabel.text = @"Title:";
+                    cell.accessoryView = titleField;
+                    
+                    titleField = [[ UITextField alloc] initWithFrame:CGRectMake(0.0, 0.0, (screenWidth - 80.0), 35.0f)];
+                    [titleField addTarget:self action:@selector(textFieldShouldReturn:) forControlEvents:UIControlEventValueChanged];
+                    [titleField setDelegate:self];  // set up the delegate
+                    [titleField setFont:headerLabelFont];
+                    [titleField setBackgroundColor:[UIColor whiteColor]];
+                    [titleField setText:[self title]];
+                    [titleField setTag:detailViewTagTitle];
+
+                    if ([self isActiveTrail]) {
+                        titleField.textColor = [UIColor redColor];
+                    }
+                    else {
+                        if (amIediting) {
+                            titleField.borderStyle = UITextBorderStyleRoundedRect;
+                        }
+                        else {
+                            titleField.borderStyle = UITextBorderStyleNone;
+                        }
+                        titleField.clearButtonMode = UITextFieldViewModeWhileEditing;
+                        titleField.autocorrectionType = UITextAutocorrectionTypeNo;
+                        titleField.textColor = [UIColor blackColor];
+                    }
+                    cell.accessoryView = titleField;
+                }
+                else if (indexPath.row == 1) {
+                    CGRect switchFrame = CGRectMake( 0.0f, 0.0f, 150.0f, 25.0f );
+                    UISwitch *aSwitch = [[UISwitch alloc] initWithFrame:switchFrame];
+                    [aSwitch setOn:NO];
+                    [aSwitch addTarget:self action:@selector(dvcSwitchSelector:) forControlEvents:UIControlEventValueChanged];
                     cell.textLabel.text = @"Save Trail as GPX";
                     gpxSwitch = aSwitch;
                     [gpxSwitch setTag: GPX_SWITCH_TAG];
@@ -259,7 +324,11 @@
                         [gpxSwitch setOn:YES];
                     }
                 }
-                else if (indexPath.row == 1) {
+                else if (indexPath.row == 2) {
+                    CGRect switchFrame = CGRectMake( 0.0f, 0.0f, 150.0f, 25.0f );
+                    UISwitch *aSwitch = [[UISwitch alloc] initWithFrame:switchFrame];
+                    [aSwitch setOn:NO];
+                    [aSwitch addTarget:self action:@selector(dvcSwitchSelector:) forControlEvents:UIControlEventValueChanged];
                     cell.textLabel.text = @"Save Trail as KMZ";
                     kmlSwitch = aSwitch;
                     cell.accessoryView = kmlSwitch;
@@ -277,18 +346,43 @@
                     cell.textLabel.text = [ NSString stringWithFormat:@"FFU Section %ld, Cell %ld",(long)indexPath.section,(long)indexPath.row];
                 }
                 break;
-            
+            }
             case 1:
                 if (picCount == 0)
                 {
                     cell.textLabel.text = @"No Pictures in Trail";
                 }
                 else {
-                    cell.textLabel.text = [ NSString stringWithFormat:@"Picture %ld",(long)indexPath.row];
-                    TOMOrganizerViewCell *thisCell = [imagesSet objectAtIndex:indexPath.row];
-                    cell.imageView.image = thisCell.image;
+                    TOMPointOnAMap *p = [imagesSet objectAtIndex:(long)indexPath.row];
+                    
+                    cell.imageView.image = [p image];
                     cell.imageView.layer.cornerRadius = TOM_LABEL_BORDER_CORNER_RADIUS;
-                    cell.accessoryType = UITableViewCellAccessoryDetailButton;
+                    
+                    if (amIediting) {
+                        UITextField *ptextField = [[UITextField alloc]initWithFrame:CGRectMake(0.0, 0.0, (screenWidth - 80.0), 35.0f)];
+                        [ptextField addTarget:self action:@selector(textFieldShouldReturn:) forControlEvents:UIControlEventValueChanged];
+                        [ptextField setDelegate:self];  // set up the delegate
+                        [ptextField setFont:headerLabelFont];
+                        [ptextField setBackgroundColor:[UIColor whiteColor]];
+                        [ptextField setText:[p title]];
+                        [ptextField setTag:indexPath.row];
+                        [ptextField setBorderStyle:UITextBorderStyleRoundedRect];
+
+                        ptextField.clearButtonMode = UITextFieldViewModeWhileEditing;
+                        ptextField.autocorrectionType = UITextAutocorrectionTypeNo;
+                        ptextField.textColor = [UIColor blackColor];
+                      
+                        cell.textLabel.text =  @"Photo:";
+                        cell.accessoryView = ptextField;
+                    }
+                    else {
+                        cell.textLabel.text =  [p title];
+                        cell.accessoryType = UITableViewCellAccessoryDetailButton;
+                        if (![p image]) {
+                            p.image = [TOMImageStore loadIcon:theTrail.title key:[p key] size:CGSizeMake(120.0f, 120.0f)];
+                        }
+                        cell.imageView.image = [p image];
+                    }
                 }
                 break;
 
@@ -371,34 +465,46 @@
     
 }
 
-#ifdef __FFU__
+
 - (UIView *) tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
  
-    NSString *text = [[NSString alloc] initWithFormat:@"Section %ld Footer",section ];
-    UILabel *label = [self newLabelWithTitle: text];
+    if (section == 0 ) {
+        if ([self isActiveTrail]) {
+            
+            NSString *text = @"Note: You have selected the current trail and cannot rename it";
+            UILabel *label = [self newLabelWithTitle: text];
     
-    label.frame = CGRectMake(label.frame.origin.x+10.0f, 5.0f, label.frame.size.width, label.frame.size.height);
-    label.font = footerLabelFont;
+            label.frame = CGRectMake(label.frame.origin.x+10.0f, 5.0f, label.frame.size.width, label.frame.size.height);
+            label.font = footerLabelFont;
+            label.textColor = [UIColor redColor];
     
-    // Give the container view 10 poionts more in width than our label
-    // becuause the lable needs a 10 extra points left-margin
-    CGRect resultFrame = CGRectMake(0.0f, 0.0f, label.frame.size.width+10.0f, label.frame.size.height);
-    UIView *footer = [[UIView alloc] initWithFrame:resultFrame];
-    [footer addSubview:label];
-    return footer;
+            // Give the container view 10 poionts more in width than our label
+            // becuause the lable needs a 10 extra points left-margin
+            CGRect resultFrame = CGRectMake(0.0f, 0.0f, label.frame.size.width+10.0f, label.frame.size.height);
+            UIView *footer = [[UIView alloc] initWithFrame:resultFrame];
+            [footer addSubview:label];
+            return footer;
+        }
+    }
+    return nil;
 }
-#endif
+
 
 - (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     return 30.0f;
 }
 
-#ifdef __FFU__
-
 - (CGFloat) tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    return 30.0f;
+    
+    if (section == 0 ) {
+        if  ([self isActiveTrail]) {
+            return 30.0f;
+        }
+    }
+    // else
+        return 0.0f;
 }
-#endif
+
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //
@@ -444,8 +550,9 @@
     CGRect tableRect = CGRectMake( 0.0, 0.0, screenWidth, screenHeight );
     [detailTable setFrame:tableRect];
 
-    [detailTable beginUpdates];
-    [detailTable endUpdates];
+    // [detailTable beginUpdates];
+    // [detailTable endUpdates];
+    [detailTable reloadData];
     
 }
 
@@ -453,11 +560,11 @@
 {
     // NSLog(@"Picked %@",indexPath);
     
-    TOMOrganizerViewCell *thisCell = [imagesSet objectAtIndex:indexPath.row];
+    TOMPointOnAMap *mp = [imagesSet objectAtIndex:indexPath.row];
     // NSLog(@"%s Title:%@ URL:%@",__func__,thisCell.title,thisCell.url);
-    
-    UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameWithKeyAndImage:@"TOMImageViewController" bundle:nil key:thisCell.title url:thisCell.url];
-    
+    NSURL *myURL = [TOMUrl urlForImageFile:self.title key:[mp key]];
+    // UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameWithKeyAndImage:@"TOMImageViewController" bundle:nil title:[mp title] key:[mp key] url:myURL];
+    UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameAndPom:@"TOMImageViewController" bundle:nil POM:mp url:myURL];
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
                                    initWithTitle: @"Back"
                                    style: UIBarButtonItemStyleBordered
@@ -619,19 +726,21 @@
     kml.feature = document;
     
     [document setName:[theTrail title]];
+        
+    if (theTrail.ptTrack && ([theTrail.ptTrack count] > 0)) {
+        TOMPointOnAMap *mp = [theTrail.ptTrack objectAtIndex: 0];
     
-    TOMPointOnAMap *mp = [theTrail.ptTrack objectAtIndex: 0];
-    
-    KMLPlacemark *startPlacemark = [self placemarkWithName:@"Start" coordinate:[mp coordinate] altitude:[mp altitude]];
-    [document addFeature:startPlacemark];
+        KMLPlacemark *startPlacemark = [self placemarkWithName:@"Start" coordinate:[mp coordinate] altitude:[mp altitude]];
+        [document addFeature:startPlacemark];
 
-    // kml > document > placemark#line
-    KMLPlacemark *line = [self lineWithTrakPoints];
-    [document addFeature:line];
+        // kml > document > placemark#line
+        KMLPlacemark *line = [self lineWithTrakPoints];
+        [document addFeature:line];
     
-    mp = [theTrail lastPom];
-    KMLPlacemark *endPlacemark = [self placemarkWithName:@"End" coordinate:[mp coordinate] altitude:[mp altitude]];
-    [document addFeature:endPlacemark];
+        mp = [theTrail lastPom];
+        KMLPlacemark *endPlacemark = [self placemarkWithName:@"End" coordinate:[mp coordinate] altitude:[mp altitude]];
+        [document addFeature:endPlacemark];
+    }
     int photoCount = 1;
     for ( int i = 0 ; i < [theTrail.ptTrack count] ; i++ )
     {
@@ -640,10 +749,12 @@
 
             KMLPhotoOverlay *photoOverlay = [KMLPhotoOverlay new];
             [document addFeature:photoOverlay];
-            NSString *photoTitle = [[NSString alloc] initWithFormat:@"Photo %d",photoCount ];
             
-            [photoOverlay setName:photoTitle];
-            [photoOverlay setDescriptionValue:[mp title]];
+            // NSString *photoTitle = [[NSString alloc] initWithFormat:@"Photo %d",photoCount ];
+            // [photoOverlay setName:photoTitle];
+            
+            [photoOverlay setName:[mp title]];
+            [photoOverlay setDescriptionValue:[mp subtitle]];
 
             // Set Up The Camera
             KMLCamera *photoCamera = [KMLCamera new];
@@ -787,8 +898,6 @@
 //
 -(void) prepareImageFiles
 {
-
-
     self.query = [[NSMetadataQuery alloc] init];
     
     if (query) {
@@ -804,7 +913,7 @@
         // [query setSearchScopes:[NSArray arrayWithObject:trailDirURL]];
         //
         [query setSearchScopes:@[NSMetadataQueryUbiquitousDocumentsScope]];
-        [query setPredicate:[NSPredicate predicateWithFormat:@"%K ENDSWITH %@", NSMetadataItemFSNameKey, @TOM_JPG_EXT]];
+        [query setPredicate:[NSPredicate predicateWithFormat:@"%K ENDSWITH %@ || %K ENDSWITH %@", NSMetadataItemFSNameKey, @TOM_JPG_EXT, NSMetadataItemFSNameKey, @TOM_FILE_EXT]];
         
     }
 
@@ -845,13 +954,15 @@
         if (![trailName isEqualToString:self.title]) {
             continue;
         }
-        
-        // NSString *fileName = [parts objectAtIndex:[parts count]-1];
+        else {
+            NSString *filename = [parts objectAtIndex:[parts count]-1];
+            if ([filename hasSuffix:@TOM_FILE_EXT]) {
+                // Only interested in JPGs here
+                continue;
+            }
+        }
         
         NSString *isDownloaded = [result valueForAttribute:NSMetadataUbiquitousItemDownloadingStatusKey];
-        // NSLog(@"%s %@ is %@",__func__,fileName,isDownloaded);
-        // NSDate *fileDate = [result valueForAttribute:NSMetadataItemFSContentChangeDateKey];
-        // TOMOrganizerViewCell *myCell = [[TOMOrganizerViewCell alloc] init];
         
         if (![isDownloaded isEqualToString:@"NSMetadataUbiquitousItemDownloadingStatusCurrent"] &&
             ![isDownloaded isEqualToString:@"NSMetadataUbiquitousItemDownloadingStatusDownloaded"]) {
@@ -892,4 +1003,442 @@
     [detailTable endUpdates];
     [detailTable reloadData];
 }
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+#pragma textFieldAndRenamingFuncs
+
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
+    
+    if (!amIediting) {
+        return NO;
+    }
+    
+
+    //
+    // This alerts the view that the field is uneditable when the trail in the detail viewer is the same one
+    // running on the rootviewcontroller (or the main view).
+    //
+    if  ([self isActiveTrail]) {
+        return NO;
+    }
+    
+    //
+    // This alerts the view that the trail is still being downloaded and should not
+    // be editiable.
+    if (query) {
+        if ([query isStarted] || [query isGathering]) {
+            [query disableUpdates ];
+            NSArray *queryResults = [query results];
+            
+            for (NSMetadataItem *result in queryResults) {
+                
+                NSURL *fileURL = [result valueForAttribute:NSMetadataItemURLKey];
+                // NSLog(@"File URL:%@",fileURL);
+                
+                NSString *path = [fileURL path];
+                NSArray *parts = [path componentsSeparatedByString:@"/"];
+                NSString *trailName = [parts objectAtIndex:[parts count]-2];
+                
+                //
+                // to speed up downloadning I only want this trails pictures
+                if (![trailName isEqualToString:self.title]) {
+                    continue;
+                }
+                else {
+                    NSString *isDownloaded = [result valueForAttribute:NSMetadataUbiquitousItemDownloadingStatusKey];
+                        
+                    if (![isDownloaded isEqualToString:@"NSMetadataUbiquitousItemDownloadingStatusCurrent"] &&
+                        ![isDownloaded isEqualToString:@"NSMetadataUbiquitousItemDownloadingStatusDownloaded"]) {
+                        NSLog(@"%s File %@ not downloaded or current",__PRETTY_FUNCTION__,[parts objectAtIndex:[parts count]-1]);
+                        [query enableUpdates];
+                        UIActionSheet *actionSheet = nil;
+                        NSString *alertTitle = @"Trail not completely downloaded from iCloud, Please try again later";
+                        actionSheet = [[UIActionSheet alloc] initWithTitle:alertTitle
+                                                                  delegate:self
+                                                         cancelButtonTitle:@"OK"
+                                                    destructiveButtonTitle:nil
+                                                         otherButtonTitles:nil];
+                        actionSheet.actionSheetStyle = UIActionSheetStyleDefault;
+                        actionSheet.tag = 0;
+                        [actionSheet showInView:self.view];
+                        return NO;
+                    }
+                }
+            }
+        }
+    }
+    return YES;
+}
+
+
+
+- (BOOL) textFieldShouldReturn:(UITextField *)textField
+{
+    if ([textField tag] != detailViewTagTitle) {
+        NSLog(@"In %s with tag %d",__PRETTY_FUNCTION__,(int) textField.tag);
+        NSString *myNewTitle = [textField text];
+        myNewTitle = [myNewTitle stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        [textField resignFirstResponder];
+        
+        TOMPointOnAMap *p = [imagesSet objectAtIndex:(long)textField.tag];
+        [p setTitle:myNewTitle];
+        [theTrail updateChangeCount:UIDocumentChangeDone];
+        return YES;
+    }
+    
+    // NSLog(@"%s New Name: [%@]",__PRETTY_FUNCTION__,textField);
+    NSString *myNewTitle = [textField text];
+    myNewTitle = [myNewTitle stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    [titleField resignFirstResponder]; // and hides the keyboard
+    
+    if ([myNewTitle isEqualToString:self.title]) {
+        // Nothing changed, just return
+        return YES;
+    }
+
+    UIActionSheet *actionSheet = nil;
+    
+    if ([myNewTitle isEqualToString:@""]) {
+        NSString *alertTitle = @"Cannot have a Trail with a blank name, Please enter a name";
+        actionSheet = [[UIActionSheet alloc] initWithTitle:alertTitle
+                                                  delegate:self
+                                         cancelButtonTitle:@"OK"
+                                    destructiveButtonTitle:nil
+                                         otherButtonTitles:nil];
+        actionSheet.actionSheetStyle = UIActionSheetStyleDefault;
+        actionSheet.tag = 0;
+        titleField.text = theTrail.title;
+    }
+    else {
+        NSURL *fileURL = [TOMUrl urlForFile:titleField.text key:titleField.text];
+        NSFileManager *fileManager = [[NSFileManager alloc]init];
+    
+
+    
+        if ([fileManager fileExistsAtPath:[fileURL path]]) {
+            NSString *alertTitle = @"A Trail exists with the this name, Please try another name";
+            actionSheet = [[UIActionSheet alloc] initWithTitle:alertTitle
+                                                      delegate:self
+                                             cancelButtonTitle:@"OK"
+                                        destructiveButtonTitle:nil
+                                             otherButtonTitles:nil];
+            actionSheet.actionSheetStyle = UIActionSheetStyleDefault;
+            actionSheet.tag = 0;
+        }
+        else {
+            // Verify the user really wants to rename the Trail.
+            //
+            // I had to move this to here to give time for the device to save.
+            // before I actually moved the trail.  If I just closed it, sometimes
+            // I lost any updates the user made to the photos.  If there are
+            // no unsaved changes or the user doesn't rename the trail, there is
+            // no harm done.
+            //
+            if ([theTrail hasUnsavedChanges]) {
+                NSURL *fileURL = [TOMUrl urlForFile:theTrail.title key:theTrail.title];
+#ifdef __DEBUG
+                [theTrail saveToURL:fileURL forSaveOperation:UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
+                    if (success) {
+                        NSLog(@"%s Completed Save To URL",__PRETTY_FUNCTION__);
+                    }
+                    else {
+                        UIDocumentState myState = [theTrail documentState];
+                        NSLog(@"%s did not completed Save To URL %d",__PRETTY_FUNCTION__,(int)myState);
+                    }
+                }];
+#else
+                [theTrail saveToURL:fileURL forSaveOperation:UIDocumentSaveForOverwriting completionHandler:nil];
+#endif
+            }
+            
+            NSString *alertTitle = @"Are you sure you want to rename the Trail?";
+    
+            actionSheet = [[UIActionSheet alloc] initWithTitle:alertTitle
+                                                                    delegate:self
+                                                          cancelButtonTitle:@"NO"
+                                                     destructiveButtonTitle:@"YES"
+                                                          otherButtonTitles:nil];
+
+            actionSheet.actionSheetStyle = UIActionSheetStyleDefault;
+            actionSheet.tag = 1;
+        }
+    }
+    [actionSheet showInView:self.view];
+    return YES;
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    // Actions sheets tagged with 0 will not perform any actions/
+    if (actionSheet.tag == 0) {
+        return;
+    }
+    if  (buttonIndex == 0 ) {
+        BOOL anyErrors = NO;
+        
+        [activityIndicator startAnimating];
+        
+        // Close this trail
+#ifdef __DEBUG
+        [theTrail closeWithCompletionHandler:^(BOOL success) {
+            if (success) {
+                NSLog(@"%s Completed closeWithCompletionHandler",__PRETTY_FUNCTION__);
+            }
+            else {
+                UIDocumentState myState = [theTrail documentState];
+                NSLog(@"%s Did mot complete closeWithCompletionHandler %d",__PRETTY_FUNCTION__,(int)myState);
+            }
+        }];
+#else
+        [theTrail closeWithCompletionHandler:nil ];
+#endif
+
+        // Verify it closed.
+        int i = 0;
+        UIDocumentState myState = [theTrail documentState];
+        while (myState != UIDocumentStateClosed && myState != UIDocumentStateNormal)
+        {
+            if (i++ >= 10) {
+                //
+                // I've not been able to test this fully.
+                [activityIndicator stopAnimating];
+                NSLog(@"%s Document %@ not Closed State: %d",__PRETTY_FUNCTION__,theTrail.title,(int)myState );
+                return;
+            }
+            sleep(1);
+            myState = [theTrail documentState];
+        }
+        
+        //
+        // Build up the URLs for the move
+        NSURL *oldURL = [TOMUrl urlForTrail:theTrail.title];
+        NSURL *newURL = [TOMUrl urlForTrail:titleField.text];
+        theTrail = nil;
+
+        // Pass it to a helper method.
+        anyErrors = [self moveTheTrailFrom:oldURL To:newURL];
+        if (anyErrors) {
+            NSLog(@"%s ERROR In Renaming Trail %@",__PRETTY_FUNCTION__,theTrail.title);
+            return;
+        }
+        else {
+        //
+        // Reload the data for the renamed trail.
+        //
+            NSURL *fileURL = [TOMUrl urlForFile:titleField.text key:titleField.text];
+            theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
+            NSFileManager *fileManager = [[NSFileManager alloc]init];
+            if ([fileManager fileExistsAtPath:[fileURL path]]) {
+                [theTrail loadFromContents:fileURL ofType:nil error:nil];
+            }
+
+            // Last step, reset the name.
+            self.title = titleField.text;
+            [activityIndicator stopAnimating];
+            [detailTable reloadData];
+        }
+    }
+    else {
+        // NSLog(@"User Selected NO");
+        titleField.text = theTrail.title;
+    }
+    
+    if (query) {
+        if ([query isStarted] || [query isGathering]) {
+            [query enableUpdates ];
+        }
+    }
+    
+}
+
+-(BOOL) moveTheTrailFrom:(NSURL *) oldTrailURL To:(NSURL *) newTrailURL
+{
+    BOOL anyError = NO;
+    NSArray *keys = [NSArray arrayWithObjects: NSURLIsDirectoryKey, NSURLIsPackageKey, NSURLLocalizedNameKey, nil];
+
+    NSFileManager *fileManager = [[NSFileManager alloc]init];
+
+    NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:oldTrailURL
+                                          includingPropertiesForKeys:keys
+                                                             options:(NSDirectoryEnumerationSkipsPackageDescendants | NSDirectoryEnumerationSkipsHiddenFiles)
+                                                        errorHandler:^(NSURL *url, NSError *error) {
+                                                                        // Handle the error.
+                                                                        // Return YES if the enumeration should continue after the error.
+                                                                        return     YES;}];
+
+    for (NSURL *url in enumerator) {
+    
+        BOOL isDirectory;
+        NSError *err = nil;
+
+        // NSLog(@"%s Source URL:%@",__PRETTY_FUNCTION__,[url path]);
+
+        BOOL fileExistsAtPath = [fileManager fileExistsAtPath:[url path] isDirectory:&isDirectory];
+        
+        if (isDirectory) {
+            // NSLog(@"%s Skipping Dir %@",__PRETTY_FUNCTION__,url);
+            continue;
+        }
+        
+        else if (fileExistsAtPath) {
+            
+            NSString *path = [url path];
+            NSArray *parts = [path componentsSeparatedByString:@"/"];
+            // NSString *trailName = [parts objectAtIndex:[parts count]-2]; // Trail Name if it's not a Directory
+            NSString *fileName = [parts objectAtIndex:[parts count]-1];
+            
+            if ( [fileName hasSuffix:@TOM_JPG_ICON_EXT]) {
+                NSString *iconFileName = [NSString stringWithFormat:@"%@%@",titleField.text,@TOM_JPG_ICON_EXT];
+                NSURL *destIconURL = [newTrailURL URLByAppendingPathComponent:iconFileName isDirectory:NO];
+                // NSLog(@"Dest URL:%@",[destIconURL path]);
+                [fileManager moveItemAtURL:url toURL:destIconURL error:&err];
+                if (err) {
+                    NSLog(@"%s : Error copy to new URL: %@",__PRETTY_FUNCTION__,err);
+                    anyError = YES;
+                }
+            }
+            else if ( [fileName hasSuffix:@TOM_JPG_EXT] ) {
+                //
+                // JPGs have their key as the file name, they don't need to be renamed.
+                //
+                NSURL *destinationURL = [newTrailURL URLByAppendingPathComponent:fileName isDirectory:NO];
+            
+                if (![fileManager fileExistsAtPath:[destinationURL path] isDirectory:NO]) {
+                    // NSLog(@"Dest URL:%@",[destinationURL path]);
+                    [fileManager moveItemAtURL:url toURL:destinationURL error:&err];
+                    if (err) {
+                        NSLog(@"%s : Error copy to new URL: %@",__PRETTY_FUNCTION__,err);
+                        anyError = YES;
+                    }
+                }
+            }
+            else if ( [fileName hasSuffix:@TOM_FILE_EXT] ) {
+                NSString *trailFileName = [NSString stringWithFormat:@"%@%@",titleField.text,@TOM_FILE_EXT];
+                NSURL *destinationURL = [newTrailURL URLByAppendingPathComponent:trailFileName isDirectory:NO];
+                [fileManager moveItemAtURL:url toURL:destinationURL error:&err];
+                if (err) {
+                    NSLog(@"%s : Error copy to new URL: %@",__PRETTY_FUNCTION__,err);
+                    anyError = YES;
+                }
+            }
+#ifdef DEBUG
+            else {
+                 NSLog(@"%s Skipping File: %@",__PRETTY_FUNCTION__,fileName);
+            }
+#endif
+        }  // fileExistsAtPath
+    } // for
+    
+    if (!anyError) {
+       
+        //
+        // Delete the temporary files
+        //
+        NSURL *docdirURL = [TOMUrl urlForLocalDocuments];
+        NSString *kmzName = [NSString stringWithFormat:@"%@%s",self.title,TOM_KMZ_EXT];
+        NSURL *zipFullURL = [docdirURL URLByAppendingPathComponent:kmzName isDirectory:NO];
+        [TOMUrl removeURL:zipFullURL];
+        
+        NSString *gpxName = [NSString stringWithFormat:@"%@%s",self.title,TOM_GPX_EXT];
+        NSURL *gpxFullURL = [docdirURL URLByAppendingPathComponent:gpxName isDirectory:NO];
+        [TOMUrl removeURL:gpxFullURL];
+        
+#ifdef DEBUG
+        NSString *csvName = [NSString stringWithFormat:@"%@%s",self.title,TOM_CSV_EXT];
+        NSURL *csvFullURL = [docdirURL URLByAppendingPathComponent:csvName isDirectory:NO];
+        [TOMUrl removeURL:csvFullURL];
+#endif
+        [TOMUrl removeURL:oldTrailURL];
+    }
+    return anyError;
+}
+
+//
+//
+- (IBAction)editClicked:(id)sender {
+    
+    // NSLog(@"In %s",__PRETTY_FUNCTION__);
+    if (amIediting) {
+        titleField.borderStyle = UITextBorderStyleNone;
+        amIediting = NO;
+        [titleField resignFirstResponder];
+        [editAndDoneButton setTitle:@"Edit"];
+        if (![self.title isEqualToString:[titleField text]]) {
+            titleField.text = self.title;
+        }
+        
+        if ([theTrail hasUnsavedChanges]) {
+            [activityIndicator startAnimating];
+            NSURL *fileURL = [TOMUrl urlForFile:theTrail.title key:theTrail.title];
+            [theTrail saveToURL:fileURL forSaveOperation:UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
+                NSLog(@"Success: %d",success);
+                [activityIndicator stopAnimating];
+                [self.navigationItem setHidesBackButton:NO animated:YES];
+                if (success) {
+                    NSLog(@"Completed");
+                    [detailTable reloadData];
+                }}];
+        }
+        else {
+            [self.navigationItem setHidesBackButton:NO animated:YES];
+            if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+                self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+            [detailTable reloadData];
+        }
+        // [self setEditing:NO animated:YES];
+        // return;
+    }
+    else if ([self isActiveTrail]) {
+        //
+        // NO EDITING!
+        // This should be a redundant check since the
+        // EDIT option is not on the toolbar.
+        //
+        titleField.borderStyle = UITextBorderStyleNone;
+        amIediting = NO;
+        // return;
+    }
+    else {
+        titleField.borderStyle = UITextBorderStyleRoundedRect;
+        amIediting = YES;
+        [editAndDoneButton setTitle:@"Done"];
+        [self.navigationItem setHidesBackButton:YES animated:YES];
+        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+            self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+        [detailTable reloadData];
+    }
+    
+    // [self setEditing:YES animated:YES];
+}
+
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+    switch (indexPath.section) {
+        case 0:
+        case 1:
+        case 2:
+            break;
+            
+        default:
+            NSLog(@"ERROR: Unhandled Section");
+            break;
+    }
+    return UITableViewCellEditingStyleNone;
+}
+
+
+
+- (BOOL) isActiveTrail {
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_NAME] != nil)
+    {
+        NSString *currentTitle = [[NSUserDefaults standardUserDefaults] stringForKey:@KEY_NAME];
+        if ([self.title isEqualToString:currentTitle]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 @end

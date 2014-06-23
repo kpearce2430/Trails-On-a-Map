@@ -11,7 +11,7 @@
 #import "TOMImageStore.h"
 #import "TOMDistance.h"
 #import "TOMSpeed.h"
-#import "TOMOrganizerViewCell.h"  // reuse this 
+#import "TOMOrganizerViewCell.h"  // reuse this
 
 #ifndef GPX_SWITCH_TAG
 #define GPX_SWITCH_TAG  1
@@ -27,32 +27,35 @@
 
 static NSString *detailViewCellIdentifier = @"detaiViewCells";
 
-@interface TOMDetailViewController :  UIViewController <UITableViewDataSource, UITableViewDelegate>
+typedef enum { detailViewTagError = -2 , detailViewTagTitle, detailViewTagPhoto } detailViewTagType;
+
+@interface TOMDetailViewController :  UIViewController <UITableViewDataSource, UITableViewDelegate,UITextFieldDelegate, UIActionSheetDelegate>
 {
-    @private
-    UIDeviceOrientation orientation;
+@private
     
-    @public
-    TOMPomSet *theTrail;
+    BOOL amIediting;
+
+    NSInteger       picCount;
+    NSMutableArray *imagesSet;
+
+    UIFont      *headerLabelFont;
+    UIFont      *footerLabelFont;
+    UIDeviceOrientation orientation;
+    UITableView *detailTable;
+    UIBarButtonItem *editAndDoneButton;
 }
 
 @property (atomic, strong) NSMetadataQuery *query;
 @property (nonatomic, strong) TOMPomSet *theTrail;
-@property (nonatomic, strong) UITableView *detailTable;
-@property (nonatomic, strong) NSString *myName;
-@property (nonatomic, strong) NSMutableArray *imagesSet;
-@property (nonatomic, readwrite) NSInteger picCount;
 
+
+@property (nonatomic, readwrite) UITextField *titleField;
 @property (nonatomic, readwrite) UISwitch *gpxSwitch;
 @property (nonatomic, readwrite) UISwitch *kmlSwitch;
-
-@property (nonatomic, readonly) UIFont *headerLabelFont;
-@property (nonatomic, readonly) UIFont *footerLabelFont;
-
-// @property (nonatomic, strong) TOMImageStore *imageStore;
+@property (nonatomic, readwrite) IBOutlet UIActivityIndicatorView *activityIndicator;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil title:(NSString *) t;
-
 - (UILabel *) newLabelWithTitle:(NSString *)paramTitle;
+- (BOOL) isActiveTrail;
 
 @end
