@@ -10,6 +10,8 @@
 #import "TOMPhotoAlbumViewController.h"
 #import "TOMPropertyViewController.h"
 #import "TOMOrganizerViewController.h"
+#import "TOMImageViewController.h"
+
 #import "TOMSpeed.h"
 #import "TOMDistance.h"
 #import "TOMUrl.h"
@@ -20,7 +22,7 @@
 
 @implementation TOMRootViewController
 
-@synthesize amiUpdatingLocation,locationManager, worldView, theTrail, currentHeading, myProperties, imagePicker, updatedTrail;
+@synthesize amiUpdatingLocation,locationManager, worldView, theTrail, currentHeading, myProperties, imagePicker, activityIndicator;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -163,7 +165,12 @@
         NSURL *fileURL = [TOMUrl urlForFile:self.title key:self.title];
         theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
         myProperties = [[TOMProperties alloc]initWithTitle:@TRAILS_ON_A_MAP];
+        
+        //
+        // Initialzie the defaults
+        //
         [[NSUserDefaults standardUserDefaults] setValue:@TRAILS_ON_A_MAP forKey:@KEY_NAME];
+        [[NSUserDefaults standardUserDefaults] setValue:@NO_STRING forKey:@KEY_TRAIL_ON];
 
         //  Wait for the user to start updating location
         amiUpdatingLocation = NO;
@@ -174,11 +181,8 @@
         // Please note that I have not created theTrail or the properties.
         // It's an empty UIDocument until the user turns on the navigation or
         // Selections a file name.
-        activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-        [activityIndicator setCenter:CGPointMake(screenWidth/2.0, screenHeight/2.0)];
-        [activityIndicator hidesWhenStopped];
-        [self.view addSubview:activityIndicator];
-        
+
+
         
         UIPinchGestureRecognizer *pinchGesture = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(scaleTheView:)];
         // [pinchGesture setDelegate:self];
@@ -189,7 +193,13 @@
         [longGesture setAllowableMovement:1000.0];
         [self.view addGestureRecognizer:longGesture];
         
-        [self setUpdatedTrail:NO];
+        activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        // CGFloat screenWidth = screenRect.size.width;
+        activityIndicator.center = self.view.center;
+        [activityIndicator hidesWhenStopped];
+        [activityIndicator setFrame:CGRectMake(140, 240, 40, 40)];
+        [self.view addSubview:activityIndicator];
+        [self.view bringSubviewToFront:activityIndicator];
     }
     [self checkProperties];
     return self;
@@ -257,8 +267,9 @@
                 
                 BOOL isDirectory;
                 NSError *err = nil;
-                NSLog(@"Source URL:%@",[url path]);
-                
+#ifdef DEBUG
+                NSLog(@"%s Source URL:%@",__PRETTY_FUNCTION__,[url path]);
+#endif
                 BOOL fileExistsAtPath = [fileManager fileExistsAtPath:[url path] isDirectory:&isDirectory];
                 if (fileExistsAtPath) {
                     NSString *path = [url path];
@@ -273,7 +284,7 @@
                             NSLog(@"Dest URL:%@",[destinationURL path]);
                             [fileManager copyItemAtURL:url toURL:destinationURL error:&err];
                             if (err) {
-                                NSLog(@"%s : Error copy to icloud: %@",__func__,err);
+                                NSLog(@"%s : Error copy to icloud: %@",__PRETTY_FUNCTION__,err);
                             }
                         }
                     }
@@ -285,26 +296,10 @@
                             NSLog(@"Dest URL:%@",[destinationURL path]);
                             [fileManager copyItemAtURL:url toURL:destinationURL error:&err];
                             if (err) {
-                                NSLog(@"%s : Error copy to icloud: %@",__func__,err);
+                                NSLog(@"%s : Error copy to icloud: %@",__PRETTY_FUNCTION__,err);
                             }
                         }
                     }
-#ifdef __NUA__
-                    // Not used anymore - KML,GPX, and CSV files will only be available in the
-                    // local directory
-                    else if ([fileName hasSuffix:@TOM_KML_EXT] || [fileName hasSuffix:@TOM_GPX_EXT] || [fileName hasSuffix:@TOM_CSV_EXT] ) {
-                        // User Created Files remain on the device
-
-                        NSURL *destinationURL = [icloudURL URLByAppendingPathComponent:fileName isDirectory:NO];
-                        if (![fileManager fileExistsAtPath:[destinationURL path]]) {
-                            NSLog(@"Dest URL:%@",[destinationURL path]);
-                            [fileManager copyItemAtURL:url toURL:destinationURL error:&err];
-                            if (err) {
-                                NSLog(@"%s : Error copy to icloud: %@",__func__,err);
-                            }
-                        }
-                    }
-#endif
                     else {
                         NSLog(@"%s Skipping File: %@",__PRETTY_FUNCTION__,fileName);
                     }
@@ -324,6 +319,9 @@
         yn = NO;
         [[NSUserDefaults standardUserDefaults] setBool:yn forKey:@KEY_ICLOUD];
     }
+    
+    self.navigationController.delegate = self;
+    
 }
 
 //
@@ -351,6 +349,7 @@
     
     //
     //  This will center the world view on my current location.
+    //
     CLLocation *userCoordinate = locationManager.location;
     [worldView setCenterCoordinate:userCoordinate.coordinate animated:YES];
     [worldView setShowsUserLocation:YES];
@@ -419,20 +418,15 @@
                 theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
                 [self loadTrails:fileURL];
                 [self processMyLocation:userCoordinate type:ptUnknown];
-                [self setUpdatedTrail:NO];
-                // [mySlider clearSpeedsAndAltitudes];
-                // [myTripTimer setDuration:[theTrail elapseTime]];
-                // [myOdoMeter setTotalDistance:[theTrail distanceTotalMeters]];
             }
             else { // no file exests at path:
                 //    the points of the trail will be kept as the new name
                 //    no action required.
                 theTrail = [[TOMPomSet alloc] initWithFileURL:fileURL];
                 myProperties = [[TOMProperties alloc]initWithTitle:newTitle];
-                
                 [self setTitle:newTitle];
-                [self setUpdatedTrail:YES];
                 [myProperties setPtName:newTitle];
+                
             }
             //
         } // end if old title is default
@@ -442,7 +436,7 @@
             if (amiUpdatingLocation == YES) {
                 // NSLog(@"Saving[%@]",self.title);
                 // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-                if ([self updatedTrail] == YES)
+                if ([theTrail hasUnsavedChanges])
                     [self saveTrails: NO]; //
                 amiUpdatingLocation = NO;
                 startStopItem.title = @TOM_ON_TEXT;
@@ -451,9 +445,8 @@
                 [ptTimer invalidate]; // Stop the timer
             }
 
-            if ([self updatedTrail] == YES) {
-                [theTrail closeWithCompletionHandler:nil];
-            }
+            [theTrail closeWithCompletionHandler:nil];
+            theTrail=nil; // buh bye...
             //
             // Clean it up
             //
@@ -493,6 +486,7 @@
                 [mySlider setNeedsDisplay];
                 
                 [mySpeedOMeter resetSpeedOMeter];
+                [mySpeedOMeter updateSpeed:0.0f];
                 [mySpeedOMeter setNeedsDisplay];
                 
                 [myTripTimer setDuration:0.0f];
@@ -501,8 +495,6 @@
                 [myOdoMeter setTrailDistance:0.0f];
                 [myOdoMeter setNeedsDisplay];
             }
-            [self setUpdatedTrail:NO];
-            // [myTripTimer setDuration:[theTrail elapseTime]];
         }
     }
     else
@@ -699,14 +691,13 @@
     if (pt != ptUnknown &&
         pt != ptError ) {
         TOMPointOnAMap *mp = [[TOMPointOnAMap alloc] initWithLocationHeadingType:newLocation heading:currentHeading type:pt];
-        [ theTrail addPointOnMap:mp ];
-        [ self setUpdatedTrail:YES];
-        
-        // [ mySlider setNeedsDisplay ];
+        [theTrail addPointOnMap:mp ];
+        [theTrail updateChangeCount:UIDocumentChangeDone];
         if ((pt == ptLocation && [self.myProperties showLocations]) ||
             (pt == ptStop && [self.myProperties showStops]) ||
             (pt == ptPicture && [self.myProperties showPictures])) {
             [worldView addAnnotation:(id)mp];
+            
         }
     }
     
@@ -820,7 +811,7 @@
         // I had a couple of values come in that went from a speed of
         // 70mph to 0mph to 100mph and then back to 70mph.  This is an attempt
         // skip these types of values.
-        
+        //
         double deltaVel = [loc speed] - [lastPoint speed];
     
         NSTimeInterval t = [loc.timestamp timeIntervalSinceDate:[lastPoint timestamp]];
@@ -844,20 +835,21 @@
     if ( myDistance >= [TOMDistance distanceFilter] || !lastPoint) {
         
         [ self processMyLocation: loc type:ptLocation];
-        
-        [ myOdoMeter setTrailDistance:[theTrail distanceTotalMeters]];
-        [ myOdoMeter setNeedsDisplay];
-        
-        [ myTripTimer setDuration:[theTrail elapseTime]];
-        [ myTripTimer setNeedsDisplay];
-        
+
         [ mySlider addSpeed:[loc speed] Altitude:[loc altitude] ];
         [ mySlider setNeedsDisplay];
-        
-
     }
+    
+    [ myOdoMeter setTrailDistance:[theTrail distanceTotalMeters]];
+    [ myOdoMeter setNeedsDisplay];
+    
+    [ myTripTimer setDuration:[theTrail elapseTime]];
+    [ myTripTimer setNeedsDisplay];
 }
 
+//
+//
+//
 -(void) updateAnnotations
 {
     // [worldView removeAnnotations:pebbleTrack.ptTrack];
@@ -1004,6 +996,7 @@
         // NSLog(@TOM_ON_TEXT);
         amiUpdatingLocation = YES;
         startStopBarButton.title = @TOM_OFF_TEXT;
+        [[NSUserDefaults standardUserDefaults] setValue:@YES_STRING forKey:@KEY_TRAIL_ON];
         // [activityIndicator startAnimating];
         
         if ([self.title isEqual: @TRAILS_DEFAULT_NAME]) {
@@ -1023,6 +1016,7 @@
             NSString *nameStr = [NSString stringWithFormat:@"Trail %@",dateStr];
             self.title = nameStr ;
             [[NSUserDefaults standardUserDefaults] setValue:nameStr forKey:@KEY_NAME];
+
             
             NSURL *fileURL = [TOMUrl urlForFile:nameStr key:nameStr];
 
@@ -1076,6 +1070,7 @@
     // NSLog(@TOM_OFF_TEXT);
     amiUpdatingLocation = NO;;
     startStopItem.title = @TOM_ON_TEXT;
+    [[NSUserDefaults standardUserDefaults] setValue:@NO_STRING forKey:@KEY_TRAIL_ON];
     
     // Stop the timer
     [ptTimer invalidate];
@@ -1083,7 +1078,10 @@
     [locationManager stopUpdatingLocation];
     [locationManager stopUpdatingHeading];
     
-    if ([self updatedTrail] == YES)
+    [mySpeedOMeter updateSpeed:0.0f];
+    [mySpeedOMeter setNeedsDisplay];
+    
+    if ([theTrail hasUnsavedChanges])
         [self saveTrails:NO];
 }
 
@@ -1155,7 +1153,7 @@
     NSInteger myTag = [actionSheet tag];
     
     if (myTag == 3) {
-        // This is the actions for the iCloud check
+        // This is the actions to turn off the trail
         
         if (buttonIndex == 0 ) {
             // NSLog(@"User Selected to go to setting to STOP");
@@ -1212,10 +1210,13 @@
     UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
     
     CLLocation *imageloc = [locationManager location];
-    CLHeading *imagehdng = [locationManager heading];
-    
-    TOMPointOnAMap *imagePebble = [[TOMPointOnAMap alloc] initWithImage: image location:imageloc heading: imagehdng];
+    CLHeading  *imagehdng = [locationManager heading];
+    NSInteger   photoID = [TOMImageStore getImageNumber];
+    NSString   *myTitle = [NSString stringWithFormat:@"Photo %d", (int) photoID++ ];
+    [TOMImageStore setImageNumber:photoID];
+    TOMPointOnAMap *imagePebble = [[TOMPointOnAMap alloc] initWithImage: image title:myTitle location:imageloc heading: imagehdng];
     [theTrail addPointOnMap:imagePebble];
+    [theTrail updateChangeCount:UIDocumentChangeDone];
     [TOMImageStore saveImage:image title:self.title key:[imagePebble key]];
 
     if (![self.title isEqual: @TRAILS_DEFAULT_NAME] &&
@@ -1244,7 +1245,7 @@
     
     // Good place to mark the file to save it.
     // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-    if ([self updatedTrail] == YES)
+    if ([theTrail hasUnsavedChanges])
         [self saveTrails:YES];
     
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -1258,7 +1259,7 @@
 {
     if (![self.title isEqual: @TRAILS_DEFAULT_NAME]   ) {
         // NSURL *fileURL = [TOMUrl fileUrlForTitle:self.title];
-        if ([self updatedTrail] == YES)
+        if ([theTrail hasUnsavedChanges])
             [self saveTrails:NO];
     }
     
@@ -1286,6 +1287,7 @@
     BOOL result = NO;
     
     [activityIndicator startAnimating];
+
     //
     //
     if ([theTrail loadFromContents:fileURL ofType:nil error:nil]== YES)
@@ -1322,7 +1324,9 @@
         }
         
         [mySlider setNeedsDisplay];
+        [mySpeedOMeter updateSpeed:0.0f];
         [mySpeedOMeter setNeedsDisplay];
+ 
         
         [myTripTimer setDuration:[theTrail elapseTime]];
         [myTripTimer setNeedsDisplay];
@@ -1330,34 +1334,6 @@
         [myOdoMeter setTrailDistance:[theTrail distanceTotalMeters]];
         [myOdoMeter setNeedsDisplay];
         
-        
-        result = YES;
-    }
-    
-    [activityIndicator stopAnimating];
-    
-    return result;
-}
-
-//
-//  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-//
-- (BOOL) saveTrailAs: (NSString *) newTitle warn:(BOOL)yn{
-
-    BOOL result = NO;
-    NSURL *fileURL = [TOMUrl urlForFile:newTitle key:newTitle];
-
-    [activityIndicator startAnimating];
-    
-    if (yn == YES) {
-        // This is just an update - the user has gone off
-        // to do something else and it's a good time to push
-        // any updates to the file
-        [theTrail updateChangeCount:UIDocumentChangeDone];
-        result = YES;
-    }
-    else {
-        [theTrail saveToURL:fileURL forSaveOperation:UIDocumentSaveForOverwriting completionHandler:nil];
         result = YES;
     }
     
@@ -1756,6 +1732,150 @@
         }
     }
     return;
+}
+
+#pragma annotations
+
+- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
+    
+    // NSLog(@"in %s",__PRETTY_FUNCTION__);
+    
+    if ([view.annotation isKindOfClass:[TOMPointOnAMap class]]) {
+        TOMPointOnAMap *mp = view.annotation;
+        // NSLog(@"mp type %d",[mp type]);
+        switch ([mp type])
+        {
+            case ptPicture:
+                if (!myAnnotation) {
+                    myAnnotation = [[TOMMapAnnotation alloc] initWithPoint:mp];
+                    // myAnnotation.
+                    // myAnnotation.backgroundColor = [UIColor grayColor];
+                    [mapView addAnnotation:myAnnotation];
+                    myPoint = mp;
+                }
+                else {
+                    [myAnnotation setMp:mp];
+                    myPoint = mp;
+                    [mapView addAnnotation:myAnnotation];
+                }
+                
+            break;
+        
+            default: // everyone else will be the same
+            break;
+        } // switch
+    } // if notation
+} // endif
+
+// * * * * *
+
+- (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view {
+    
+    // NSLog(@"in %s",__PRETTY_FUNCTION__);
+    if ([view.annotation isKindOfClass:[TOMMapAnnotation class]]) {
+        [mapView removeAnnotation:myAnnotation];
+        myAnnotation.mp = nil; // release the map point
+    }
+#ifdef __FFU__
+    else if ([view.annotation isKindOfClass:[TOMPointOnAMap class]]) {
+        // TOMPointOnAMap *mp = view.annotation;
+        // NSLog(@"mp type %d",[mp type]);
+    }
+#endif
+
+}
+
+// * * * * *
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation {
+    
+    // NSLog(@"in %s with %@",__PRETTY_FUNCTION__,[annotation description]);
+    
+    MKPinAnnotationView *annotationView = nil;
+    
+    if ([annotation isKindOfClass:[TOMPointOnAMap class]]) {
+        TOMPointOnAMap *mp = annotation;
+        switch ([mp type]) {
+            case ptStop:
+            annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation
+                                                             reuseIdentifier:@"TOMStopAnnotation"];
+            annotationView.pinColor = MKPinAnnotationColorRed;
+            annotationView.canShowCallout = YES;
+            annotationView.annotation = annotation;
+            break;
+            
+            case ptPicture:
+            {
+                annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation
+                                                                 reuseIdentifier:@"TOMPhotoAnnotation"];
+                annotationView.pinColor = MKPinAnnotationColorPurple;
+                annotationView.canShowCallout = YES;
+                annotationView.annotation = annotation;
+                
+                CGSize myIconSize = CGSizeMake(30, 30);
+                UIImage *myIcon = nil;
+                
+                if (mp.image) {
+                    //
+                    // If the image is already in the map point, just use it.
+                    UIGraphicsBeginImageContext(myIconSize);
+                    [mp.image drawInRect:CGRectMake(0,0,myIconSize.width,myIconSize.height)];
+                    myIcon = UIGraphicsGetImageFromCurrentImageContext();
+                    UIGraphicsEndImageContext();
+                }
+                else {
+                    // Otherwise, read it in and make an icon out of it.
+                    myIcon = [TOMImageStore loadIcon: self.title key:[mp key] size:myIconSize];
+
+                }
+                
+                UIImageView *myIconView = [[UIImageView alloc] initWithImage:myIcon];
+                annotationView.leftCalloutAccessoryView = myIconView;
+                
+                UIButton *disclosureButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+                annotationView.rightCalloutAccessoryView = disclosureButton;
+                
+                [disclosureButton addTarget:self action:@selector(showFullSizeImage:) forControlEvents:UIControlEventTouchUpInside];
+                
+                break;
+                
+            }
+            // Everything else
+            default:
+                annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation
+                                                                 reuseIdentifier:@"TOMBasicAnnotation"];
+                annotationView.pinColor = MKPinAnnotationColorGreen;
+                annotationView.annotation = annotation;
+                annotationView.canShowCallout = YES;
+                break;
+        }
+
+    }
+    else {
+        NSLog(@"%s It's something else",__PRETTY_FUNCTION__);
+    }
+    return annotationView;
+}
+
+- (void)showFullSizeImage:(id)sender {
+
+    if (!myPoint) {
+        NSLog(@"%s Error - No Point Selected",__PRETTY_FUNCTION__);
+        return;
+    }
+ 
+    NSURL *myURL = [TOMUrl urlForImageFile:self.title key:[myPoint key]];
+    
+    // UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameWithKeyAndImage:@"TOMImageViewController" bundle:nil title:[myPoint title] key:[myPoint key] url:myURL];
+
+    UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameAndPom:@"TOMImageViewController" bundle:nil POM:myPoint url:myURL];
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle: @"Back"
+                                                                   style: UIBarButtonItemStyleBordered
+                                                                  target: nil
+                                                                  action: nil];
+    
+    [self.navigationItem setBackBarButtonItem: backButton];
+    [[self navigationController] pushViewController:ptController animated:YES];
 }
 
 
