@@ -16,7 +16,9 @@ static NSString *orgainizerViewCellIdentifier = @"organizerViewCells";
 {
 @private
     UIDeviceOrientation orientation;
+    UIBarButtonItem *editAndDoneButton;
     BOOL firstPass;
+    BOOL fromOtherView;
 
 @public
     UITableView *organizerTable;
@@ -25,5 +27,10 @@ static NSString *orgainizerViewCellIdentifier = @"organizerViewCells";
 
 @property (nonatomic, retain) NSMutableArray *cells;
 @property (nonatomic, retain) NSMetadataQuery *query;
+@property (nonatomic, readwrite) IBOutlet UIActivityIndicatorView *activityIndicator;
+
+-(BOOL) isActiveTrail:(NSString *) trailName ;
+-(BOOL) isActiveIndex:(NSIndexPath *)indexPath;
+-(BOOL) isCurrentTrail:(NSString *) trailName;
 
 @end

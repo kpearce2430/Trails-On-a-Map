@@ -16,14 +16,15 @@
 
 @implementation TOMOrganizerViewController
 
-@synthesize cells,query;
+@synthesize cells,query,activityIndicator;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        firstPass = TRUE;
+        firstPass = YES;
+        fromOtherView = NO;
     }
     return self;
 }
@@ -31,22 +32,27 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
     // Do any additional setup after loading the view from its nib.
     if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_NAME] != nil)
     {
         [self setTitle:[[NSUserDefaults standardUserDefaults] stringForKey:@KEY_NAME]];
+#ifdef DEBUG
         NSLog(@"%s Using %@ from standardUserDefaults",__PRETTY_FUNCTION__,self.title);
+#endif
     }
     else
     {   //
         // we don't have a preference stored on this device, use the map type standard as default.
         //
         [self setTitle:@TRAILS_DEFAULT_NAME]; // default
-        NSLog(@"%s Assigning %@ As Default",__PRETTY_FUNCTION__,self.title);
+        // NSLog(@"%s Assigning %@ As Default",__PRETTY_FUNCTION__,self.title);
     }
     
     if  ([self.title isEqualToString:@"0"]) {
+#ifdef DEBUG
         NSLog(@"%s : Title %@",__PRETTY_FUNCTION__,self.title);
+#endif
         [self setTitle:@TRAILS_DEFAULT_NAME]; // default
     }
     
@@ -61,12 +67,20 @@
 
     // Push an orientation change on the the view to set the presentation of the screen correctly.
     orientation = UIDeviceOrientationUnknown;
-    [self orientationChanged:NULL]; // orientationChanged
+
     
-    UIBarButtonItem *anotherButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
-    self.navigationItem.rightBarButtonItem = anotherButton;
+    editAndDoneButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
+    self.navigationItem.rightBarButtonItem = editAndDoneButton;
     amIediting = NO;
-     
+    
+    activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    // CGFloat screenWidth = screenRect.size.width;
+    self.activityIndicator.center = self.view.center;
+    [activityIndicator hidesWhenStopped];
+    [activityIndicator setFrame:CGRectMake(140, 240, 40, 40)];
+    [self.view addSubview:activityIndicator];
+    [self.view bringSubviewToFront:activityIndicator];
+    [activityIndicator startAnimating];
     [self prepareFiles];
 }
 
@@ -76,23 +90,56 @@
 -(void) viewDidAppear:(BOOL)animated {
 
     [super viewDidAppear:animated];
+    
+    [self orientationChanged:NULL]; // orientationChanged
 
     // Set up notification for
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
-}
 
+    if (fromOtherView) {
+        // We're coming in from another view,
+        //  Make sure nothing else has changed.
+            [activityIndicator startAnimating];
+        [self prepareFiles];
+        fromOtherView = NO;
+        // NSString *myTitle = self.title;
+        if (![TOMUrl checkTrailExists:self.title]) {
+            self.title = @TRAILS_ON_A_MAP;
+        }
+    }
+}
 
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 //
--(void) viewDidDisappear {
-    // Request to stop receiving accelerometer events and turn off accelerometer
+-(void) viewWillDisappear:(BOOL)animated {
     
+    if ([self.navigationController.viewControllers indexOfObject:self]==NSNotFound) {
+        // back button was pressed.  We know this is true because self is no longer
+        // in the navigation stack.
+        // NSLog(@"in %s",__PRETTY_FUNCTION__);
+        NSString *currentTitle = nil;
+        if  ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_NAME] != nil)
+        {
+            currentTitle = [[NSUserDefaults standardUserDefaults] stringForKey:@KEY_NAME];
+        }
+        
+        if  (![self.title isEqualToString:currentTitle]) {  // If the user selected a new
+            if (![self isActiveTrail:currentTitle]) {       // amd tje Current Trail is not active
+                [[NSUserDefaults standardUserDefaults] setValue:self.title forKey:@KEY_NAME];
+                NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
+                [kvStore setString:self.title forKey:@KEY_NAME];
+            }
+        }
+    }
+
     if (query) {
+        
         if ([query isStarted] || [query isGathering]) {
             [query stopQuery];
         }
+
         [[NSNotificationCenter defaultCenter] removeObserver:self
                                                         name:NSMetadataQueryDidFinishGatheringNotification
                                                       object:nil];
@@ -100,11 +147,12 @@
         [[NSNotificationCenter defaultCenter] removeObserver:self
                                                         name:NSMetadataQueryDidUpdateNotification
                                                       object:nil];
-        
     }
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    
+    [super viewWillDisappear:animated];
 }
 
 //
@@ -140,8 +188,21 @@
         [cell.textLabel setText:@"No Trails Available"];
         [cell.detailTextLabel setText:@""];
         [cell.imageView setImage:nil];
+        [cell.textLabel setTextAlignment: NSTextAlignmentCenter];
         cell.accessoryType = UITableViewCellAccessoryNone;
-        if (amIediting)
+        if  (amIediting)
+            [self editClicked:nil];
+        return cell;
+    }
+    
+    if (indexPath.row >= [self.cells count]) {
+        // Set the values for No Trails Available
+        [cell.textLabel setText:@"Reset Trail Name"];
+        [cell.detailTextLabel setText:@""];
+        [cell.imageView setImage:nil];
+        [cell.textLabel setTextAlignment: NSTextAlignmentCenter];
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        if  (amIediting)
             [self editClicked:nil];
         return cell;
     }
@@ -178,28 +239,53 @@
     }
     
     [cell.textLabel setText:myLabel];
-    [cell.detailTextLabel setText:dateStr];
+    
+    if ([self isActiveIndex:indexPath]) {
+        [cell.detailTextLabel setText:@"Current Active Trail"];
+        [cell.detailTextLabel setTextColor:[UIColor redColor]];
+    }
+    else {
+        [cell.detailTextLabel setText:dateStr];
+        [cell.detailTextLabel setTextColor:[UIColor blackColor]];
+    }
     
     cell.imageView.image = theImage;
     cell.imageView.backgroundColor    = TOM_LABEL_BACKGROUND_COLOR;
     cell.imageView.layer.borderColor  = TOM_LABEL_BORDER_COLOR;
     cell.imageView.layer.borderWidth  = TOM_LABEL_BORDER_WIDTH;
-    // cell.imageView.layer.cornerRadius = TOM_LABEL_BORDER_CORNER_RADIUS;
     return cell;
 }
 
+#ifdef __FFU__
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    NSLog(@"%s Row %d",__PRETTY_FUNCTION__,(int)[indexPath row]);
+
+}
+#endif
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 
-    TOMOrganizerViewCell *thisCell = [self.cells objectAtIndex:indexPath.row];
-    NSString *myTitle = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
-    self.title = myTitle;
+    NSString *myTitle = @TRAILS_ON_A_MAP;
+    if (indexPath.row >= [self.cells count]) {
+        // The user selected the last row which is to reset the page.
+        NSLog(@"%s RESET",__PRETTY_FUNCTION__ );
+    }
+    else {
+        TOMOrganizerViewCell *thisCell = [self.cells objectAtIndex:indexPath.row];
+        myTitle = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
+    }
     
-    // set the new value to the cloud and synchronize
-    [[NSUserDefaults standardUserDefaults] setValue:myTitle forKey:@KEY_NAME];
-    NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
-    [kvStore setString:myTitle forKey:@KEY_NAME];
-    
+    if ([self isActiveTrail:myTitle]) {
+        NSLog(@"%s There is a trail on %@",__PRETTY_FUNCTION__,myTitle);
+    }
+    else {
+
+        //
+        // Dont change the key name yet.
+        //
+        self.title = myTitle;
+    }
     return;
 }
 
@@ -223,6 +309,8 @@
     
     [[self navigationController] pushViewController:ptController animated:YES];
     
+    fromOtherView = YES;
+    
 }
 
 
@@ -231,6 +319,7 @@
     [organizerTable beginUpdates];
     [organizerTable endUpdates];
 }
+
 
 
 //
@@ -279,15 +368,15 @@
 }
 
 - (IBAction)editClicked:(id)sender {
-    
-    // NSLog(@"In %s",__func__);
-    
+
     if (amIediting == YES) {
         amIediting = NO;
+        [editAndDoneButton setTitle:@"Edit"];
         [self setEditing:NO animated:YES];
     }
     else {
         amIediting = YES;
+        [editAndDoneButton setTitle:@"Done"];
         [self setEditing:YES animated:YES];
     }
 }
@@ -295,8 +384,12 @@
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
 
-    return UITableViewCellEditingStyleDelete;
+    // NSLog(@"%s Row %d",__PRETTY_FUNCTION__,(int)[indexPath row]);
+    if ([self isActiveIndex:indexPath]) {
+        return UITableViewCellEditingStyleNone;
+    }
 
+    return UITableViewCellEditingStyleDelete;
 }
 
 - (void) setEditing:(BOOL)editing animated:(BOOL)animated {
@@ -312,24 +405,28 @@
         // Delete the row from the data source
         
         TOMOrganizerViewCell *thisCell = [self.cells objectAtIndex:indexPath.row];
+        NSString *myTitle = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
+        
+        if ([self isActiveTrail:myTitle]) {
+            // This shouldn't happen but I've put in this redundant check.
+            return;
+        }
+        if ([self isCurrentTrail:myTitle]) {
+            //
+            // Deleting the current trail, Reset the the KEY_NAME
+            [[NSUserDefaults standardUserDefaults] setValue:@TRAILS_ON_A_MAP forKey:@KEY_NAME];
+            NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
+            [kvStore setString:@TRAILS_ON_A_MAP forKey:@KEY_NAME];
+            [self setTitle:@TRAILS_DEFAULT_NAME];
+        }
+        else if ([self.title isEqualToString:myTitle]) {
+            [self setTitle:@TRAILS_DEFAULT_NAME];
+        }
         NSURL *theURL = thisCell.url;
         
         TOMPomSet *theTrail = [[TOMPomSet alloc] initWithFileURL:theURL];
 
-        if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_NAME] != nil)
-        {
-            NSString *currentTitle = [[NSUserDefaults standardUserDefaults] stringForKey:@KEY_NAME];
-            NSString *myTitle = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
-            if ([currentTitle isEqualToString:myTitle]) {
-                // set the new value to the cloud and synchronize
-                [[NSUserDefaults standardUserDefaults] setValue:@TRAILS_ON_A_MAP forKey:@KEY_NAME];
-                NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
-                [kvStore setString:@TRAILS_ON_A_MAP forKey:@KEY_NAME];
-                [self setTitle:@TRAILS_DEFAULT_NAME];
-            }
-        }
-
-#ifdef __DEBUG
+#ifdef DEBUG
         [self deleteDocument:theTrail withCompletionBlock:^{
             // insert code for next action
             NSLog(@"%s Deleted Document",__PRETTY_FUNCTION__);
@@ -346,6 +443,39 @@
         else
             [organizerTable reloadData];
     }
+}
+
+-(BOOL) isActiveTrail:(NSString *) trailName {
+    
+    if ([self isCurrentTrail:trailName]) {
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_TRAIL_ON] != nil) {
+            NSString *isTrailOn = [[NSUserDefaults standardUserDefaults] objectForKey:@KEY_TRAIL_ON];
+            if  ([isTrailOn isEqualToString:@YES_STRING]) {
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
+-(BOOL) isCurrentTrail:(NSString *) trailName {
+
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_NAME] != nil)
+    {
+        NSString *currentTitle = [[NSUserDefaults standardUserDefaults] stringForKey:@KEY_NAME];
+        if  ([currentTitle isEqualToString:trailName]) {
+             return YES;
+        }
+    }
+    return NO;
+}
+
+-(BOOL) isActiveIndex:(NSIndexPath *)indexPath  {
+    
+    // NSLog(@"%s IndexPath: %d",__PRETTY_FUNCTION__,(int)[indexPath row]);
+    TOMOrganizerViewCell *thisCell = [self.cells objectAtIndex:[indexPath row]];
+    NSString *myTitle = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
+    return [self isActiveTrail:myTitle];
 }
 
 #pragma __trail_managment__
@@ -437,10 +567,13 @@
             }
         } // for enumerator
         [self sortCells];
-        firstPass = FALSE;
+        [organizerTable reloadData];
+
+        firstPass = NO;
         
     } // else (!usingIcloud)
-
+    if ([activityIndicator isAnimating])
+        [activityIndicator stopAnimating];
 }
 
 -(void) processFiles:(NSNotification *) aNotification
@@ -505,7 +638,7 @@
     [query enableUpdates];
     [self sortCells];
     [organizerTable reloadData];
-    firstPass = FALSE;
+    firstPass = NO;
 }
 
 
@@ -595,12 +728,9 @@
         NSDate *date1 = [obj1 date];
         NSDate *date2 = [obj2 date];
         // this gives decending (newest to oldest order.
-        return [date2 compare:date1];
         // to get oldest to newest order, reverse the fields.
-
+        return [date2 compare:date1];
     }];
-
 }
-
 
 @end
