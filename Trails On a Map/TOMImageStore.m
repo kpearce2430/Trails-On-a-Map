@@ -157,4 +157,42 @@
     
 }
 
++ (UIImage *) loadIcon: (NSString *) imageTitle key:(NSString *) imageKey size:(CGSize) iconSize;
+{
+    //
+    // TODO:  Build a cache mechanism to keep from recreating icons
+    //
+    UIImage *myImage = [TOMImageStore loadImage:imageTitle key:imageKey warn:NO];
+
+    if (myImage == NULL) {
+        myImage = [UIImage imageNamed:@"TomIcon-60@2x.png"];
+    }
+    
+    // CGSize destinationSize = CGSizeMake(128.0f, 128.0f);
+    UIGraphicsBeginImageContext(iconSize);
+    [myImage drawInRect:CGRectMake(0,0,iconSize.width,iconSize.height)];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
+
++ (NSInteger) getImageNumber {
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_PHOTO_COUNT] != nil)
+    {
+        NSString *currentValue = [[NSUserDefaults standardUserDefaults] stringForKey:@KEY_PHOTO_COUNT];
+        return [currentValue integerValue];
+    }
+    return 1;
+}
+
++ (void) setImageNumber: (NSInteger) newNumber {
+    
+    NSString *mytext = [NSString stringWithFormat:@"%d",(int)newNumber];
+    [[NSUserDefaults standardUserDefaults] setValue:mytext forKey:@KEY_PHOTO_COUNT];
+    
+    // set the new value to the cloud and synchronize
+    NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
+    [kvStore setString:mytext forKey:@KEY_PHOTO_COUNT];
+}
+
 @end
