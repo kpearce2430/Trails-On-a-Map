@@ -26,19 +26,10 @@
 @property (nonatomic, readwrite) MKMapRect ptMapRect;    //
 
 // TOM PomSet Methods
-
 - (id)initWithTitle: (NSString *) t;
 - (void)addPointOnMap:(TOMPointOnAMap *) p;
-
 - (void)listPoms;
-// - (NSString *) tomArchivePath;
-// - (NSString *) tomArchivePathWithTitle: (NSString *)title;
-// - (BOOL) savePoms:(NSString *)title;
-// - (BOOL) loadPoms:(NSString *)title;
-
 - (BOOL) deletePoms:(NSString *) t;
-
-// - (BOOL) areTherePoms;
 - (double) distanceTotalMeters;
 - (double) distanceStraightLine;
 
