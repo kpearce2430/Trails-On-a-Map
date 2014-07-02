@@ -414,7 +414,7 @@
         return ptMapRect;
     }
 
-   
+  
     // MKMapPoint* pointArr = malloc(sizeof(CLLocationCoordinate2D) * [ptTrack count]);
     TOMPointOnAMap *p = [ptTrack objectAtIndex:0];
     MKMapPoint newPoint = MKMapPointForCoordinate([p coordinate]);
@@ -431,7 +431,6 @@
         minY = MIN(minY, newPoint.y);
         maxX = MAX(maxX, newPoint.x);
         maxY = MAX(maxY, newPoint.y);
-        // pointArr[i] = newPoint;
     }
     
     ptMapRect = MKMapRectMake(minX, minY, (maxX-minX), (maxY-minY));
