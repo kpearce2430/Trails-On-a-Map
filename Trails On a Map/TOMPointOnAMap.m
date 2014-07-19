@@ -92,7 +92,7 @@
         [self generateMyKey:0];
         [self setImage:nil];
         CLLocationSpeed mySpeed = [TOMSpeed displaySpeed:speed];
-        title = [NSString stringWithFormat:@"%@: %.4f %.4f %.2f%@", @POM_TYPE_LOCATION, self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
+        title = [NSString stringWithFormat:@"%.4f %.4f %.2f%@", self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
     }
     return self;
 }
@@ -143,7 +143,7 @@
         [self setImage:nil];
         
         CLLocationSpeed mySpeed = [TOMSpeed displaySpeed:speed];
-        title = [NSString stringWithFormat:@"%@: %.4f %.4f %.2f%@", @POM_TYPE_LOCATION, self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
+        title = [NSString stringWithFormat:@"%.4f %.4f %.2f%@", self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
     }
     return self;
 }
@@ -171,13 +171,13 @@
                 title = [NSString stringWithFormat:@"%@: %.4f %.4f %.2f%@", @POM_TYPE_UNKNOWN, self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
                 break;
             case ptLocation:
-                title = [NSString stringWithFormat:@"%@: %.4f %.4f %.2f%@", @POM_TYPE_LOCATION, self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
+                title = [NSString stringWithFormat:@"%.4f %.4f %.2f%@",  self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
                 break;
             case ptPicture:
                 title = [NSString stringWithFormat:@"%@: %.4f %.4f",        @POM_TYPE_PICTURE, self.coordinate.latitude, self.coordinate.longitude];
                 break;
             case ptStop:
-                title = [NSString stringWithFormat:@"%@: %.4f %.4f",        @POM_TYPE_STOP, self.coordinate.latitude, self.coordinate.longitude];
+                title = [NSString stringWithFormat:@"%.4f %.4f",         self.coordinate.latitude, self.coordinate.longitude];
                 break;
             default:
                 title = [NSString stringWithFormat:@"%@: %.4f %.4f %.2f%@", @POM_TYPE_OTHER, self.coordinate.latitude, self.coordinate.longitude, mySpeed,[TOMSpeed displaySpeedUnits]];
