@@ -32,5 +32,6 @@
 + (BOOL) removeURL:(NSURL *)targetURL;
 + (NSURL *) temporaryDir: (NSString *) ext;
 + (BOOL) isValidURL:(NSURL *) theURL;
++ (BOOL) isUsingICloud;
 
 @end

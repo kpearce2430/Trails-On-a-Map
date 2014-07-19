@@ -130,13 +130,18 @@
         return nil;
     }
     
+    NSURL *fileURL = nil;
+    
     if ([title isEqualToString:@TRAILS_ON_A_MAP]) {
-        return [TOMUrl urlForDocumentsDirectory];
+        NSURL *tmpURL = [TOMUrl temporaryDir:nil];
+        NSString *newFileName = [title stringByAppendingString:@TOM_FILE_EXT];
+        fileURL = [tmpURL URLByAppendingPathComponent:newFileName isDirectory:NO];
+        return fileURL;
     }
 
     // else,
     // Build up the URL
-    NSURL *fileURL = nil;
+
     NSURL *trailURL = [TOMUrl urlForTrail:title];
     
     if  (trailURL) {
@@ -275,4 +280,17 @@
     return YES;
     
 }
+
++ (BOOL) isUsingICloud {
+    BOOL yn = NO;
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_ICLOUD] != nil)
+    {
+        yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_ICLOUD];
+    }
+    else
+        yn = NO;
+    
+    return yn;
+}
+
 @end
