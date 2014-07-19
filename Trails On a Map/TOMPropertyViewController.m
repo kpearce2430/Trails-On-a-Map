@@ -107,11 +107,11 @@
 
 - (BOOL) textFieldShouldReturn:(UITextField *)textField
 {
-    NSLog(@"New Name: [%@]",textField);
+    // NSLog(@"New Name: [%@]",textField);
     
     NSString *mytext = [textField text];
     mytext = [mytext stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    NSLog(@"my title: [%@]",mytext);
+    // NSLog(@"my title: [%@]",mytext);
     [[NSUserDefaults standardUserDefaults] setValue:mytext forKey:@KEY_NAME];
     //
     // The title does not need to go to the cloud.
@@ -187,11 +187,15 @@
     if (myDist < 10.0)
         myDist = 5.0;
     else {
-        CLLocationDistance trim = fmodf(myDist,10.0);
+// #ifdef DEBUG
+//        CLLocationDistance trim = fmodf(myDist,50.0);
+// #else
+        CLLocationDistance trim = fmod(myDist, 25.0);
+// #endif
         myDist -= trim;
     }
     
-    NSString *title = [[NSString alloc] initWithFormat:@"Distance Filter: %.1f m",myDist] ;
+    NSString *title = [[NSString alloc] initWithFormat:@"Distance Filter: %.0f m",myDist] ;
     
     [distanceFilterLabel setText:title];
     
@@ -708,7 +712,7 @@
     }
 
 	// label.textAlignment = UITextAlignmentLeft;
-    NSString *title = [[NSString alloc] initWithFormat:@"Distance Filter: %.1f",myDistanceFilter] ;
+    NSString *title = [[NSString alloc] initWithFormat:@"Distance Filter: %.0f m",myDistanceFilter] ;
     distanceFilterLabel = [TOMPropertyViewController labelWithFrame:frame title:title];
     [distanceFilterLabel setFont:myLabelFont];
     [distanceFilterLabel setTextAlignment:NSTextAlignmentRight];
@@ -1015,7 +1019,7 @@
     [versionLabel setTextAlignment:NSTextAlignmentLeft];
     [scrollView addSubview:versionLabel];
     
-#ifdef DEBUG
+#ifdef __DEBUG__
     NSLog( @"%s Height So Far: %.2f",__PRETTY_FUNCTION__, yPlacement);
     NSLog(@"CFBundleVersion is: %@",version);
     NSLog(@"CFBundleShortVersionString: %@",shortVersionString);
