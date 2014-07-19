@@ -359,11 +359,12 @@
     [self.view setFrame:screenRect];
     
     CGRect tableRect = CGRectMake( 0.0, 0.0, screenWidth, screenHeight );
-    [organizerTable setFrame:tableRect];
-
-    [organizerTable beginUpdates];
-    [organizerTable endUpdates];
     
+    if ([organizerTable numberOfRowsInSection:0] > 0 ) {
+        [organizerTable setFrame:tableRect];
+        [organizerTable beginUpdates];
+        [organizerTable endUpdates];
+    }
     return;
 }
 
@@ -473,6 +474,11 @@
 -(BOOL) isActiveIndex:(NSIndexPath *)indexPath  {
     
     // NSLog(@"%s IndexPath: %d",__PRETTY_FUNCTION__,(int)[indexPath row]);
+    if ([indexPath row] > [self.cells count]) {
+        NSLog(@"%s ERROR Recieved Row %d With Cell Count %d",__PRETTY_FUNCTION__,(int)indexPath.row,(int)[self.cells count]);
+        return FALSE;
+    }
+    
     TOMOrganizerViewCell *thisCell = [self.cells objectAtIndex:[indexPath row]];
     NSString *myTitle = [thisCell.title stringByReplacingOccurrencesOfString:@TOM_FILE_EXT withString:@""];
     return [self isActiveTrail:myTitle];
@@ -569,9 +575,12 @@
         [self sortCells];
         [organizerTable reloadData];
 
-        firstPass = NO;
+ 
         
     } // else (!usingIcloud)
+    
+    firstPass = NO;
+    
     if ([activityIndicator isAnimating])
         [activityIndicator stopAnimating];
 }
@@ -672,14 +681,28 @@
                 // TODO handle the error
             }
             
-            // Need to check if there is a KMZ, GPX, and CSV files
             NSString *path = [trailURL path];
             NSArray *parts = [path componentsSeparatedByString:@"/"];
             NSString *fileName = [parts objectAtIndex:[parts count]-1];
-            NSString *gpxName = [fileName stringByAppendingString:@TOM_GPX_EXT];
+            NSURL *localDocs = [TOMUrl urlForLocalDocuments];
+            if ([TOMUrl isUsingICloud]) {
+                
+                // Check to see if there is a local copy of the trail
+                // This assumes that the trailURL is the path to the file in the icloud.
+                NSURL *localTrailDir = [localDocs URLByAppendingPathComponent:fileName];
+                if ([fileManager fileExistsAtPath:[localTrailDir path]]) {
+                    NSError *err = nil;
+                    [fileManager removeItemAtURL:localTrailDir error:&err];
+                    if (err) {
+                        NSLog(@"%s Error %@",__PRETTY_FUNCTION__,err);
+                    }
+                }
+            }
             
-            NSURL *dirURL = [trailURL URLByDeletingLastPathComponent];
-            NSURL *gpxURL = [dirURL URLByAppendingPathComponent:gpxName isDirectory:NO];
+            // Need to check if there is a KMZ, GPX, and CSV files
+
+            NSString *gpxName = [fileName stringByAppendingString:@TOM_GPX_EXT];
+            NSURL *gpxURL = [localDocs URLByAppendingPathComponent:gpxName isDirectory:NO];
             
             error = nil;
             if ([fileManager fileExistsAtPath:[gpxURL path] isDirectory:NO]) {
@@ -691,7 +714,7 @@
             }
             
             NSString *kmzName = [fileName stringByAppendingString:@TOM_KMZ_EXT];
-            NSURL *kmzURL = [dirURL URLByAppendingPathComponent:kmzName isDirectory:NO];
+            NSURL *kmzURL = [localDocs URLByAppendingPathComponent:kmzName isDirectory:NO];
             
             error = nil;
             if ([fileManager fileExistsAtPath:[kmzURL path] isDirectory:NO]) {
@@ -703,7 +726,7 @@
             }
             
             NSString *csvName = [fileName stringByAppendingString:@TOM_CSV_EXT];
-            NSURL *csvURL = [dirURL URLByAppendingPathComponent:csvName isDirectory:NO];
+            NSURL *csvURL = [localDocs URLByAppendingPathComponent:csvName isDirectory:NO];
             
             error = nil;
             if ([fileManager fileExistsAtPath:[csvURL path] isDirectory:NO]) {
