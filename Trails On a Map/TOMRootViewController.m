@@ -139,6 +139,7 @@
                                        initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
                                        target:self
                                        action:@selector(takePicture:)];
+        [cameraItem setEnabled:NO];
 
         startStopItem = [[UIBarButtonItem alloc]
                                           initWithTitle:@TOM_ON_TEXT
@@ -216,15 +217,9 @@
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
 
-    BOOL yn = NO;
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_ICLOUD] != nil)
-    {
-        yn = [[NSUserDefaults standardUserDefaults] boolForKey:@KEY_ICLOUD];
-    }
-    else
-        yn = NO;
-    
-    if (yn == NO) {
+    BOOL yn = [TOMUrl isUsingICloud];
+   
+    if  (yn == NO) {
         //
         // Previously, the app marked that iCloud was not available.
         // Let's check to see if it is:
@@ -244,7 +239,7 @@
             
             // Look for local files on the device's documents directory and copy them
             // to the iCloud.
-            NSURL *defaultURL = [TOMUrl urlForLocalDocuments];
+            NSURL *localtURL = [TOMUrl urlForLocalDocuments];
             
             NSArray *keys = [NSArray arrayWithObjects:
                              NSURLIsDirectoryKey, NSURLIsPackageKey, NSURLLocalizedNameKey, nil];
@@ -252,7 +247,7 @@
             NSFileManager *fileManager = [[NSFileManager alloc]init];
             
             NSDirectoryEnumerator *enumerator = [fileManager
-                                                 enumeratorAtURL:defaultURL
+                                                 enumeratorAtURL:localtURL
                                                  includingPropertiesForKeys:keys
                                                  options:(NSDirectoryEnumerationSkipsPackageDescendants |
                                                           NSDirectoryEnumerationSkipsHiddenFiles)
@@ -296,6 +291,26 @@
                             [fileManager copyItemAtURL:url toURL:destinationURL error:&err];
                             if (err) {
                                 NSLog(@"%s : Error copy to icloud: %@",__PRETTY_FUNCTION__,err);
+                            }
+                        }
+                        else {
+                            NSDictionary* sAttrs = [fileManager attributesOfItemAtPath:[url path] error:nil];
+                            if ( sAttrs != nil ) {
+                                NSDictionary* dAttrs = [fileManager attributesOfItemAtPath:[destinationURL path] error:nil];
+                                if  (dAttrs != nil) {
+                                    NSDate *sDate = [sAttrs objectForKey: NSFileModificationDate];
+                                    NSDate *dDate = [dAttrs objectForKey: NSFileModificationDate];
+                                    // NSLog(@"Source %@",[url path]);
+                                    if  ([sDate compare:dDate] == NSOrderedDescending) {
+                                        // The sDate is earlier than the dDate
+                                        // compare will return the order type
+                                        NSLog(@"%s Replacing existing file %@ to %@",__PRETTY_FUNCTION__,[url path],[destinationURL path]);
+                                        [fileManager replaceItemAtURL:destinationURL withItemAtURL:url backupItemName:nil options:NSFileManagerItemReplacementUsingNewMetadataOnly resultingItemURL:nil error:&err];
+                                        if (err) {
+                                            NSLog(@"%s : Error copy to icloud: %@",__PRETTY_FUNCTION__,err);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -447,8 +462,113 @@
                 [locationManager stopUpdatingHeading];
                 [ptTimer invalidate]; // Stop the timer
             }
+            NSString *oldTitle = [NSString stringWithString:self.title];
+            [theTrail closeWithCompletionHandler:^(BOOL success) {
+                if (success) {
+                    if ([TOMUrl isUsingICloud]) {
+                        
+                        NSArray *keys = [NSArray arrayWithObjects:
+                                         NSURLIsDirectoryKey, NSURLIsPackageKey, NSURLLocalizedNameKey, nil];
+                        
+                        // NSLog(@"Need to copy %@ back to local device",oldTitle);
+                        NSFileManager *fileManager = [[NSFileManager alloc]init];
+                        NSURL *cloudURL = [TOMUrl urlForICloudDocuments];
+                        NSURL *trailURL = [cloudURL URLByAppendingPathComponent:oldTitle isDirectory:YES];
+                        NSDirectoryEnumerator *enumerator = [fileManager
+                                                             enumeratorAtURL:trailURL
+                                                             includingPropertiesForKeys:keys
+                                                             options:(NSDirectoryEnumerationSkipsPackageDescendants |
+                                                                      NSDirectoryEnumerationSkipsHiddenFiles)
+                                                             errorHandler:^(NSURL *url, NSError *error) {
+                                                                 // Handle the error.
+                                                                 // Return YES if the enumeration should continue after the error.
+                                                                 return     YES;
+                                                             }];
+                        
+                        NSURL *localDocs = [TOMUrl urlForLocalDocuments];
+                        NSURL *destDir = [localDocs URLByAppendingPathComponent:oldTitle isDirectory:YES];
+                        NSError *err;
+                        BOOL yn;
+                        if (![fileManager fileExistsAtPath:[destDir path] isDirectory:&yn]) {
+                            [fileManager createDirectoryAtPath:[destDir path] withIntermediateDirectories:YES attributes:nil error:&err];
+                            if (err) {
+                                NSLog(@"%s Error Creating Direcotry at Path %@",__PRETTY_FUNCTION__,err);
+                            }
+                        }
+#ifdef DEBUG
+                        if (yn == NO) {
+                            NSLog(@"%s Error, Expecting %@ to be a Directory?",__PRETTY_FUNCTION__,[destDir path]);
+                        }
+#endif
 
-            [theTrail closeWithCompletionHandler:nil];
+                        for (NSURL *sUrl in enumerator) {
+
+                            BOOL isDirectory;
+                            NSError *err = nil;
+#ifdef DEBUG
+                            NSLog(@"%s Source URL:%@",__PRETTY_FUNCTION__,[sUrl path]);
+#endif
+                            BOOL fileExistsAtPath = [fileManager fileExistsAtPath:[sUrl path] isDirectory:&isDirectory];
+                            if (fileExistsAtPath) {
+                                NSString *path = [sUrl path];
+                                NSArray *parts = [path componentsSeparatedByString:@"/"];
+                                // NSString *trailName = [parts objectAtIndex:[parts count]-2]; // Trail Name if it's not a Directory
+                                NSString *fileName = [parts objectAtIndex:[parts count]-1];
+                                if (isDirectory)
+                                {
+                                    //It's a Directory.
+                                    NSURL *destinationURL = [destDir URLByAppendingPathComponent:fileName isDirectory:YES];
+                                    if (![fileManager fileExistsAtPath:[destinationURL path]]) {
+                                        NSLog(@"Dest URL:%@",[destinationURL path]);
+                                        [fileManager copyItemAtURL:sUrl toURL:destinationURL error:&err];
+                                        if (err) {
+                                            NSLog(@"%s : Error copy to local: %@",__PRETTY_FUNCTION__,err);
+                                        }
+                                    }
+                                }
+                                else if ([fileName hasSuffix:@TOM_FILE_EXT] || [fileName hasSuffix:@TOM_JPG_EXT] ) {
+                                    // NSURL *destinationDir = [icloudURL URLByAppendingPathComponent:trailName isDirectory:YES];
+                                    NSURL *destinationURL = [destDir URLByAppendingPathComponent:fileName isDirectory:NO];
+                                    
+                                    if (![fileManager fileExistsAtPath:[destinationURL path] isDirectory:NO]) {
+                                        // NSLog(@"Dest URL:%@",[destinationURL path]);
+                                        [fileManager copyItemAtURL:sUrl toURL:destinationURL error:&err];
+                                        if (err) {
+                                            NSLog(@"%s : Error copy to icloud: %@",__PRETTY_FUNCTION__,err);
+                                        }
+                                    }
+                                    else {
+                                        NSDictionary* sAttrs = [fileManager attributesOfItemAtPath:[sUrl path] error:nil];
+                                        if ( sAttrs != nil ) {
+                                            NSDictionary* dAttrs = [fileManager attributesOfItemAtPath:[destinationURL path] error:nil];
+                                            if  (dAttrs != nil) {
+                                                NSDate *sDate = [sAttrs objectForKey: NSFileModificationDate];
+                                                NSDate *dDate = [dAttrs objectForKey: NSFileModificationDate];
+                                                // NSLog(@"Source %@",[sUrl path]);
+                                                if  ([sDate compare:dDate] == NSOrderedDescending) {
+                                                    // The sDate is earlier than the dDate
+                                                    // compare will return the order type
+#ifdef DEBUG
+                                                    NSLog(@"%s Replacing existing file %@ to %@",__PRETTY_FUNCTION__,[sUrl path],[destinationURL path]);
+#endif
+                                                    [fileManager replaceItemAtURL:destinationURL withItemAtURL:sUrl backupItemName:nil options:NSFileManagerItemReplacementUsingNewMetadataOnly resultingItemURL:nil error:&err];
+                                                    if (err) {
+                                                        NSLog(@"%s : Error copy to local dir: %@",__PRETTY_FUNCTION__,err);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                else {
+                                    NSLog(@"%s Skipping File: %@",__PRETTY_FUNCTION__,fileName);
+                                }
+                            } // fileExistsAtPath
+                        }
+                    }
+                }
+            }]; // remember, this is all one block
+
             theTrail=nil; // buh bye...
             //
             // Clean it up
@@ -1032,6 +1152,8 @@
         [locationManager startUpdatingLocation];
         [locationManager startUpdatingHeading];
         
+        [cameraItem setEnabled:YES];
+        
         // Start The Timer...
         if (![ptTimer isValid])
             ptTimer = [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(checkIfStopped:) userInfo:nil repeats:YES];
@@ -1084,6 +1206,8 @@
     [mySpeedOMeter updateSpeed:0.0f];
     [mySpeedOMeter setNeedsDisplay];
     
+    [cameraItem setEnabled:NO];
+
     if ([theTrail hasUnsavedChanges])
         [self saveTrails:NO];
 }
@@ -1094,6 +1218,10 @@
 -(IBAction)takePicture:(id)sender
 {
     // NSLog(@"In takePicture");
+    if (!amiUpdatingLocation) {
+        NSLog(@"Not Updating Location");
+        return;
+    }
 #ifdef __FFU__
     if (!imagePicker)
         imagePicker = [[UIImagePickerController alloc] init];
@@ -1399,12 +1527,10 @@
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     CGFloat screenHeight = screenRect.size.height;
     CGFloat screenWidth = screenRect.size.width;
-    // CGFloat sliderMaxY = TOM_SLIDER_MAX_Y_VERT;
     if (UIDeviceOrientationIsLandscape(currentOrientation)  ||
         currentOrientation == UIDeviceOrientationPortraitUpsideDown ) {
         screenHeight = screenRect.size.width;
         screenWidth = screenRect.size.height;
-        // sliderMaxY = TOM_SLIDER_MAX_Y_HORZ;
     }
 
 
@@ -1796,14 +1922,19 @@
     
     if ([annotation isKindOfClass:[TOMPointOnAMap class]]) {
         TOMPointOnAMap *mp = annotation;
+
         switch ([mp type]) {
             case ptStop:
+            {
                 annotationView = [[MKAnnotationView alloc] initWithAnnotation:annotation
                                                               reuseIdentifier:@"TOMStopAnnotation"];
                 // annotationView.pinColor = MKPinAnnotationColorRed;
                 annotationView.canShowCallout = YES;
                 annotationView.annotation = annotation;
-                annotationView.image = [UIImage imageNamed:@"stop sign.png"];
+                annotationView.image = [UIImage imageNamed:@"TomStopIcon_32x32.png"];
+               
+                UIImageView *myIconView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TomStopIcon_32x32.png"]];
+                annotationView.leftCalloutAccessoryView = myIconView;
                 //
                 // offset the flag annotation so that the flag pole rests on the map coordinate
                 //
@@ -1812,6 +1943,7 @@
                 //
                 annotationView.centerOffset = CGPointMake( annotationView.centerOffset.x /* - (annotationView.image.size.width/2) */,
                                                             annotationView.centerOffset.y - (annotationView.image.size.height/2));
+            }
             break;
             
             case ptPicture:
@@ -1821,8 +1953,8 @@
                 // annotationView.pinColor = MKPinAnnotationColorPurple;
                 annotationView.canShowCallout = YES;
                 annotationView.annotation = annotation;
-                
-                CGSize myIconSize = CGSizeMake(30, 30);
+               
+                CGSize myIconSize = CGSizeMake(32, 32);
                 UIImage *myIcon = nil;
                 
                 if (mp.image) {
@@ -1838,7 +1970,7 @@
                     myIcon = [TOMImageStore loadIcon: self.title key:[mp key] size:myIconSize];
 
                 }
-                
+            
                 UIImageView *myIconView = [[UIImageView alloc] initWithImage:myIcon];
                 annotationView.leftCalloutAccessoryView = myIconView;
                 
@@ -1847,7 +1979,10 @@
 
                 
                 [disclosureButton addTarget:self action:@selector(showFullSizeImage:) forControlEvents:UIControlEventTouchUpInside];
-                annotationView.image = [UIImage imageNamed:@"camera.png"];
+                
+               
+                annotationView.image = [UIImage imageNamed:@"TomCameraIcon_32x32.png"];
+                
                 annotationView.centerOffset = CGPointMake( annotationView.centerOffset.x /* - (annotationView.image.size.width/2) */,
                                                           annotationView.centerOffset.y - (annotationView.image.size.height/2));
                 
@@ -1857,25 +1992,26 @@
             // Everything else
             default:
             {
-#ifndef FFU
-                MKPinAnnotationView *pinAnnotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"TOMBasicAnnotation"];
-                pinAnnotationView.pinColor = MKPinAnnotationColorGreen;
-                pinAnnotationView.canShowCallout = YES;
-                return pinAnnotationView;
-#else
                 annotationView = [[MKAnnotationView alloc] initWithAnnotation:annotation
                                                              reuseIdentifier:@"TOMBasicAnnotation"];
                 // annotationView.pinColor = MKPinAnnotationColorGreen;
+                annotationView.image = [UIImage imageNamed:@"TomPinIcon_32x32.png"];
                 annotationView.annotation = annotation;
                 annotationView.canShowCallout = YES;
-#endif
+                
+                UIImageView *myIconView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TomPinIcon_32x32.png"]];
+                annotationView.leftCalloutAccessoryView = myIconView;
+                annotationView.centerOffset = CGPointMake( annotationView.centerOffset.x ,
+                                                          annotationView.centerOffset.y - (annotationView.image.size.height/2));
                 break;
             }
         }
     }
+#ifdef DEBUG
     else {
-        NSLog(@"%s It's something else",__PRETTY_FUNCTION__);
+        NSLog(@"%s DEBUG: It's something else",__PRETTY_FUNCTION__);
     }
+#endif
     return annotationView;
 }
 
@@ -1900,4 +2036,7 @@
     [[self navigationController] pushViewController:ptController animated:YES];
 }
 
+
+
+    
 @end
