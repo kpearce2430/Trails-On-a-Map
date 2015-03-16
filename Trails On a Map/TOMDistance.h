@@ -7,10 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-
-@interface TOMDistance : NSObject
 #import <MapKit/MapKit.h>
 #import "TOM.h"
+
+@interface TOMDistance : NSObject
 
 // CLLocationDistance
 + (CLLocationDistance) displayDistance: (CLLocationDistance) d;
