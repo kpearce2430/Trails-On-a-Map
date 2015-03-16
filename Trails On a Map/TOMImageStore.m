@@ -43,7 +43,7 @@
     
     if  (!title) {
         NSLog(@"ERROR: %s %d:No Title Provided",__PRETTY_FUNCTION__,__LINE__);
-        return NO;
+        return nil;
     }
     
     NSError *err = nil;
