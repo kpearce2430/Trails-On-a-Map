@@ -21,7 +21,8 @@
 #import "TOMOdometer.h"
 #import "TOMTripTimer.h"
 #import "TOMMapAnnotation.h"
-// #import "TOMMapAnnotationView.h"
+#import "TOMUIUtilities.h"
+
 
 @interface TOMRootViewController : UIViewController <MKMapViewDelegate, CLLocationManagerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIActionSheetDelegate>
 
@@ -76,5 +77,8 @@
 - (void) launchCamera;
 - (void) launchPhotoLibrary;
 - (void) checkProperties;
+
+- (void)checkLocationServicesAuthorizationStatus;
+- (void)requestAlwaysAuthorization;
 
 @end
