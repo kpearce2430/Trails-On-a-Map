@@ -302,7 +302,7 @@
     
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
                                    initWithTitle: @"Back"
-                                   style: UIBarButtonItemStyleBordered
+                                   style: UIBarButtonItemStylePlain
                                    target: nil action: nil];
     
     [self.navigationItem setBackBarButtonItem: backButton];
@@ -335,26 +335,23 @@
         return;
     }
 
-    
     if ((UIDeviceOrientationIsPortrait(currentOrientation) && UIDeviceOrientationIsPortrait(orientation)) ||
-        (UIDeviceOrientationIsLandscape(currentOrientation) && UIDeviceOrientationIsLandscape(orientation))) {
+        (UIDeviceOrientationIsLandscape(currentOrientation) && UIDeviceOrientationIsLandscape(orientation)) ||
+         currentOrientation == UIDeviceOrientationPortraitUpsideDown ) {
         //
         //still saving the current orientation
         orientation = currentOrientation;
-        // return;
+        return;
     }
 
     orientation = currentOrientation;
     
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGRect screenRect ; //= [[UIScreen mainScreen] bounds];
+    [TOMUIUtilities screenRect:&screenRect];
+    
     CGFloat screenHeight = screenRect.size.height;
     CGFloat screenWidth = screenRect.size.width;
     
-    if (UIDeviceOrientationIsLandscape(orientation)) {
-        screenHeight = screenRect.size.width;
-        screenWidth = screenRect.size.height;
-    }
-
     screenRect = CGRectMake(0.0, 0.0, screenWidth, screenHeight);
     [self.view setFrame:screenRect];
     
@@ -625,7 +622,7 @@
             NSError *err = [result valueForKey:NSMetadataUbiquitousItemDownloadingErrorKey];
             if (err) {
                 NSLog(@"%s Error In Downloading: %@",__PRETTY_FUNCTION__,err);
-                isDownloaded = (BOOL) 0;
+                isDownloaded = nil;
             }
             
             if (![isDownLoading boolValue]) {
@@ -703,9 +700,10 @@
 
             NSString *gpxName = [fileName stringByAppendingString:@TOM_GPX_EXT];
             NSURL *gpxURL = [localDocs URLByAppendingPathComponent:gpxName isDirectory:NO];
+            BOOL isDirectory;
             
             error = nil;
-            if ([fileManager fileExistsAtPath:[gpxURL path] isDirectory:NO]) {
+            if ([fileManager fileExistsAtPath:[gpxURL path] isDirectory:&isDirectory]) {
                 [fileManager removeItemAtURL:gpxURL error:&error];
             }
             
@@ -717,7 +715,7 @@
             NSURL *kmzURL = [localDocs URLByAppendingPathComponent:kmzName isDirectory:NO];
             
             error = nil;
-            if ([fileManager fileExistsAtPath:[kmzURL path] isDirectory:NO]) {
+            if ([fileManager fileExistsAtPath:[kmzURL path] isDirectory:&isDirectory]) {
                 [fileManager removeItemAtURL:kmzURL error:&error];
             }
             
@@ -729,7 +727,7 @@
             NSURL *csvURL = [localDocs URLByAppendingPathComponent:csvName isDirectory:NO];
             
             error = nil;
-            if ([fileManager fileExistsAtPath:[csvURL path] isDirectory:NO]) {
+            if ([fileManager fileExistsAtPath:[csvURL path] isDirectory:&isDirectory]) {
                 [fileManager removeItemAtURL:csvURL error:&error];
             }
             
