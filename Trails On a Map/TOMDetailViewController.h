@@ -12,6 +12,7 @@
 #import "TOMDistance.h"
 #import "TOMSpeed.h"
 #import "TOMOrganizerViewCell.h"  // reuse this
+#import "TOMUIUtilities.h"
 
 #ifndef GPX_SWITCH_TAG
 #define GPX_SWITCH_TAG  1

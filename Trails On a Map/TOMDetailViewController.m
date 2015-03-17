@@ -267,12 +267,9 @@
         cell.accessoryView = nil;
         cell.textLabel.font = headerLabelFont;
         
-        CGRect screenRect = [[UIScreen mainScreen] bounds];
+        CGRect screenRect;
+        [TOMUIUtilities screenRect:&screenRect];
         CGFloat screenWidth = screenRect.size.width;
-        
-        if (UIDeviceOrientationIsLandscape(orientation)) {
-            screenWidth = screenRect.size.height;
-        }
         
         switch (indexPath.section)  {
             case 0:
@@ -527,7 +524,8 @@
     }
     
     if ((UIDeviceOrientationIsPortrait(currentOrientation) && UIDeviceOrientationIsPortrait(orientation)) ||
-        (UIDeviceOrientationIsLandscape(currentOrientation) && UIDeviceOrientationIsLandscape(orientation))) {
+        (UIDeviceOrientationIsLandscape(currentOrientation) && UIDeviceOrientationIsLandscape(orientation)) ||
+        currentOrientation == UIDeviceOrientationPortraitUpsideDown) {
         //still saving the current orientation
         orientation = currentOrientation;
         return;
@@ -535,14 +533,10 @@
     
     orientation = currentOrientation;
     
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGRect screenRect;
+    [TOMUIUtilities screenRect:&screenRect];
     CGFloat screenHeight = screenRect.size.height;
     CGFloat screenWidth = screenRect.size.width;
-    
-    if (UIDeviceOrientationIsLandscape(orientation)) {
-        screenHeight = screenRect.size.width;
-        screenWidth = screenRect.size.height;
-    }
     
     screenRect = CGRectMake(0.0, 0.0, screenWidth, screenHeight);
     [self.view setFrame:screenRect];
@@ -564,10 +558,10 @@
     // NSLog(@"%s Title:%@ URL:%@",__func__,thisCell.title,thisCell.url);
     NSURL *myURL = [TOMUrl urlForImageFile:self.title key:[mp key]];
     // UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameWithKeyAndImage:@"TOMImageViewController" bundle:nil title:[mp title] key:[mp key] url:myURL];
-    UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameAndPom:@"TOMImageViewController" bundle:nil POM:mp url:myURL];
+    UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameAndPom:@"TOMImageViewController" bundle:nil Trail: theTrail.title POM:mp url:myURL];
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
                                    initWithTitle: @"Back"
-                                   style: UIBarButtonItemStyleBordered
+                                   style: UIBarButtonItemStylePlain
                                    target: nil action: nil];
     
     [self.navigationItem setBackBarButtonItem: backButton];
@@ -977,7 +971,7 @@
             NSNumber *isDownLoading;
             if (err) {
                 NSLog(@"%s Error In Downloading: %@",__PRETTY_FUNCTION__,err);
-                isDownloaded = (BOOL) 0;
+                isDownloaded = nil;
             }
             else
                 isDownLoading = [result valueForKey:NSMetadataUbiquitousItemIsDownloadingKey];
@@ -1259,7 +1253,8 @@
     NSArray *keys = [NSArray arrayWithObjects: NSURLIsDirectoryKey, NSURLIsPackageKey, NSURLLocalizedNameKey, nil];
 
     NSFileManager *fileManager = [[NSFileManager alloc]init];
-
+    BOOL isDir;
+    
     NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:oldTrailURL
                                           includingPropertiesForKeys:keys
                                                              options:(NSDirectoryEnumerationSkipsPackageDescendants | NSDirectoryEnumerationSkipsHiddenFiles)
@@ -1305,7 +1300,7 @@
                 //
                 NSURL *destinationURL = [newTrailURL URLByAppendingPathComponent:fileName isDirectory:NO];
             
-                if (![fileManager fileExistsAtPath:[destinationURL path] isDirectory:NO]) {
+                if (![fileManager fileExistsAtPath:[destinationURL path] isDirectory:&isDir]) {
                     // NSLog(@"Dest URL:%@",[destinationURL path]);
                     [fileManager moveItemAtURL:url toURL:destinationURL error:&err];
                     if (err) {
@@ -1440,5 +1435,6 @@
     }
     return NO;
 }
+
 
 @end
