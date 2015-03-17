@@ -11,6 +11,7 @@
 //
 #import <UIKit/UIKit.h>
 #import "TOM.h"
+#import "TOMUIUtilities.h"
 
 //
 // Common items between all subviews of
