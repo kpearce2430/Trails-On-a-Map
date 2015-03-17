@@ -461,8 +461,11 @@
     UIFont *myLabelFont = [UIFont fontWithName: @TOM_FONT size: 12.0 ];
     UIFont *myTitleFont = [UIFont fontWithName: @TOM_FONT size: 12.0 ];
     UIFont *myVersionFont = [UIFont fontWithName: @TOM_FONT size: 10.0 ];
-    //  A better way to do this...
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    
+    //  Am even better way to do this...
+    CGRect screenRect;
+    [TOMUIUtilities screenRect:&screenRect];
+    
     CGRect myrect = CGRectMake(0, 0, screenRect.size.width, screenRect.size.height);
     
     // UIScrollView *scrollView
@@ -1036,23 +1039,27 @@
     // else
     //    NSLog(@"Orientation Changed! (nil)");
 
-    UIInterfaceOrientation uiOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-
-    if ((UIInterfaceOrientationIsLandscape(currentInterfaceOrientation) && UIInterfaceOrientationIsLandscape(uiOrientation)) ||
-        (UIInterfaceOrientationIsPortrait(currentInterfaceOrientation) && UIInterfaceOrientationIsPortrait(uiOrientation))) {
-        //still saving the current orientation ?
-        currentInterfaceOrientation = uiOrientation;
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    
+    if (orientation == currentDeviceOrientation) {
         return;
     }
- 
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    
+
+    if ((UIDeviceOrientationIsPortrait(currentDeviceOrientation) && UIDeviceOrientationIsPortrait(orientation)) ||
+        (UIDeviceOrientationIsLandscape(currentDeviceOrientation) && UIDeviceOrientationIsLandscape(orientation)) ||
+        orientation == UIDeviceOrientationPortraitUpsideDown) {
+        //still saving the current orientation
+        currentDeviceOrientation = orientation;
+        return;
+    }
+    
+    currentDeviceOrientation = orientation;
+
+    CGRect screenRect;
+    [TOMUIUtilities screenRect:&screenRect];
     CGFloat screenHeight = screenRect.size.height;
     CGFloat screenWidth = screenRect.size.width;
-    
-    if (UIInterfaceOrientationIsLandscape(uiOrientation)) {
-        screenHeight = screenRect.size.width;
-        screenWidth = screenRect.size.height;
-    }
     
     CGRect myScreenRect = CGRectMake(0, 0, screenWidth, screenHeight);
     [self.view setFrame:myScreenRect];
