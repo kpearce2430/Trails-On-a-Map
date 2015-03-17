@@ -66,11 +66,11 @@
         screenRect->size.height = myScreenRect.size.height;
         screenRect->size.width = myScreenRect.size.width;
     }
-#ifdef DEBUG
+#ifdef __DEBUG
     NSLog(@"screenRect %@ orig[x:%f y:%f],size[w:%f h:%f]\n", [TOMUIUtilities printOrientation: myOrientation],
           screenRect->origin.x, screenRect->origin.y,
           screenRect->size.width, screenRect->size.height );
-    // NSLog(@"End %s",__PRETTY_FUNCTION__);
+    NSLog(@"End %s",__PRETTY_FUNCTION__);
 #endif
     
     
