@@ -109,12 +109,10 @@
 
     if (displayup == NO) {
  
-        CGRect screenRect = [[UIScreen mainScreen] bounds];
-    
+        CGRect screenRect;
+        [TOMUIUtilities screenRect:&screenRect];
         CGFloat screenWidth = screenRect.size.width;
-        if (UIDeviceOrientationIsLandscape(orientation))
-            screenWidth = screenRect.size.height;
-        
+
         if (minRect.origin.x >= (screenWidth / 2.0f))
             minRect.origin.x = screenWidth - TOM_SLIDER_MIN_X;
         else
@@ -128,7 +126,7 @@
 
 - (void) resetView
 {
-    NSLog(@"%s WARNING Method needs to be implemented in you class",__PRETTY_FUNCTION__);
+    NSLog(@"%s WARNING Method needs to be implemented in your class",__PRETTY_FUNCTION__);
     return;
 }
 
