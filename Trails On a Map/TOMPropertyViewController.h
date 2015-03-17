@@ -9,14 +9,15 @@
 #import <UIKit/UIKit.h>
 #import "TOMProperties.h"
 #import "TOMPointOnAMap.h"
+#import "TOMUIUtilities.h"
 
 #import <math.h>
 
 @interface TOMPropertyViewController : UIViewController <UITextFieldDelegate, UIScrollViewDelegate, UIActionSheetDelegate>
 {
     @private
-    // UIDeviceOrientation currentDeviceOrientation;
-    UIInterfaceOrientation currentInterfaceOrientation;
+    UIDeviceOrientation currentDeviceOrientation;
+    // UIInterfaceOrientation currentInterfaceOrientation;
 }
 
 // Controller sub-views
