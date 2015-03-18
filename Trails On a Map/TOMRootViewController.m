@@ -1,3 +1,4 @@
+
 //
 //  TOMRootViewController.m
 //  Trails On a Map
@@ -69,6 +70,15 @@
         //
         locationManager = [[ CLLocationManager alloc] init ];
         [locationManager setDelegate:self];
+        
+#if DEBUG
+        [self checkLocationServicesAuthorizationStatus];
+#endif
+        if  ([TOMUIUtilities isIOS8]) {
+            if ([locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
+                [locationManager requestAlwaysAuthorization];
+            }
+        }
         
         // New for IOS7
         //  For future, need to allow user to pick.
@@ -286,7 +296,7 @@
                         NSURL *destinationDir = [icloudURL URLByAppendingPathComponent:trailName isDirectory:YES];
                         NSURL *destinationURL = [destinationDir URLByAppendingPathComponent:fileName isDirectory:NO];
                         
-                        if (![fileManager fileExistsAtPath:[destinationURL path] isDirectory:NO]) {
+                        if (![fileManager fileExistsAtPath:[destinationURL path] isDirectory:&isDirectory]) {
                             NSLog(@"Dest URL:%@",[destinationURL path]);
                             [fileManager copyItemAtURL:url toURL:destinationURL error:&err];
                             if (err) {
@@ -385,7 +395,7 @@
         //
         if ([newTitle isEqualToString:self.title]) {
             // Do nothing
-#ifdef DEBUG
+#if __DEBUG
             NSLog(@"%s INFO Did not change title[%@]",__func__,newTitle);
 #endif
         }
@@ -495,7 +505,7 @@
                                 NSLog(@"%s Error Creating Direcotry at Path %@",__PRETTY_FUNCTION__,err);
                             }
                         }
-#ifdef DEBUG
+#ifdef __DEBUG
                         if (yn == NO) {
                             NSLog(@"%s Error, Expecting %@ to be a Directory?",__PRETTY_FUNCTION__,[destDir path]);
                         }
@@ -505,7 +515,7 @@
 
                             BOOL isDirectory;
                             NSError *err = nil;
-#ifdef DEBUG
+#ifdef __DEBUG
                             NSLog(@"%s Source URL:%@",__PRETTY_FUNCTION__,[sUrl path]);
 #endif
                             BOOL fileExistsAtPath = [fileManager fileExistsAtPath:[sUrl path] isDirectory:&isDirectory];
@@ -530,7 +540,7 @@
                                     // NSURL *destinationDir = [icloudURL URLByAppendingPathComponent:trailName isDirectory:YES];
                                     NSURL *destinationURL = [destDir URLByAppendingPathComponent:fileName isDirectory:NO];
                                     
-                                    if (![fileManager fileExistsAtPath:[destinationURL path] isDirectory:NO]) {
+                                    if (![fileManager fileExistsAtPath:[destinationURL path] isDirectory:&isDirectory]) {
                                         // NSLog(@"Dest URL:%@",[destinationURL path]);
                                         [fileManager copyItemAtURL:sUrl toURL:destinationURL error:&err];
                                         if (err) {
@@ -1094,7 +1104,7 @@
     
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
                                    initWithTitle: @"Back"
-                                   style: UIBarButtonItemStyleBordered
+                                   style: UIBarButtonItemStylePlain
                                    target: nil action: nil];
     
     [self.navigationItem setBackBarButtonItem: backButton];
@@ -1327,7 +1337,7 @@
     
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
                                    initWithTitle: @"Back"
-                                   style: UIBarButtonItemStyleBordered
+                                   style: UIBarButtonItemStylePlain
                                    target: nil action: nil];
     
     [self.navigationItem setBackBarButtonItem: backButton];
@@ -1398,7 +1408,7 @@
     
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
                                    initWithTitle: @"Back"
-                                   style: UIBarButtonItemStyleBordered
+                                   style: UIBarButtonItemStylePlain
                                    target: nil action: nil];
     
     [self.navigationItem setBackBarButtonItem: backButton];
@@ -1523,16 +1533,11 @@
     }
 
     currentOrientation = orientation;
-    
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
+
+    CGRect screenRect;
+    [TOMUIUtilities screenRect:&screenRect];
     CGFloat screenHeight = screenRect.size.height;
     CGFloat screenWidth = screenRect.size.width;
-    if (UIDeviceOrientationIsLandscape(currentOrientation)  ||
-        currentOrientation == UIDeviceOrientationPortraitUpsideDown ) {
-        screenHeight = screenRect.size.width;
-        screenWidth = screenRect.size.height;
-    }
-
 
     [self.view setFrame:screenRect];
     CGRect mapRect = CGRectMake( 0.0, 0.0, screenWidth, (screenHeight - TOM_TOOL_BAR_HEIGHT ));
@@ -2026,9 +2031,9 @@
     
     // UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameWithKeyAndImage:@"TOMImageViewController" bundle:nil title:[myPoint title] key:[myPoint key] url:myURL];
 
-    UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameAndPom:@"TOMImageViewController" bundle:nil POM:myPoint url:myURL];
+    UIViewController *ptController = [[TOMImageViewController alloc] initWithNibNameAndPom:@"TOMImageViewController" bundle:nil Trail:theTrail.title POM:myPoint url:myURL];
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithTitle: @"Back"
-                                                                   style: UIBarButtonItemStyleBordered
+                                                                   style: UIBarButtonItemStylePlain
                                                                   target: nil
                                                                   action: nil];
     
@@ -2036,7 +2041,100 @@
     [[self navigationController] pushViewController:ptController animated:YES];
 }
 
+// For turning on location servcies
 
-
+- (void)requestAlwaysAuthorization
+{
+    CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
     
+    // If the status is denied or only granted for when in use, display an alert
+    if (status == kCLAuthorizationStatusAuthorizedWhenInUse || status == kCLAuthorizationStatusDenied) {
+        NSString *title;
+        title = (status == kCLAuthorizationStatusDenied) ? @"Location services are off" : @"Background location is not enabled";
+        NSString *message = @"To use background location you must turn on 'Always' in the Location Services Settings";
+        
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:title
+                                                            message:message
+                                                           delegate:self
+                                                  cancelButtonTitle:@"Cancel"
+                                                  otherButtonTitles:@"Settings", nil];
+        [alertView show];
+    }
+    // The user has not enabled any location services. Request background authorization.
+    else if (status == kCLAuthorizationStatusNotDetermined) {
+        [locationManager requestAlwaysAuthorization];
+    }
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1) {
+        // Send the user to the Settings for this app
+        NSURL *settingsURL = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+        [[UIApplication sharedApplication] openURL:settingsURL];
+    }
+}
+
+
+#pragma mark - CLLocationMangerDelegate methods
+
+#if DEBUG
+
+- (void)checkLocationServicesAuthorizationStatus {
+    if([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined) {
+        NSLog(@"Authorization Status Not Determined");
+        [self requestAlwaysAuthorization];
+    }
+    else if([CLLocationManager authorizationStatus] == kCLAuthorizationStatusRestricted) {
+        NSLog(@"Authorization Status Restricted");
+    }
+    else if([CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied) {
+        NSLog(@"Authorization Status Denied");
+    }
+    else if([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedAlways) {
+        NSLog(@"Authorization Status Authorized Always");
+    }
+    else if([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
+        NSLog(@"Authorization Status When In Use");
+    }
+    else {
+        NSLog(@"Authorization Status Error!!");
+    }
+}
+
+#endif
+
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
+    /*
+     The delegate function will be called when the permission status changes the application should then attempt to handle the change appropriately by changing UI or setting up or tearing down data structures.
+     */
+    if(status == kCLAuthorizationStatusNotDetermined) {
+        NSLog(@"Authorization Status Not Determined");
+    }
+    else if(status == kCLAuthorizationStatusRestricted) {
+        NSLog(@"Authorization Status Restricted");
+    }
+    else if(status == kCLAuthorizationStatusDenied) {
+        NSLog(@"Authorization Status Denied");
+    }
+    else if(status == kCLAuthorizationStatusAuthorizedAlways) {
+        NSLog(@"Authorization Status Authorized Always");
+    }
+    else if(status == kCLAuthorizationStatusAuthorizedWhenInUse) {
+        NSLog(@"Authorization Status Authorized When In Use");
+    }
+    else {
+        NSLog(@"Authorization Status Error!!");
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
+    /*
+     Handle the failure...
+     */
+    NSLog(@"ALERT!  Location Manger Failure!");
+    [self.locationManager stopUpdatingLocation];
+}
+
 @end

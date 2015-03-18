@@ -78,7 +78,10 @@
 - (void) launchPhotoLibrary;
 - (void) checkProperties;
 
+#ifdef DEBUG
 - (void)checkLocationServicesAuthorizationStatus;
+#endif
+
 - (void)requestAlwaysAuthorization;
 
 @end
