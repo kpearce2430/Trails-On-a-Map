@@ -16,13 +16,14 @@
 
 @synthesize url,mp;
 
-- (id)initWithNibNameAndPom:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil POM: (TOMPointOnAMap *) p url:(NSURL *)u
+- (id)initWithNibNameAndPom:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil Trail: (NSString *) t POM: (TOMPointOnAMap *) p url:(NSURL *)u
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
         mp = p;
         self.title = p.title;
+        trailName = [[NSString alloc] initWithString:t];
         url = u;
     }
     return self;
@@ -59,6 +60,10 @@
             image = [UIImage imageWithData:data];
             [self createControls];
             [self orientationPropertiesChanged:nil];
+#if USE_AVIARY
+            editAndDoneButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
+            self.navigationItem.rightBarButtonItem = editAndDoneButton;
+#endif
         }
     }
 }
@@ -95,7 +100,9 @@
     self.edgesForExtendedLayout = UIRectEdgeNone;
     
     //  A better way to do this...
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGRect screenRect ; // = [[UIScreen mainScreen] bounds];
+    [TOMUIUtilities screenRect:&screenRect];
+    
     imageScrollView = [[UIScrollView alloc] initWithFrame:screenRect];
     imageScrollView.delegate = self;
     imageScrollView.showsVerticalScrollIndicator = YES;
@@ -156,21 +163,15 @@
         return;
     }
     
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGRect screenRect; // = [[UIScreen mainScreen] bounds];
+    [TOMUIUtilities screenRect:&screenRect];
+    
     CGFloat screenHeight = screenRect.size.height;
     CGFloat screenWidth = screenRect.size.width;
-    
-    if (UIInterfaceOrientationIsLandscape(uiOrientation)) {
-        screenHeight = screenRect.size.width;
-        screenWidth = screenRect.size.height;
-    }
     
     // update the rest of the items on the screen with the now rect
     CGRect myScreenRect = CGRectMake(0, 0, screenWidth, screenHeight);
     [imageScrollView setFrame:myScreenRect];
-    // [imageView setFrame:myScreenRect];
-    
-    // CGSize mySize = CGSizeMake(image.size.width, image.size.height);
     [imageScrollView setContentSize:image.size];
     [imageView sizeToFit];
     return;
@@ -236,5 +237,41 @@
     zoomView.frame = zvf;
 }
 
+
+// #if USE_AVIARY
+- (IBAction)editClicked:(id)sender {
+    
+    // kAviaryAPIKey and kAviarySecret are developer defined
+    // and contain your API key and secret respectively
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [AFPhotoEditorController setAPIKey:@kAviaryAPIKey secret:@kAviarySecret];
+    });
+    
+    AFPhotoEditorController *editorController = [[AFPhotoEditorController alloc] initWithImage:image];
+    [editorController setDelegate:self];
+    [self presentViewController:editorController animated:YES completion:nil];
+
+}
+
+- (void)photoEditor:(AFPhotoEditorController *)editor finishedWithImage:(UIImage *)returnImage
+{
+    // Handle the result image here
+    NSLog(@"Done Editing");
+    // image = returnImage;
+    [TOMImageStore saveImage:returnImage title:trailName key:[mp key]];
+    [imageView setImage:returnImage];
+    [imageView sizeToFit];
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)photoEditorCanceled:(AFPhotoEditorController *)editor
+{
+    // Handle cancellation here
+    NSLog(@"Cancel Editing");
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+// #endif
 
 @end
