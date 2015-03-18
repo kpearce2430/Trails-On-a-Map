@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD03050919EB354E004AFB6B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03050819EB354E004AFB6B /* Accelerate.framework */; };
+		AD03050B19EB35A1004AFB6B /* AviarySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03050A19EB35A1004AFB6B /* AviarySDK.framework */; };
+		AD03050D19EB35C9004AFB6B /* libsqlite3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03050C19EB35C9004AFB6B /* libsqlite3.0.dylib */; };
+		AD03050F19EB35E6004AFB6B /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03050E19EB35E6004AFB6B /* libz.1.2.5.dylib */; };
+		AD03051119EB3605004AFB6B /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03051019EB3605004AFB6B /* MessageUI.framework */; };
+		AD03051319EB3612004AFB6B /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03051219EB3612004AFB6B /* OpenGLES.framework */; };
+		AD03051519EB362B004AFB6B /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03051419EB362B004AFB6B /* QuartzCore.framework */; };
+		AD03051719EB3720004AFB6B /* AviarySDKResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AD03051619EB3720004AFB6B /* AviarySDKResources.bundle */; };
 		AD0FC3DB18DCC1970060F2B8 /* pssGPX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD0FC3DA18DCC1970060F2B8 /* pssGPX.framework */; };
 		AD26E2FB181B129A0021BEE2 /* TOMImageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */; };
 		AD31BFA7182EED5800BCEE96 /* TOMViewSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = AD31BFA6182EED5800BCEE96 /* TOMViewSlider.m */; };
@@ -79,6 +87,7 @@
 		ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */; };
 		ADBF322F18BD454A00EBEF1D /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBF322E18BD454A00EBEF1D /* iAd.framework */; };
 		ADC70DCC190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png in Resources */ = {isa = PBXBuildFile; fileRef = ADC70DCB190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png */; };
+		ADC91CE61AB4B624001F9D4C /* TOMUIUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = ADC91CE51AB4B624001F9D4C /* TOMUIUtilities.m */; };
 		ADDE2927184A456F00CBB238 /* TOMSpeed.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDE2926184A456F00CBB238 /* TOMSpeed.m */; };
 		ADDE292A184A4C2000CBB238 /* TOMDistance.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDE2929184A4C2000CBB238 /* TOMDistance.m */; };
 		ADDE292C184D29F500CBB238 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADDE292B184D29F500CBB238 /* AssetsLibrary.framework */; };
@@ -95,6 +104,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AD03050819EB354E004AFB6B /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		AD03050A19EB35A1004AFB6B /* AviarySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AviarySDK.framework; path = "../../../Projects/AviarySDK-4.3.2/AviarySDK/AviarySDK.framework"; sourceTree = "<group>"; };
+		AD03050C19EB35C9004AFB6B /* libsqlite3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.0.dylib; path = usr/lib/libsqlite3.0.dylib; sourceTree = SDKROOT; };
+		AD03050E19EB35E6004AFB6B /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = usr/lib/libz.1.2.5.dylib; sourceTree = SDKROOT; };
+		AD03051019EB3605004AFB6B /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
+		AD03051219EB3612004AFB6B /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		AD03051419EB362B004AFB6B /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		AD03051619EB3720004AFB6B /* AviarySDKResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AviarySDKResources.bundle; sourceTree = "<group>"; };
 		AD0FC3DA18DCC1970060F2B8 /* pssGPX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = pssGPX.framework; path = ../../../pssGPX.framework; sourceTree = "<group>"; };
 		AD26E2F9181B129A0021BEE2 /* TOMImageStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMImageStore.h; sourceTree = "<group>"; };
 		AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMImageStore.m; sourceTree = "<group>"; };
@@ -194,6 +211,8 @@
 		ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMOrganizerViewController.xib; sourceTree = "<group>"; };
 		ADBF322E18BD454A00EBEF1D /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		ADC70DCB190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-ios7-cloud-download-outline-128.png"; sourceTree = "<group>"; };
+		ADC91CE41AB4B624001F9D4C /* TOMUIUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMUIUtilities.h; sourceTree = "<group>"; };
+		ADC91CE51AB4B624001F9D4C /* TOMUIUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMUIUtilities.m; sourceTree = "<group>"; };
 		ADDE2925184A456F00CBB238 /* TOMSpeed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMSpeed.h; sourceTree = "<group>"; };
 		ADDE2926184A456F00CBB238 /* TOMSpeed.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSpeed.m; sourceTree = "<group>"; };
 		ADDE2928184A4C2000CBB238 /* TOMDistance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDistance.h; sourceTree = "<group>"; };
@@ -206,8 +225,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ADA35AB018E7609700C1A099 /* libz.dylib in Frameworks */,
 				AD63EBE9190AF49D004FDE02 /* StoreKit.framework in Frameworks */,
+				AD03051519EB362B004AFB6B /* QuartzCore.framework in Frameworks */,
+				AD03051319EB3612004AFB6B /* OpenGLES.framework in Frameworks */,
+				AD03051119EB3605004AFB6B /* MessageUI.framework in Frameworks */,
+				AD03050F19EB35E6004AFB6B /* libz.1.2.5.dylib in Frameworks */,
+				AD03050D19EB35C9004AFB6B /* libsqlite3.0.dylib in Frameworks */,
+				AD03050B19EB35A1004AFB6B /* AviarySDK.framework in Frameworks */,
+				AD03050919EB354E004AFB6B /* Accelerate.framework in Frameworks */,
+				ADA35AB018E7609700C1A099 /* libz.dylib in Frameworks */,
 				ADA35AC018E76DD800C1A099 /* pssZipKit.framework in Frameworks */,
 				ADBF322F18BD454A00EBEF1D /* iAd.framework in Frameworks */,
 				AD6F03571857DCC700753144 /* ImageIO.framework in Frameworks */,
@@ -266,6 +292,7 @@
 		AD7BEC71180E22910003187D = {
 			isa = PBXGroup;
 			children = (
+				AD03051619EB3720004AFB6B /* AviarySDKResources.bundle */,
 				AD7BEC85180E22910003187D /* Trails On a Map */,
 				AD7BECA2180E22910003187D /* Trails On a MapTests */,
 				AD7BEC7C180E22910003187D /* Frameworks */,
@@ -285,6 +312,13 @@
 		AD7BEC7C180E22910003187D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AD03051419EB362B004AFB6B /* QuartzCore.framework */,
+				AD03051219EB3612004AFB6B /* OpenGLES.framework */,
+				AD03051019EB3605004AFB6B /* MessageUI.framework */,
+				AD03050E19EB35E6004AFB6B /* libz.1.2.5.dylib */,
+				AD03050C19EB35C9004AFB6B /* libsqlite3.0.dylib */,
+				AD03050A19EB35A1004AFB6B /* AviarySDK.framework */,
+				AD03050819EB354E004AFB6B /* Accelerate.framework */,
 				AD63EBE8190AF49D004FDE02 /* StoreKit.framework */,
 				ADA35AAF18E7609700C1A099 /* libz.dylib */,
 				ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */,
@@ -372,6 +406,8 @@
 				ADDE2929184A4C2000CBB238 /* TOMDistance.m */,
 				ADDE2925184A456F00CBB238 /* TOMSpeed.h */,
 				ADDE2926184A456F00CBB238 /* TOMSpeed.m */,
+				ADC91CE41AB4B624001F9D4C /* TOMUIUtilities.h */,
+				ADC91CE51AB4B624001F9D4C /* TOMUIUtilities.m */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -529,6 +565,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD03051719EB3720004AFB6B /* AviarySDKResources.bundle in Resources */,
 				ADC70DCC190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png in Resources */,
 				AD6651B4197AAC82002E84A2 /* TomCameraIcon_32x32.png in Resources */,
 				AD6F03671858A88900753144 /* TOMPhotoGroupViewController.xib in Resources */,
@@ -609,6 +646,7 @@
 				AD7D63EB19647C19006D7F66 /* TOMMapAnnotation.m in Sources */,
 				AD45010C181191AE00E76DE0 /* TOMPointOnAMap.m in Sources */,
 				AD5CC56A18F1A53C00393BC1 /* TOMSubView.m in Sources */,
+				ADC91CE61AB4B624001F9D4C /* TOMUIUtilities.m in Sources */,
 				AD26E2FB181B129A0021BEE2 /* TOMImageStore.m in Sources */,
 				AD7BEC90180E22910003187D /* TOMAppDelegate.m in Sources */,
 				AD69E67718F70C4C00819996 /* TOMTripTimer.m in Sources */,
@@ -686,6 +724,11 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
+					"DEBUG=1",
+					"$(inherited)",
+					"USE_AVIARY=1",
+				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -754,10 +797,12 @@
 					"$(inherited)",
 					/Users/pearcek,
 					"$(PROJECT_DIR)",
+					"/Users/pearcek/Projects/AviarySDK-4.3.2/AviarySDK",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trails On a Map/Trails On a Map-Prefix.pch";
 				INFOPLIST_FILE = "Trails On a Map/Trails On a Map-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,
@@ -781,10 +826,12 @@
 					"$(inherited)",
 					/Users/pearcek,
 					"$(PROJECT_DIR)",
+					"/Users/pearcek/Projects/AviarySDK-4.3.2/AviarySDK",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trails On a Map/Trails On a Map-Prefix.pch";
 				INFOPLIST_FILE = "Trails On a Map/Trails On a Map-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,
