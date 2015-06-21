@@ -28,11 +28,14 @@ typedef enum  { tomDDError = -1, tomDDUnknown, tomDDMiles, tomDDKilometers, tomD
 #define KEY_TRIPMETER            "ptTripMeter"
 #define KEY_SLIDER               "ptSlider"
 #define KEY_SPEEDOMETER          "ptSpeedOMeter"
-#define KEY_PROPERTIES_SYNC      "ptPropertiesSync"  // Yes/No if properties are synced on iCloud.
+#define KEY_PROPERTIES_SYNC      "ptPropertiesSync"     // Yes/No if properties are synced on iCloud.
 #define KEY_ICLOUD               "ptICloud"
 #define KEY_ICON_IMAGE           "ptIconImage"
-#define KEY_TRAIL_ON             "ptTrailOM"   // Which trail is currently loaded on the RootViewController
-#define KEY_PHOTO_COUNT          "ptPhotoCount"
+#define KEY_TRAIL_ON             "ptTrailOM"            // Which trail is currently loaded on the RootViewController
+#define KEY_PHOTO_COUNT          "ptPhotoCount"         //
+#define KEY_GOOGLE_DRIVE_ENABLED "pkGDriveEnabled"      // Google Drive Enabled
+#define KEY_GOOGLE_DRIVE_PATH    "pkGDrivePath"         // Google Drive Path
+
 
 // Defaults
 #define TRAILS_ON_A_MAP          "Trails On A Map"
