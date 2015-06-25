@@ -12,13 +12,14 @@
 #import "pssKML/pssKML.h"
 #import "pssZipKit/pssZipKit.h"
 
+
 @interface TOMDetailViewController ()
 
 @end
 
 @implementation TOMDetailViewController
 
-@synthesize theTrail, titleField, gpxSwitch, kmlSwitch, query, activityIndicator;
+@synthesize theTrail, titleField, gpxSwitch, kmlSwitch, csvSwitch, query, activityIndicator;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -43,14 +44,18 @@
         headerLabelFont = [UIFont fontWithName: @TOM_FONT size: 14.0 ];
         footerLabelFont = [UIFont fontWithName: @TOM_FONT size: 10.0 ];
         
-       
+        //
+        if ([TOMGDrive isGDriveEnabled]) {
+            gDrive = [[TOMGDrive alloc] initGDrive];
+            if  ([gDrive isAuthorized]) {
+                [gDrive trailsFolderExists];
+            }
+        }
     }
     return self;
 }
 
-//
-// * * * * * * * * * * * * * * * * * * *
-//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 - (void)viewDidLoad
 {
@@ -66,6 +71,16 @@
     
     if (usingIcloud) {
         [self prepareImageFiles];
+    }
+    
+  
+    if ([TOMGDrive isGDriveEnabled] && ![gDrive isAuthorized])
+    {
+        // Not yet authorized, request authorization and push the login UI onto the navigation stack.
+#ifdef DEBUG
+        NSLog(@"DEBUG: %s Not Yet Authorized",__PRETTY_FUNCTION__);
+#endif
+        [self.navigationController pushViewController:[gDrive createAuthController] animated:YES];
     }
     
     if (![self isActiveTrail]) {
@@ -223,8 +238,8 @@
 
     if ([tableView isEqual:detailTable]) {
         switch (section) {
-            case 0: // Trail Properties (currently Name, GPX, KML)
-                return 3;
+            case 0: // Trail Properties (currently Name, GPX, KML, CSV)
+                return 4;
                 break;
             case 1: // Trail Pictures;
 
@@ -256,7 +271,8 @@
     
     if ([tableView isEqual:detailTable]) {
         
-        NSURL *docsdirURL = [TOMUrl urlForDocumentsDirectory];
+        // For version 1.3 store the documents on the local drive.
+        NSURL *docsdirURL = [TOMUrl urlForLocalDocuments];
         NSString *fileName = nil; // [NSString stringWithFormat:@"%@.gpx",self.title];
         NSURL *fileFullURL = nil;
         
@@ -313,7 +329,6 @@
                     [gpxSwitch setTag: GPX_SWITCH_TAG];
                     cell.accessoryView = gpxSwitch;
                     
-                    // docsdirURL = [TOMUrl urlForDocumentsDirectory];
                     fileName = [NSString stringWithFormat:@"%@.gpx",self.title];
                     fileFullURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
                     
@@ -336,6 +351,22 @@
                     
                     if ([TOMUrl checkDirectory:fileFullURL create:NO]) {
                         [kmlSwitch setOn:YES];
+                    }
+                }
+                else if (indexPath.row == 3) {
+                    CGRect switchFrame = CGRectMake( 0.0f, 0.0f, 150.0f, 25.0f );
+                    UISwitch *aSwitch = [[UISwitch alloc] initWithFrame:switchFrame];
+                    [aSwitch setOn:NO];
+                    [aSwitch addTarget:self action:@selector(dvcSwitchSelector:) forControlEvents:UIControlEventValueChanged];
+                    cell.textLabel.text = @"Save Trail as CSV";
+                    csvSwitch = aSwitch;
+                    cell.accessoryView = csvSwitch;
+                    [csvSwitch setTag:CSV_SWITCH_TAG];
+                    fileName = [NSString stringWithFormat:@"%@.csv",self.title];
+                    fileFullURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
+                    
+                    if ([TOMUrl checkDirectory:fileFullURL create:NO]) {
+                        [csvSwitch setOn:YES];
                     }
                 }
                 else {
@@ -585,7 +616,7 @@
             [self createGPX];
         }
         else {
-            NSURL *gpxdocdirURL = [TOMUrl urlForDocumentsDirectory];
+            NSURL *gpxdocdirURL = [TOMUrl urlForLocalDocuments];
             NSString *gpxName = [NSString stringWithFormat:@"%@.gpx",self.title];
             NSURL *gpxFullURL = [gpxdocdirURL URLByAppendingPathComponent:gpxName isDirectory:NO];
             [TOMUrl removeURL:gpxFullURL];
@@ -596,15 +627,46 @@
             [self createKML];
         }
         else {
-            NSURL *kmzdocdirURL = [TOMUrl urlForDocumentsDirectory];
+            NSURL *kmzdocdirURL = [TOMUrl urlForLocalDocuments];
             NSString *kmzName = [NSString stringWithFormat:@"%@.kmz",self.title];
             NSURL *kmzFullURL = [kmzdocdirURL URLByAppendingPathComponent:kmzName isDirectory:NO];
             [TOMUrl removeURL:kmzFullURL];
         }
     }
+    else if ([sender tag] == CSV_SWITCH_TAG) {
+        if (yn) {
+            [self createCSV];
+        }
+        else {
+            NSURL *csvdocdirURL = [TOMUrl urlForLocalDocuments];
+            NSString *csvName = [NSString stringWithFormat:@"%@.csv",self.title];
+            NSURL *csvFullURL = [csvdocdirURL URLByAppendingPathComponent:csvName isDirectory:NO];
+            [TOMUrl removeURL:csvFullURL];
+        }
+    }
     else {
             NSLog(@"%s Error: Invalid Tag %ld",__PRETTY_FUNCTION__,(long)[sender tag]);
     }
+}
+
+#pragma __CSV_Functions__
+
+- (void) createCSV
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    NSURL *docsdirURL = [TOMUrl urlForLocalDocuments];
+    NSString *csvFileName = [NSString stringWithFormat:@"%@.csv",self.title];
+    NSURL *csvDocURL = [docsdirURL URLByAppendingPathComponent:csvFileName isDirectory:NO];
+    [theTrail trailCSVtoURL:csvDocURL];
+    
+    if ([TOMGDrive isGDriveEnabled]) {
+        //
+        // Write it out to the Google Drive
+        //
+        NSData *csvData = [NSData dataWithContentsOfURL:csvDocURL];
+        [gDrive writeToGDrive:csvFileName mimeType:@"text/csv" data: csvData];
+    }
+    });
 }
 
 
@@ -645,11 +707,14 @@
         NSLog(@"%s ERROR WRITING GPX FILE: %@",__func__,err);
     }
     
-#ifdef DEBUG
-    NSString *csvFileName = [NSString stringWithFormat:@"%@.csv",self.title];
-    NSURL *csvDocURL = [docsdirURL URLByAppendingPathComponent:csvFileName isDirectory:NO];
-    [theTrail trailCSVtoURL:csvDocURL];
-#endif
+    if ([TOMGDrive isGDriveEnabled]) {
+        //
+        // Write it out to the Google Drive
+        //
+        NSData *gpxData = [NSData dataWithContentsOfURL:documentURL];
+        [gDrive writeToGDrive:fileName mimeType:@"application/gpx+xml" data: gpxData];
+    }
+
         
     }); // end dispatch
     return;
@@ -707,8 +772,10 @@
 
 - (void) createKML
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    // dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     // [pssKML pssKMLMessage];
+    [activityIndicator startAnimating];
+    
     NSMutableArray *imageURLs = [[NSMutableArray alloc] init] ;
     
     // kml
@@ -822,12 +889,11 @@
                 newImage = UIGraphicsGetImageFromCurrentImageContext();
                 UIGraphicsEndImageContext();
             }
-            else {
+#ifdef DEBUG
+            else {  // Image was small enough to be used in the KMZ file.
                 NSLog(@"%s myImage small enough to be used as existing image",__PRETTY_FUNCTION__);
             }
-            
-            // Image was small enough to be used in the KMZ file.
-
+#endif
             
             if (!tempURL) {
                 tempURL = [TOMUrl temporaryDir:@"files"];
@@ -884,7 +950,17 @@
             NSLog(@"%s Error archiving photos.  Result: %ld",__PRETTY_FUNCTION__,(long)result);
         }
     }
-    }); // end dispatch
+
+    if ([TOMGDrive isGDriveEnabled]) {
+        //
+        // Write it out to the Google Drive
+        //
+        NSData *kmzData = [NSData dataWithContentsOfURL:zipFullURL];
+        [gDrive writeToGDrive:zipName mimeType:@"application/vnd.google-earth.kmz" data: kmzData];
+    }
+    [activityIndicator stopAnimating];
+    
+    // }); // end dispatch
 }
 
 //
@@ -1340,11 +1416,10 @@
         NSURL *gpxFullURL = [docdirURL URLByAppendingPathComponent:gpxName isDirectory:NO];
         [TOMUrl removeURL:gpxFullURL];
         
-#ifdef DEBUG
         NSString *csvName = [NSString stringWithFormat:@"%@%s",self.title,TOM_CSV_EXT];
         NSURL *csvFullURL = [docdirURL URLByAppendingPathComponent:csvName isDirectory:NO];
         [TOMUrl removeURL:csvFullURL];
-#endif
+
         [TOMUrl removeURL:oldTrailURL];
     }
     return anyError;

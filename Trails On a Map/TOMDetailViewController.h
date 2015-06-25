@@ -7,12 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MobileCoreServices/MobileCoreServices.h>
+
 #import "TOMPomSet.h"
 #import "TOMImageStore.h"
 #import "TOMDistance.h"
 #import "TOMSpeed.h"
 #import "TOMOrganizerViewCell.h"  // reuse this
 #import "TOMUIUtilities.h"
+#import "TOMGDrive.h"
 
 #ifndef GPX_SWITCH_TAG
 #define GPX_SWITCH_TAG  1
@@ -20,6 +23,10 @@
 
 #ifndef KML_SWITCH_TAG
 #define KML_SWITCH_TAG  2
+#endif
+
+#ifndef CSV_SWITCH_TAG
+#define CSV_SWITCH_TAG  3
 #endif
 
 #ifndef KML_JPG_SIZE
@@ -30,7 +37,7 @@ static NSString *detailViewCellIdentifier = @"detaiViewCells";
 
 typedef enum { detailViewTagError = -2 , detailViewTagTitle, detailViewTagPhoto } detailViewTagType;
 
-@interface TOMDetailViewController :  UIViewController <UITableViewDataSource, UITableViewDelegate,UITextFieldDelegate, UIActionSheetDelegate>
+@interface TOMDetailViewController :  UIViewController <UINavigationControllerDelegate, UITableViewDataSource, UITableViewDelegate,UITextFieldDelegate, UIActionSheetDelegate>
 {
 @private
     
@@ -44,6 +51,7 @@ typedef enum { detailViewTagError = -2 , detailViewTagTitle, detailViewTagPhoto 
     UIDeviceOrientation orientation;
     UITableView *detailTable;
     UIBarButtonItem *editAndDoneButton;
+    TOMGDrive *gDrive;
 }
 
 @property (atomic, strong) NSMetadataQuery *query;
@@ -53,6 +61,7 @@ typedef enum { detailViewTagError = -2 , detailViewTagTitle, detailViewTagPhoto 
 @property (nonatomic, readwrite) UITextField *titleField;
 @property (nonatomic, readwrite) UISwitch *gpxSwitch;
 @property (nonatomic, readwrite) UISwitch *kmlSwitch;
+@property (nonatomic, readwrite) UISwitch *csvSwitch;
 @property (nonatomic, readwrite) IBOutlet UIActivityIndicatorView *activityIndicator;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil title:(NSString *) t;
