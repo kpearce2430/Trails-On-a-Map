@@ -60,10 +60,10 @@
             image = [UIImage imageWithData:data];
             [self createControls];
             [self orientationPropertiesChanged:nil];
-#if USE_AVIARY
+// #if USE_AVIARY
             editAndDoneButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
             self.navigationItem.rightBarButtonItem = editAndDoneButton;
-#endif
+// #endif
         }
     }
 }
