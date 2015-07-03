@@ -23,6 +23,8 @@
 		AD45010F1811A77800E76DE0 /* TOMPomSet.m in Sources */ = {isa = PBXBuildFile; fileRef = AD45010E1811A77800E76DE0 /* TOMPomSet.m */; };
 		AD4501131812E74100E76DE0 /* TOMPropertyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */; };
 		AD4501141812E74100E76DE0 /* TOMPropertyViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */; };
+		AD5B38361AD7498B00B8D07B /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD5B38351AD7498B00B8D07B /* SystemConfiguration.framework */; };
+		AD5B38381AD7499F00B8D07B /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD5B38371AD7499F00B8D07B /* Security.framework */; };
 		AD5CC56A18F1A53C00393BC1 /* TOMSubView.m in Sources */ = {isa = PBXBuildFile; fileRef = AD5CC56918F1A53C00393BC1 /* TOMSubView.m */; };
 		AD5CC56D18F6D77D00393BC1 /* TOMOdometer.m in Sources */ = {isa = PBXBuildFile; fileRef = AD5CC56C18F6D77D00393BC1 /* TOMOdometer.m */; };
 		AD63EBDD190AB91C004FDE02 /* TomIcon-60@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AD63EBDA190AB91C004FDE02 /* TomIcon-60@2x.png */; };
@@ -78,6 +80,10 @@
 		AD7D63F319647D9F006D7F66 /* TOMPhotoAlbumViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD7D63F119647D9F006D7F66 /* TOMPhotoAlbumViewController.xib */; };
 		AD7D63F719647DDE006D7F66 /* TOMRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD7D63F519647DDE006D7F66 /* TOMRootViewController.m */; };
 		AD7D63F819647DDE006D7F66 /* TOMRootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD7D63F619647DDE006D7F66 /* TOMRootViewController.xib */; };
+		AD8F8FD21ADAEC1500AFE3D8 /* libGTLTouchStaticLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADD44E881ADAD00B00EFAAAD /* libGTLTouchStaticLib.a */; };
+		AD8F8FD41ADAEDAE00AFE3D8 /* GTMOAuth2ViewTouch.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD8F8FD31ADAEDAE00AFE3D8 /* GTMOAuth2ViewTouch.xib */; };
+		AD8F8FD91ADAEE9D00AFE3D8 /* GTLDrive_Sources.m in Sources */ = {isa = PBXBuildFile; fileRef = AD8F8FD81ADAEE9D00AFE3D8 /* GTLDrive_Sources.m */; };
+		AD8F8FDC1ADAF14400AFE3D8 /* TOMGDrive.m in Sources */ = {isa = PBXBuildFile; fileRef = AD8F8FDB1ADAF14400AFE3D8 /* TOMGDrive.m */; };
 		ADA35A1418E4D29100C1A099 /* pssKML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35A1318E4D29100C1A099 /* pssKML.framework */; };
 		ADA35AB018E7609700C1A099 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35AAF18E7609700C1A099 /* libz.dylib */; };
 		ADA35AC018E76DD800C1A099 /* pssZipKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */; };
@@ -100,6 +106,34 @@
 			proxyType = 1;
 			remoteGlobalIDString = AD7BEC79180E22910003187D;
 			remoteInfo = "Trails On a Map";
+		};
+		ADD44E851ADAD00B00EFAAAD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4F38F6A60B66E91D00B24B81;
+			remoteInfo = GTLFramework;
+		};
+		ADD44E871ADAD00B00EFAAAD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4F12027C11A4CA2F00BEB470;
+			remoteInfo = GTLTouchStaticLib;
+		};
+		ADD44E891ADAD00B00EFAAAD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4F12027D11A4CA2F00BEB470;
+			remoteInfo = GTLUnitTests;
+		};
+		ADD44E8B1ADAD00B00EFAAAD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4F1AD9020B71603F00DC0485;
+			remoteInfo = DevelopmentTestTool;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -126,6 +160,8 @@
 		AD4501101812E74100E76DE0 /* TOMPropertyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMPropertyViewController.h; sourceTree = "<group>"; };
 		AD4501111812E74100E76DE0 /* TOMPropertyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMPropertyViewController.m; sourceTree = "<group>"; };
 		AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMPropertyViewController.xib; sourceTree = "<group>"; };
+		AD5B38351AD7498B00B8D07B /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		AD5B38371AD7499F00B8D07B /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		AD5CC56818F1A53C00393BC1 /* TOMSubView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMSubView.h; sourceTree = "<group>"; };
 		AD5CC56918F1A53C00393BC1 /* TOMSubView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSubView.m; sourceTree = "<group>"; };
 		AD5CC56B18F6D77D00393BC1 /* TOMOdometer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMOdometer.h; sourceTree = "<group>"; };
@@ -199,6 +235,12 @@
 		AD7D63F419647DDE006D7F66 /* TOMRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMRootViewController.h; sourceTree = "<group>"; };
 		AD7D63F519647DDE006D7F66 /* TOMRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMRootViewController.m; sourceTree = "<group>"; };
 		AD7D63F619647DDE006D7F66 /* TOMRootViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMRootViewController.xib; sourceTree = "<group>"; };
+		AD8F8FC91ADADBF000AFE3D8 /* libGTLTouchStaticLib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGTLTouchStaticLib.a; path = "AviarySDKResources.bundle/build/Debug-iphoneos/libGTLTouchStaticLib.a"; sourceTree = "<group>"; };
+		AD8F8FD31ADAEDAE00AFE3D8 /* GTMOAuth2ViewTouch.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GTMOAuth2ViewTouch.xib; path = "../../GoogleDrive/google-api-objectivec-client-read-only/Source/OAuth2/Touch/GTMOAuth2ViewTouch.xib"; sourceTree = "<group>"; };
+		AD8F8FD71ADAEE8800AFE3D8 /* GTLDrive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GTLDrive.h; path = "../../GoogleDrive/google-api-objectivec-client-read-only/Source/Services/Drive/Generated/GTLDrive.h"; sourceTree = "<group>"; };
+		AD8F8FD81ADAEE9D00AFE3D8 /* GTLDrive_Sources.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GTLDrive_Sources.m; path = "../../GoogleDrive/google-api-objectivec-client-read-only/Source/Services/Drive/Generated/GTLDrive_Sources.m"; sourceTree = "<group>"; };
+		AD8F8FDA1ADAF14400AFE3D8 /* TOMGDrive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMGDrive.h; sourceTree = "<group>"; };
+		AD8F8FDB1ADAF14400AFE3D8 /* TOMGDrive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMGDrive.m; sourceTree = "<group>"; };
 		ADA35A1318E4D29100C1A099 /* pssKML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = pssKML.framework; sourceTree = "<group>"; };
 		ADA35AAF18E7609700C1A099 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = pssZipKit.framework; path = ../../../pssZipKit.framework; sourceTree = "<group>"; };
@@ -213,6 +255,7 @@
 		ADC70DCB190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-ios7-cloud-download-outline-128.png"; sourceTree = "<group>"; };
 		ADC91CE41AB4B624001F9D4C /* TOMUIUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMUIUtilities.h; sourceTree = "<group>"; };
 		ADC91CE51AB4B624001F9D4C /* TOMUIUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMUIUtilities.m; sourceTree = "<group>"; };
+		ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GTL.xcodeproj; path = "../../GoogleDrive/google-api-objectivec-client-read-only/Source/GTL.xcodeproj"; sourceTree = "<group>"; };
 		ADDE2925184A456F00CBB238 /* TOMSpeed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMSpeed.h; sourceTree = "<group>"; };
 		ADDE2926184A456F00CBB238 /* TOMSpeed.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSpeed.m; sourceTree = "<group>"; };
 		ADDE2928184A4C2000CBB238 /* TOMDistance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDistance.h; sourceTree = "<group>"; };
@@ -225,6 +268,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD5B38381AD7499F00B8D07B /* Security.framework in Frameworks */,
+				AD5B38361AD7498B00B8D07B /* SystemConfiguration.framework in Frameworks */,
 				AD63EBE9190AF49D004FDE02 /* StoreKit.framework in Frameworks */,
 				AD03051519EB362B004AFB6B /* QuartzCore.framework in Frameworks */,
 				AD03051319EB3612004AFB6B /* OpenGLES.framework in Frameworks */,
@@ -246,6 +291,7 @@
 				AD7BEC84180E22910003187D /* CoreData.framework in Frameworks */,
 				AD7BEC82180E22910003187D /* UIKit.framework in Frameworks */,
 				AD7BEC7E180E22910003187D /* Foundation.framework in Frameworks */,
+				AD8F8FD21ADAEC1500AFE3D8 /* libGTLTouchStaticLib.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,6 +358,9 @@
 		AD7BEC7C180E22910003187D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AD8F8FC91ADADBF000AFE3D8 /* libGTLTouchStaticLib.a */,
+				AD5B38371AD7499F00B8D07B /* Security.framework */,
+				AD5B38351AD7498B00B8D07B /* SystemConfiguration.framework */,
 				AD03051419EB362B004AFB6B /* QuartzCore.framework */,
 				AD03051219EB3612004AFB6B /* OpenGLES.framework */,
 				AD03051019EB3605004AFB6B /* MessageUI.framework */,
@@ -342,6 +391,9 @@
 			isa = PBXGroup;
 			children = (
 				AD778D3518141F0A008E1D06 /* Trails On a Map.entitlements */,
+				AD8F8FD81ADAEE9D00AFE3D8 /* GTLDrive_Sources.m */,
+				AD8F8FD71ADAEE8800AFE3D8 /* GTLDrive.h */,
+				ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */,
 				AD743E2A18F9969500053D13 /* Images */,
 				AD7BECBB180E239E0003187D /* TOM.h */,
 				AD7BEC8E180E22910003187D /* TOMAppDelegate.h */,
@@ -367,6 +419,7 @@
 				AD6F03651858A88900753144 /* TOMPhotoGroupViewController.xib */,
 				AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */,
 				AD7D63F619647DDE006D7F66 /* TOMRootViewController.xib */,
+				AD8F8FD31ADAEDAE00AFE3D8 /* GTMOAuth2ViewTouch.xib */,
 				AD7BEC87180E22910003187D /* Trails On a Map-Info.plist */,
 				AD7BEC88180E22910003187D /* InfoPlist.strings */,
 				AD7BEC8B180E22910003187D /* main.m */,
@@ -396,6 +449,8 @@
 		ADA35AC118E9F83D00C1A099 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				AD8F8FDA1ADAF14400AFE3D8 /* TOMGDrive.h */,
+				AD8F8FDB1ADAF14400AFE3D8 /* TOMGDrive.m */,
 				AD26E2F9181B129A0021BEE2 /* TOMImageStore.h */,
 				AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */,
 				AD7D63E919647C19006D7F66 /* TOMMapAnnotation.m */,
@@ -469,6 +524,17 @@
 				AD31BFA6182EED5800BCEE96 /* TOMViewSlider.m */,
 			);
 			name = SubViews;
+			sourceTree = "<group>";
+		};
+		ADD44E7F1ADAD00A00EFAAAD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				ADD44E861ADAD00B00EFAAAD /* GTL.framework */,
+				ADD44E881ADAD00B00EFAAAD /* libGTLTouchStaticLib.a */,
+				ADD44E8A1ADAD00B00EFAAAD /* GTLUnitTests.xctest */,
+				ADD44E8C1ADAD00B00EFAAAD /* DevelopmentTestTool */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -552,6 +618,12 @@
 			mainGroup = AD7BEC71180E22910003187D;
 			productRefGroup = AD7BEC7B180E22910003187D /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = ADD44E7F1ADAD00A00EFAAAD /* Products */;
+					ProjectRef = ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				AD7BEC79180E22910003187D /* Trails On a Map */,
@@ -560,11 +632,43 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXReferenceProxy section */
+		ADD44E861ADAD00B00EFAAAD /* GTL.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = GTL.framework;
+			remoteRef = ADD44E851ADAD00B00EFAAAD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		ADD44E881ADAD00B00EFAAAD /* libGTLTouchStaticLib.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libGTLTouchStaticLib.a;
+			remoteRef = ADD44E871ADAD00B00EFAAAD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		ADD44E8A1ADAD00B00EFAAAD /* GTLUnitTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = GTLUnitTests.xctest;
+			remoteRef = ADD44E891ADAD00B00EFAAAD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		ADD44E8C1ADAD00B00EFAAAD /* DevelopmentTestTool */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = DevelopmentTestTool;
+			remoteRef = ADD44E8B1ADAD00B00EFAAAD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
 /* Begin PBXResourcesBuildPhase section */
 		AD7BEC78180E22910003187D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD8F8FD41ADAEDAE00AFE3D8 /* GTMOAuth2ViewTouch.xib in Resources */,
 				AD03051719EB3720004AFB6B /* AviarySDKResources.bundle in Resources */,
 				ADC70DCC190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png in Resources */,
 				AD6651B4197AAC82002E84A2 /* TomCameraIcon_32x32.png in Resources */,
@@ -642,6 +746,8 @@
 				ADDE2927184A456F00CBB238 /* TOMSpeed.m in Sources */,
 				AD31BFA7182EED5800BCEE96 /* TOMViewSlider.m in Sources */,
 				ADA35AC718EC72ED00C1A099 /* TOMSpeedOMeter.m in Sources */,
+				AD8F8FDC1ADAF14400AFE3D8 /* TOMGDrive.m in Sources */,
+				AD8F8FD91ADAEE9D00AFE3D8 /* GTLDrive_Sources.m in Sources */,
 				AD72939F18D65D6E0095FE53 /* TOMImageViewController.m in Sources */,
 				AD7D63EB19647C19006D7F66 /* TOMMapAnnotation.m in Sources */,
 				AD45010C181191AE00E76DE0 /* TOMPointOnAMap.m in Sources */,
@@ -806,10 +912,12 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,
+					"$(PROJECT_DIR)/AviarySDKResources.bundle/build/Debug-iphoneos",
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				USER_HEADER_SEARCH_PATHS = "/Users/pearcek/Documents/Projects/GoogleDrive/google-api-objectivec-client-read-only/Source/**";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -835,10 +943,12 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,
+					"$(PROJECT_DIR)/AviarySDKResources.bundle/build/Debug-iphoneos",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				USER_HEADER_SEARCH_PATHS = "/Users/pearcek/Documents/Projects/GoogleDrive/google-api-objectivec-client-read-only/Source/**";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
