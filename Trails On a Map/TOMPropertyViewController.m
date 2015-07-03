@@ -21,7 +21,8 @@
             distanceFilterSliderCtl, accuracyFilterLabel, accuracyFilterSegmentedControl,
             toggleLabel, locationLabel, locationSwitch, pictureLabel, pictureSwitch,
             stopLabel, stopSwitch, odoMeterLabel, odoMeterSwitch, tripMeterLabel,tripMeterSwitch, sliderLabel,sliderSwitch, speedOMeterLabel, speedOMeterSwitch,
-            syncLabel, syncSwitch, iCloudLabel, iCloudSwitch, resetButton, versionLabel;
+            syncLabel, syncSwitch, resetButton, versionLabel, googleDriveEnabledLabel, googleDriveEnabledSwitch,googleDrivePathLabel, googleDrivePathField, photoCountLabel, photoCountField;
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -29,6 +30,13 @@
     if (self) {
         // Custom initialization
         self.title = [titleField text];
+        //
+        if ([TOMGDrive isGDriveEnabled]) {
+            gDrive = [[TOMGDrive alloc] initGDrive];
+            if  ([gDrive isAuthorized]) {
+                [gDrive trailsFolderExists];
+            }
+        }
     }
     return self;
 }
@@ -44,6 +52,14 @@
     // currentDeviceOrientation = UIDeviceOrientationUnknown;
     // currentInterfaceOrientation = UIDeviceOrientationUnknown;
     
+    if ([TOMGDrive isGDriveEnabled] && ![gDrive isAuthorized])
+    {
+        // Not yet authorized, request authorization and push the login UI onto the navigation stack.
+#ifdef DEBUG
+        NSLog(@"Not Yet Authorized");
+#endif
+        [self.navigationController pushViewController:[gDrive createAuthController] animated:YES];
+    }
 
     
     // Set up the crontrols first, then set them by the orientation.
@@ -61,7 +77,7 @@
 
 //
 //
--(void) viewDidDisappear {
+-(void) viewDidDisappear:(BOOL)animated {
     // Request to stop receiving accelerometer events and turn off accelerometer
     BOOL yn = YES;
     
@@ -108,23 +124,39 @@
 - (BOOL) textFieldShouldReturn:(UITextField *)textField
 {
     // NSLog(@"New Name: [%@]",textField);
-    
+    NSInteger tag = textField.tag;
     NSString *mytext = [textField text];
     mytext = [mytext stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    // NSLog(@"my title: [%@]",mytext);
-    [[NSUserDefaults standardUserDefaults] setValue:mytext forKey:@KEY_NAME];
-    //
-    // The title does not need to go to the cloud.
-    //
-    // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
-    // NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
-    // [kvStore setString:mytext forKey:@KEY_NAME];
     
-    [self setTitle:mytext];
-    
-    [titleField resignFirstResponder]; // and hides the keyboard
+    switch (tag) {
+        case 0:
+            [[NSUserDefaults standardUserDefaults] setValue:mytext forKey:@KEY_NAME];
+            [self setTitle:mytext];
+            [titleField resignFirstResponder]; // and hides the keyboard
+            break;
+            
+        case 1:
+            [[NSUserDefaults standardUserDefaults] setValue:mytext forKey:@KEY_GOOGLE_DRIVE_PATH];
+            [googleDrivePathField resignFirstResponder]; // and hides the keyboard
+            break;
+            
+        case 2:
+        {   // Sometime in the future I'll find a numpad with a return until then, this will have to do :(
+            int myInt = [mytext intValue];
+            NSString *myvalue = [NSString stringWithFormat:@"%d",myInt];
+            [[NSUserDefaults standardUserDefaults] setValue:myvalue forKey:@KEY_PHOTO_COUNT];
+            [photoCountField setText:myvalue];
+            [photoCountField resignFirstResponder]; // and hides the keyboard
+        }
+            break;
+        default:
+            break;
+    }
+
     return YES;
 }
+
+
 
 //
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -187,11 +219,7 @@
     if (myDist < 10.0)
         myDist = 5.0;
     else {
-// #ifdef DEBUG
-//        CLLocationDistance trim = fmodf(myDist,50.0);
-// #else
         CLLocationDistance trim = fmod(myDist, 25.0);
-// #endif
         myDist -= trim;
     }
     
@@ -372,6 +400,38 @@
         case 10:
             keyvalue = @KEY_PROPERTIES_SYNC;
             break;
+        case 11:
+            keyvalue = @KEY_GOOGLE_DRIVE_ENABLED;
+            //
+            // Set the Path Field to match the enabled field.
+            //
+            [googleDrivePathField setEnabled:yn];
+            
+            if (yn == YES) {
+                //
+                //
+                [googleDrivePathField setBackgroundColor:[UIColor whiteColor]];
+                //
+                // If the drive hasn't been allocated.
+                if (!gDrive)
+                    // allocate
+                    gDrive = [[TOMGDrive alloc] init];
+                
+                // if authroized
+                if  ([gDrive isAuthorized])
+                    // make sure the folder exists
+                    [gDrive trailsFolderExists];
+                else
+                    // otherwise try to get authorization.
+                    [self.navigationController pushViewController:[gDrive createAuthController] animated:YES];
+                
+            }
+            else {
+                // gray out the field
+                [googleDrivePathField setBackgroundColor:[UIColor lightGrayColor]];
+            }
+            
+            break;
 
         default:
             NSLog(@"ERROR: %s Unknown Sender Tag for pt types",__func__);
@@ -383,8 +443,6 @@
         [[NSUserDefaults standardUserDefaults] setBool:yn forKey:keyvalue];
         
         // set the new value for the cloud.  Note, I dont syncronize until I leave this controller
-
-
         NSUbiquitousKeyValueStore *kvStore = [NSUbiquitousKeyValueStore defaultStore];
         if  (yn)
             [kvStore setString:@"YES" forKey:keyvalue];
@@ -454,13 +512,16 @@
     NSArray *segmentUserTracking = [NSArray arrayWithObjects: @"None", @"Follow", @"Heading", nil];
     NSArray *accuracyTextContent = [NSArray arrayWithObjects: @"Nav", @"Best", @"10m", @"100m", @"1km", @"3km" , nil];
     NSArray *pebbleTypeText = [NSArray arrayWithObjects: @"Locations:",@"Pictures:", @"Stops:", @"Notes", @"Sounds", @"Odometer:",@"Trip Meter:",
-                                                         @"Histograph:",@"SpeedOMeter:", @"Sync Properties:", @"Sync Trails on iCloud",nil];
+                                                         @"Histograph:",@"SpeedOMeter:", @"Sync Properties:", @"Google Drive Enabled:", nil];
+    
     NSArray *displaySpeedText = [NSArray arrayWithObjects:@"M P H",@"K P H",@"M P M",@"M P S", nil]; // Miles per Hour, KM per Hour, Min / Mile, Meters / Sec
     NSArray *displayDistanceText = [NSArray arrayWithObjects:@"Miles",@"Kilometers", @"Meters", @"Feet", nil];
     
     UIFont *myLabelFont = [UIFont fontWithName: @TOM_FONT size: 12.0 ];
     UIFont *myTitleFont = [UIFont fontWithName: @TOM_FONT size: 12.0 ];
     UIFont *myVersionFont = [UIFont fontWithName: @TOM_FONT size: 10.0 ];
+    
+    BOOL googleDriveEnabledFlag = NO;
     
     //  Am even better way to do this...
     CGRect screenRect;
@@ -512,13 +573,13 @@
     }
     
     [titleField addTarget:self action:@selector(textFieldShouldReturn:) forControlEvents:UIControlEventValueChanged];
-    titleField.borderStyle = UITextBorderStyleRoundedRect;
-    titleField.clearButtonMode = UITextFieldViewModeWhileEditing;
-    
+    [titleField setBorderStyle:UITextBorderStyleRoundedRect];
+    [titleField setClearButtonMode:UITextFieldViewModeWhileEditing];
+    [titleField setKeyboardType:UIKeyboardTypeNumbersAndPunctuation];
     [titleField setDelegate:self];  // set up the delegate
     [titleField setFont:myTitleFont];
-    titleField.backgroundColor = [UIColor whiteColor];
-
+    [titleField setTag:0];
+    [titleField setBackgroundColor:[UIColor whiteColor]];
     [scrollView addSubview:titleField];
     
     // Map Type Label
@@ -817,7 +878,7 @@
     [scrollView addSubview:toggleLabel];
     
     // for (POMType pt = ptLocation; pt <= ptSound; pt++ )
-    for (NSInteger pt = 1; pt < 11  ; pt++)
+    for (NSInteger pt = 1; pt < 12  ; pt++)
     {
         if (pt == ptNote || pt == ptSound) {
             continue;
@@ -982,6 +1043,18 @@
                 [scrollView addSubview:syncLabel];
                 break;
 
+            case 11:
+                googleDriveEnabledSwitch = ptSwitch;
+                yn  = [TOMGDrive isGDriveEnabled];
+                googleDriveEnabledFlag = yn;
+                
+                frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
+                googleDriveEnabledLabel = [TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]];
+                [googleDriveEnabledLabel setFont:myLabelFont];
+                [googleDriveEnabledLabel setTextAlignment:NSTextAlignmentRight];
+                [scrollView addSubview:googleDriveEnabledLabel];
+  
+                break;
             default:
                 yn = NO;  // default
                 break;
@@ -995,6 +1068,71 @@
         // [scrollView addSubview:[TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]]];
     }
  
+    // Google Path
+    yPlacement += (ptTweenMargin * ptTweenMarginMultiplier) + ptSegmentedControlHeight - 10;
+    frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
+    googleDrivePathLabel = [TOMPropertyViewController labelWithFrame:frame title:@"Google Path:"];
+    [googleDrivePathLabel setFont:myLabelFont];
+    [googleDrivePathLabel setTextAlignment:NSTextAlignmentRight];
+    [scrollView addSubview:googleDrivePathLabel];
+    
+    frame = CGRectMake(	ptLeftMargin + 100,yPlacement -5, objectWidth - 120, ptLabelHeight + 5);
+    
+    googleDrivePathField = [[ UITextField alloc] initWithFrame: frame];
+    [googleDrivePathField setText:[TOMGDrive getPathName]];
+    
+  
+    [googleDrivePathField addTarget:self action:@selector(textFieldShouldReturn:) forControlEvents:UIControlEventValueChanged];
+    [googleDrivePathField setTag:1];
+    [googleDrivePathField setKeyboardType:UIKeyboardTypeNumbersAndPunctuation];
+    [googleDrivePathField setBorderStyle:UITextBorderStyleRoundedRect];
+    [googleDrivePathField setClearButtonMode:UITextFieldViewModeWhileEditing];
+    [googleDrivePathField setDelegate:self];  // set up the delegate
+    [googleDrivePathField setFont:myTitleFont];
+
+    if (googleDriveEnabledFlag == YES) {
+        [googleDrivePathField setBackgroundColor:[UIColor whiteColor]];
+    }
+    else {
+        [googleDrivePathField setBackgroundColor:[UIColor lightGrayColor]];
+    }
+    [googleDrivePathField setEnabled:googleDriveEnabledFlag];
+    [scrollView addSubview:googleDrivePathField];
+    
+
+    // Photo Count
+    yPlacement += (ptTweenMargin * ptTweenMarginMultiplier) + ptSegmentedControlHeight - 10;
+    frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
+    photoCountLabel = [TOMPropertyViewController labelWithFrame:frame title:@"Photo Count:"];
+    [photoCountLabel setFont:myLabelFont];
+    [photoCountLabel setTextAlignment:NSTextAlignmentRight];
+    [scrollView addSubview:photoCountLabel];
+    
+    frame = CGRectMake(	ptLeftMargin + 100,yPlacement -5, objectWidth - 120, ptLabelHeight + 5);
+    
+    photoCountField = [[ UITextField alloc] initWithFrame: frame];
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@KEY_PHOTO_COUNT] != nil)
+    {
+        [photoCountField setText:[[NSUserDefaults standardUserDefaults] stringForKey:@KEY_PHOTO_COUNT]];
+    }
+    else
+    {   //
+        // we don't have a preference stored on this device, use the map type standard as default.
+        //
+        [photoCountField setText:@"1"]; // default
+    }
+    
+    [photoCountField addTarget:self action:@selector(textFieldShouldReturn:) forControlEvents:UIControlEventValueChanged];
+    [photoCountField setTag:2];
+    [photoCountField setBorderStyle:UITextBorderStyleRoundedRect];
+    [photoCountField setClearButtonMode:UITextFieldViewModeWhileEditing];
+    [photoCountField setKeyboardType:UIKeyboardTypeNumbersAndPunctuation];
+    [photoCountField setDelegate:self];  // set up the delegate
+    [photoCountField setFont:myTitleFont];
+    [photoCountField setBackgroundColor:[UIColor whiteColor]];
+    [photoCountField setReturnKeyType:UIReturnKeyDone];
+    [scrollView addSubview:photoCountField];
+    
     //
     // Finally - Add a reset button for the user to clear the trail.
     
@@ -1218,7 +1356,35 @@
         // Sync Propoerties Switch
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [syncSwitch setFrame:myrect];
+        
+        // Google Drive Enabled Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [googleDriveEnabledLabel setFrame:myrect];
+        
+        // Google Drive Enabled Switch
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [googleDriveEnabledSwitch setFrame:myrect];
 
+        // Google Drive Path Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [googleDrivePathLabel setFrame:myrect];
+        
+        // Google Drive Path Text Box
+        myrect= CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [googleDrivePathField setFrame:myrect];
+        
+       
+        // Photo Count Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [photoCountLabel setFrame:myrect];
+        
+        // Photo Count Text Box
+        myrect= CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [photoCountField setFrame:myrect];
+        
         // Reset Button
         CGFloat buttonX = (screenWidth - (myX + ptRightMargin + 100.0)) / 2.0;
         myY += ptSegmentedControlHeight + SPACING;
@@ -1380,6 +1546,33 @@
         // Propeties Sync Switch
         myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
         [syncSwitch setFrame:myrect];
+        
+        // Google Drive Enabled Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [googleDriveEnabledLabel setFrame:myrect];
+        
+        // Google Drive Enabled Switch
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [googleDriveEnabledSwitch setFrame:myrect];
+        
+        // Google Drive Path Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [googleDrivePathLabel setFrame:myrect];
+        
+        // Google Drive Path Text Box
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [googleDrivePathField setFrame:myrect];
+        
+        // Photo Count Label
+        myY += ptSegmentedControlHeight + SPACING;
+        myrect= CGRectMake(myX, myY+myYSpacer, labelWidth, ptLabelHeight);
+        [photoCountLabel setFrame:myrect];
+        
+        // Photo Count Text Box
+        myrect = CGRectMake(myX + labelWidth + SPACING, myY, actorWidth, ptSegmentedControlHeight);
+        [photoCountField setFrame:myrect];;
 
         // Reset Button
         CGFloat buttonX = (screenWidth - (myX + ptRightMargin + 100.0)) / 2.0;

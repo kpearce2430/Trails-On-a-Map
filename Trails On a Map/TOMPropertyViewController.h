@@ -10,13 +10,15 @@
 #import "TOMProperties.h"
 #import "TOMPointOnAMap.h"
 #import "TOMUIUtilities.h"
+#import "TOMGDrive.h"
 
 #import <math.h>
 
-@interface TOMPropertyViewController : UIViewController <UITextFieldDelegate, UIScrollViewDelegate, UIActionSheetDelegate>
+@interface TOMPropertyViewController : UIViewController <UITextFieldDelegate, UIScrollViewDelegate, UIActionSheetDelegate, UINavigationControllerDelegate>
 {
     @private
     UIDeviceOrientation currentDeviceOrientation;
+    TOMGDrive *gDrive;
     // UIInterfaceOrientation currentInterfaceOrientation;
 }
 
@@ -86,9 +88,18 @@
 @property (nonatomic, readwrite) UILabel *syncLabel;
 @property (nonatomic, readwrite) UISwitch *syncSwitch;
 
-@property (nonatomic, readwrite) UILabel *iCloudLabel;
-@property (nonatomic, readwrite) UISwitch *iCloudSwitch;
+// Enable Google Drive Switch
+@property (nonatomic, readwrite) UILabel *googleDriveEnabledLabel;
+@property (nonatomic, readwrite) UISwitch *googleDriveEnabledSwitch;
 
+// Google Drive Path Name
+@property (nonatomic, readwrite) UILabel *googleDrivePathLabel;
+@property (nonatomic,readwrite) UITextField *googleDrivePathField;
+
+// Photo Counter Number
+@property (nonatomic, readwrite) UILabel *photoCountLabel;
+@property (nonatomic,readwrite) UITextField *photoCountField;
+//
 @property (nonatomic, readwrite) UIButton *resetButton;
 
 @property (nonatomic, readwrite) UILabel *versionLabel;
