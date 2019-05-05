@@ -8,14 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		AD03050919EB354E004AFB6B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03050819EB354E004AFB6B /* Accelerate.framework */; };
-		AD03050B19EB35A1004AFB6B /* AviarySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03050A19EB35A1004AFB6B /* AviarySDK.framework */; };
-		AD03050D19EB35C9004AFB6B /* libsqlite3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03050C19EB35C9004AFB6B /* libsqlite3.0.dylib */; };
-		AD03050F19EB35E6004AFB6B /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03050E19EB35E6004AFB6B /* libz.1.2.5.dylib */; };
 		AD03051119EB3605004AFB6B /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03051019EB3605004AFB6B /* MessageUI.framework */; };
 		AD03051319EB3612004AFB6B /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03051219EB3612004AFB6B /* OpenGLES.framework */; };
 		AD03051519EB362B004AFB6B /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD03051419EB362B004AFB6B /* QuartzCore.framework */; };
-		AD03051719EB3720004AFB6B /* AviarySDKResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AD03051619EB3720004AFB6B /* AviarySDKResources.bundle */; };
-		AD0FC3DB18DCC1970060F2B8 /* pssGPX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD0FC3DA18DCC1970060F2B8 /* pssGPX.framework */; };
+		AD0AD27E1BDD85C000740F9E /* libz.1.2.5.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AD0AD27D1BDD85C000740F9E /* libz.1.2.5.tbd */; };
+		AD0AD2801BDD864400740F9E /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AD0AD27F1BDD864400740F9E /* libsqlite3.0.tbd */; };
+		AD0AD2821BDD8B5400740F9E /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD0AD2811BDD8B5400740F9E /* CloudKit.framework */; };
 		AD26E2FB181B129A0021BEE2 /* TOMImageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */; };
 		AD31BFA7182EED5800BCEE96 /* TOMViewSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = AD31BFA6182EED5800BCEE96 /* TOMViewSlider.m */; };
 		AD35F19018C65510006314E1 /* TOMOrganizerViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AD35F18F18C65510006314E1 /* TOMOrganizerViewCell.m */; };
@@ -64,7 +62,6 @@
 		AD7BEC90180E22910003187D /* TOMAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AD7BEC8F180E22910003187D /* TOMAppDelegate.m */; };
 		AD7BEC93180E22910003187D /* Trails_On_a_Map.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AD7BEC91180E22910003187D /* Trails_On_a_Map.xcdatamodeld */; };
 		AD7BEC95180E22910003187D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AD7BEC94180E22910003187D /* Images.xcassets */; };
-		AD7BEC9C180E22910003187D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC9B180E22910003187D /* XCTest.framework */; };
 		AD7BEC9D180E22910003187D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC7D180E22910003187D /* Foundation.framework */; };
 		AD7BEC9E180E22910003187D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC81180E22910003187D /* UIKit.framework */; };
 		AD7BEC9F180E22910003187D /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD7BEC83180E22910003187D /* CoreData.framework */; };
@@ -80,18 +77,15 @@
 		AD7D63F319647D9F006D7F66 /* TOMPhotoAlbumViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD7D63F119647D9F006D7F66 /* TOMPhotoAlbumViewController.xib */; };
 		AD7D63F719647DDE006D7F66 /* TOMRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD7D63F519647DDE006D7F66 /* TOMRootViewController.m */; };
 		AD7D63F819647DDE006D7F66 /* TOMRootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD7D63F619647DDE006D7F66 /* TOMRootViewController.xib */; };
-		AD8F8FD21ADAEC1500AFE3D8 /* libGTLTouchStaticLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADD44E881ADAD00B00EFAAAD /* libGTLTouchStaticLib.a */; };
-		AD8F8FD41ADAEDAE00AFE3D8 /* GTMOAuth2ViewTouch.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD8F8FD31ADAEDAE00AFE3D8 /* GTMOAuth2ViewTouch.xib */; };
-		AD8F8FD91ADAEE9D00AFE3D8 /* GTLDrive_Sources.m in Sources */ = {isa = PBXBuildFile; fileRef = AD8F8FD81ADAEE9D00AFE3D8 /* GTLDrive_Sources.m */; };
 		AD8F8FDC1ADAF14400AFE3D8 /* TOMGDrive.m in Sources */ = {isa = PBXBuildFile; fileRef = AD8F8FDB1ADAF14400AFE3D8 /* TOMGDrive.m */; };
-		ADA35A1418E4D29100C1A099 /* pssKML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35A1318E4D29100C1A099 /* pssKML.framework */; };
-		ADA35AB018E7609700C1A099 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35AAF18E7609700C1A099 /* libz.dylib */; };
-		ADA35AC018E76DD800C1A099 /* pssZipKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */; };
 		ADA35AC718EC72ED00C1A099 /* TOMSpeedOMeter.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA35AC618EC72ED00C1A099 /* TOMSpeedOMeter.m */; };
 		ADA6C32818B8063600F64E59 /* TOMUrl.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA6C32718B8063600F64E59 /* TOMUrl.m */; };
 		ADA795DE18205AD1004E383D /* TOMOrganizerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */; };
 		ADA795DF18205AD1004E383D /* TOMOrganizerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */; };
 		ADBF322F18BD454A00EBEF1D /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBF322E18BD454A00EBEF1D /* iAd.framework */; };
+		ADC422771C4304180094D342 /* pssZipKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADC422761C4304180094D342 /* pssZipKit.framework */; };
+		ADC422791C4317490094D342 /* pssKML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADC422781C4317490094D342 /* pssKML.framework */; };
+		ADC4227B1C4319360094D342 /* pssGPX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADC4227A1C4319360094D342 /* pssGPX.framework */; };
 		ADC70DCC190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png in Resources */ = {isa = PBXBuildFile; fileRef = ADC70DCB190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png */; };
 		ADC91CE61AB4B624001F9D4C /* TOMUIUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = ADC91CE51AB4B624001F9D4C /* TOMUIUtilities.m */; };
 		ADDE2927184A456F00CBB238 /* TOMSpeed.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDE2926184A456F00CBB238 /* TOMSpeed.m */; };
@@ -107,46 +101,16 @@
 			remoteGlobalIDString = AD7BEC79180E22910003187D;
 			remoteInfo = "Trails On a Map";
 		};
-		ADD44E851ADAD00B00EFAAAD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4F38F6A60B66E91D00B24B81;
-			remoteInfo = GTLFramework;
-		};
-		ADD44E871ADAD00B00EFAAAD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4F12027C11A4CA2F00BEB470;
-			remoteInfo = GTLTouchStaticLib;
-		};
-		ADD44E891ADAD00B00EFAAAD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4F12027D11A4CA2F00BEB470;
-			remoteInfo = GTLUnitTests;
-		};
-		ADD44E8B1ADAD00B00EFAAAD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4F1AD9020B71603F00DC0485;
-			remoteInfo = DevelopmentTestTool;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		AD03050819EB354E004AFB6B /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
-		AD03050A19EB35A1004AFB6B /* AviarySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AviarySDK.framework; path = "../../../Projects/AviarySDK-4.3.2/AviarySDK/AviarySDK.framework"; sourceTree = "<group>"; };
-		AD03050C19EB35C9004AFB6B /* libsqlite3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.0.dylib; path = usr/lib/libsqlite3.0.dylib; sourceTree = SDKROOT; };
-		AD03050E19EB35E6004AFB6B /* libz.1.2.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.2.5.dylib; path = usr/lib/libz.1.2.5.dylib; sourceTree = SDKROOT; };
 		AD03051019EB3605004AFB6B /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		AD03051219EB3612004AFB6B /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		AD03051419EB362B004AFB6B /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		AD03051619EB3720004AFB6B /* AviarySDKResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AviarySDKResources.bundle; sourceTree = "<group>"; };
-		AD0FC3DA18DCC1970060F2B8 /* pssGPX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = pssGPX.framework; path = ../../../pssGPX.framework; sourceTree = "<group>"; };
+		AD0AD27D1BDD85C000740F9E /* libz.1.2.5.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.1.2.5.tbd; path = usr/lib/libz.1.2.5.tbd; sourceTree = SDKROOT; };
+		AD0AD27F1BDD864400740F9E /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
+		AD0AD2811BDD8B5400740F9E /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		AD26E2F9181B129A0021BEE2 /* TOMImageStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMImageStore.h; sourceTree = "<group>"; };
 		AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMImageStore.m; sourceTree = "<group>"; };
 		AD31BFA5182EED5800BCEE96 /* TOMViewSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMViewSlider.h; sourceTree = "<group>"; };
@@ -215,7 +179,6 @@
 		AD7BEC92180E22910003187D /* Trails_On_a_Map.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Trails_On_a_Map.xcdatamodel; sourceTree = "<group>"; };
 		AD7BEC94180E22910003187D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		AD7BEC9A180E22910003187D /* Trails On a MapTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Trails On a MapTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AD7BEC9B180E22910003187D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		AD7BECA4180E22910003187D /* Trails On a MapTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Trails On a MapTests-Info.plist"; sourceTree = "<group>"; };
 		AD7BECA6180E22910003187D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		AD7BECA8180E22910003187D /* Trails_On_a_MapTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Trails_On_a_MapTests.m; sourceTree = "<group>"; };
@@ -235,15 +198,8 @@
 		AD7D63F419647DDE006D7F66 /* TOMRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMRootViewController.h; sourceTree = "<group>"; };
 		AD7D63F519647DDE006D7F66 /* TOMRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMRootViewController.m; sourceTree = "<group>"; };
 		AD7D63F619647DDE006D7F66 /* TOMRootViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMRootViewController.xib; sourceTree = "<group>"; };
-		AD8F8FC91ADADBF000AFE3D8 /* libGTLTouchStaticLib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGTLTouchStaticLib.a; path = "AviarySDKResources.bundle/build/Debug-iphoneos/libGTLTouchStaticLib.a"; sourceTree = "<group>"; };
-		AD8F8FD31ADAEDAE00AFE3D8 /* GTMOAuth2ViewTouch.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GTMOAuth2ViewTouch.xib; path = "../../GoogleDrive/google-api-objectivec-client-read-only/Source/OAuth2/Touch/GTMOAuth2ViewTouch.xib"; sourceTree = "<group>"; };
-		AD8F8FD71ADAEE8800AFE3D8 /* GTLDrive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GTLDrive.h; path = "../../GoogleDrive/google-api-objectivec-client-read-only/Source/Services/Drive/Generated/GTLDrive.h"; sourceTree = "<group>"; };
-		AD8F8FD81ADAEE9D00AFE3D8 /* GTLDrive_Sources.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GTLDrive_Sources.m; path = "../../GoogleDrive/google-api-objectivec-client-read-only/Source/Services/Drive/Generated/GTLDrive_Sources.m"; sourceTree = "<group>"; };
 		AD8F8FDA1ADAF14400AFE3D8 /* TOMGDrive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMGDrive.h; sourceTree = "<group>"; };
 		AD8F8FDB1ADAF14400AFE3D8 /* TOMGDrive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMGDrive.m; sourceTree = "<group>"; };
-		ADA35A1318E4D29100C1A099 /* pssKML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = pssKML.framework; sourceTree = "<group>"; };
-		ADA35AAF18E7609700C1A099 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = pssZipKit.framework; path = ../../../pssZipKit.framework; sourceTree = "<group>"; };
 		ADA35AC518EC72ED00C1A099 /* TOMSpeedOMeter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMSpeedOMeter.h; sourceTree = "<group>"; };
 		ADA35AC618EC72ED00C1A099 /* TOMSpeedOMeter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSpeedOMeter.m; sourceTree = "<group>"; };
 		ADA6C32618B8063600F64E59 /* TOMUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMUrl.h; sourceTree = "<group>"; };
@@ -252,10 +208,12 @@
 		ADA795DC18205AD1004E383D /* TOMOrganizerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMOrganizerViewController.m; sourceTree = "<group>"; };
 		ADA795DD18205AD1004E383D /* TOMOrganizerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TOMOrganizerViewController.xib; sourceTree = "<group>"; };
 		ADBF322E18BD454A00EBEF1D /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
+		ADC422761C4304180094D342 /* pssZipKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = pssZipKit.framework; path = ../../../Frameworks/pssZipKit.framework; sourceTree = "<group>"; };
+		ADC422781C4317490094D342 /* pssKML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = pssKML.framework; path = ../../../Frameworks/pssKML.framework; sourceTree = "<group>"; };
+		ADC4227A1C4319360094D342 /* pssGPX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = pssGPX.framework; path = ../../../Frameworks/pssGPX.framework; sourceTree = "<group>"; };
 		ADC70DCB190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-ios7-cloud-download-outline-128.png"; sourceTree = "<group>"; };
 		ADC91CE41AB4B624001F9D4C /* TOMUIUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMUIUtilities.h; sourceTree = "<group>"; };
 		ADC91CE51AB4B624001F9D4C /* TOMUIUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMUIUtilities.m; sourceTree = "<group>"; };
-		ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GTL.xcodeproj; path = "../../GoogleDrive/google-api-objectivec-client-read-only/Source/GTL.xcodeproj"; sourceTree = "<group>"; };
 		ADDE2925184A456F00CBB238 /* TOMSpeed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMSpeed.h; sourceTree = "<group>"; };
 		ADDE2926184A456F00CBB238 /* TOMSpeed.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMSpeed.m; sourceTree = "<group>"; };
 		ADDE2928184A4C2000CBB238 /* TOMDistance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMDistance.h; sourceTree = "<group>"; };
@@ -268,30 +226,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD0AD2801BDD864400740F9E /* libsqlite3.0.tbd in Frameworks */,
+				AD0AD27E1BDD85C000740F9E /* libz.1.2.5.tbd in Frameworks */,
+				ADC422791C4317490094D342 /* pssKML.framework in Frameworks */,
 				AD5B38381AD7499F00B8D07B /* Security.framework in Frameworks */,
 				AD5B38361AD7498B00B8D07B /* SystemConfiguration.framework in Frameworks */,
 				AD63EBE9190AF49D004FDE02 /* StoreKit.framework in Frameworks */,
 				AD03051519EB362B004AFB6B /* QuartzCore.framework in Frameworks */,
 				AD03051319EB3612004AFB6B /* OpenGLES.framework in Frameworks */,
 				AD03051119EB3605004AFB6B /* MessageUI.framework in Frameworks */,
-				AD03050F19EB35E6004AFB6B /* libz.1.2.5.dylib in Frameworks */,
-				AD03050D19EB35C9004AFB6B /* libsqlite3.0.dylib in Frameworks */,
-				AD03050B19EB35A1004AFB6B /* AviarySDK.framework in Frameworks */,
 				AD03050919EB354E004AFB6B /* Accelerate.framework in Frameworks */,
-				ADA35AB018E7609700C1A099 /* libz.dylib in Frameworks */,
-				ADA35AC018E76DD800C1A099 /* pssZipKit.framework in Frameworks */,
+				AD0AD2821BDD8B5400740F9E /* CloudKit.framework in Frameworks */,
+				ADC422771C4304180094D342 /* pssZipKit.framework in Frameworks */,
 				ADBF322F18BD454A00EBEF1D /* iAd.framework in Frameworks */,
 				AD6F03571857DCC700753144 /* ImageIO.framework in Frameworks */,
-				ADA35A1418E4D29100C1A099 /* pssKML.framework in Frameworks */,
 				ADDE292C184D29F500CBB238 /* AssetsLibrary.framework in Frameworks */,
-				AD0FC3DB18DCC1970060F2B8 /* pssGPX.framework in Frameworks */,
 				AD7BECB5180E22EE0003187D /* CoreLocation.framework in Frameworks */,
 				AD7BECB3180E22E30003187D /* MapKit.framework in Frameworks */,
+				ADC4227B1C4319360094D342 /* pssGPX.framework in Frameworks */,
 				AD7BEC80180E22910003187D /* CoreGraphics.framework in Frameworks */,
 				AD7BEC84180E22910003187D /* CoreData.framework in Frameworks */,
 				AD7BEC82180E22910003187D /* UIKit.framework in Frameworks */,
 				AD7BEC7E180E22910003187D /* Foundation.framework in Frameworks */,
-				AD8F8FD21ADAEC1500AFE3D8 /* libGTLTouchStaticLib.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -299,7 +255,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AD7BEC9C180E22910003187D /* XCTest.framework in Frameworks */,
 				AD7BEC9F180E22910003187D /* CoreData.framework in Frameworks */,
 				AD7BEC9E180E22910003187D /* UIKit.framework in Frameworks */,
 				AD7BEC9D180E22910003187D /* Foundation.framework in Frameworks */,
@@ -338,7 +293,6 @@
 		AD7BEC71180E22910003187D = {
 			isa = PBXGroup;
 			children = (
-				AD03051619EB3720004AFB6B /* AviarySDKResources.bundle */,
 				AD7BEC85180E22910003187D /* Trails On a Map */,
 				AD7BECA2180E22910003187D /* Trails On a MapTests */,
 				AD7BEC7C180E22910003187D /* Frameworks */,
@@ -358,21 +312,16 @@
 		AD7BEC7C180E22910003187D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				AD8F8FC91ADADBF000AFE3D8 /* libGTLTouchStaticLib.a */,
+				AD0AD2811BDD8B5400740F9E /* CloudKit.framework */,
+				AD0AD27F1BDD864400740F9E /* libsqlite3.0.tbd */,
+				AD0AD27D1BDD85C000740F9E /* libz.1.2.5.tbd */,
 				AD5B38371AD7499F00B8D07B /* Security.framework */,
 				AD5B38351AD7498B00B8D07B /* SystemConfiguration.framework */,
 				AD03051419EB362B004AFB6B /* QuartzCore.framework */,
 				AD03051219EB3612004AFB6B /* OpenGLES.framework */,
 				AD03051019EB3605004AFB6B /* MessageUI.framework */,
-				AD03050E19EB35E6004AFB6B /* libz.1.2.5.dylib */,
-				AD03050C19EB35C9004AFB6B /* libsqlite3.0.dylib */,
-				AD03050A19EB35A1004AFB6B /* AviarySDK.framework */,
 				AD03050819EB354E004AFB6B /* Accelerate.framework */,
 				AD63EBE8190AF49D004FDE02 /* StoreKit.framework */,
-				ADA35AAF18E7609700C1A099 /* libz.dylib */,
-				ADA35ABF18E76DD800C1A099 /* pssZipKit.framework */,
-				ADA35A1318E4D29100C1A099 /* pssKML.framework */,
-				AD0FC3DA18DCC1970060F2B8 /* pssGPX.framework */,
 				ADBF322E18BD454A00EBEF1D /* iAd.framework */,
 				AD6F03561857DCC700753144 /* ImageIO.framework */,
 				ADDE292B184D29F500CBB238 /* AssetsLibrary.framework */,
@@ -381,8 +330,10 @@
 				AD7BEC7D180E22910003187D /* Foundation.framework */,
 				AD7BEC7F180E22910003187D /* CoreGraphics.framework */,
 				AD7BEC81180E22910003187D /* UIKit.framework */,
+				ADC422761C4304180094D342 /* pssZipKit.framework */,
+				ADC4227A1C4319360094D342 /* pssGPX.framework */,
+				ADC422781C4317490094D342 /* pssKML.framework */,
 				AD7BEC83180E22910003187D /* CoreData.framework */,
-				AD7BEC9B180E22910003187D /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -391,9 +342,6 @@
 			isa = PBXGroup;
 			children = (
 				AD778D3518141F0A008E1D06 /* Trails On a Map.entitlements */,
-				AD8F8FD81ADAEE9D00AFE3D8 /* GTLDrive_Sources.m */,
-				AD8F8FD71ADAEE8800AFE3D8 /* GTLDrive.h */,
-				ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */,
 				AD743E2A18F9969500053D13 /* Images */,
 				AD7BECBB180E239E0003187D /* TOM.h */,
 				AD7BEC8E180E22910003187D /* TOMAppDelegate.h */,
@@ -419,7 +367,6 @@
 				AD6F03651858A88900753144 /* TOMPhotoGroupViewController.xib */,
 				AD4501121812E74100E76DE0 /* TOMPropertyViewController.xib */,
 				AD7D63F619647DDE006D7F66 /* TOMRootViewController.xib */,
-				AD8F8FD31ADAEDAE00AFE3D8 /* GTMOAuth2ViewTouch.xib */,
 				AD7BEC87180E22910003187D /* Trails On a Map-Info.plist */,
 				AD7BEC88180E22910003187D /* InfoPlist.strings */,
 				AD7BEC8B180E22910003187D /* main.m */,
@@ -455,14 +402,14 @@
 				AD26E2FA181B129A0021BEE2 /* TOMImageStore.m */,
 				AD7D63E919647C19006D7F66 /* TOMMapAnnotation.m */,
 				AD7D63EA19647C19006D7F66 /* TOMMapAnnotation.h */,
-				ADA6C32618B8063600F64E59 /* TOMUrl.h */,
-				ADA6C32718B8063600F64E59 /* TOMUrl.m */,
 				ADDE2928184A4C2000CBB238 /* TOMDistance.h */,
 				ADDE2929184A4C2000CBB238 /* TOMDistance.m */,
 				ADDE2925184A456F00CBB238 /* TOMSpeed.h */,
 				ADDE2926184A456F00CBB238 /* TOMSpeed.m */,
 				ADC91CE41AB4B624001F9D4C /* TOMUIUtilities.h */,
 				ADC91CE51AB4B624001F9D4C /* TOMUIUtilities.m */,
+				ADA6C32618B8063600F64E59 /* TOMUrl.h */,
+				ADA6C32718B8063600F64E59 /* TOMUrl.m */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -526,17 +473,6 @@
 			name = SubViews;
 			sourceTree = "<group>";
 		};
-		ADD44E7F1ADAD00A00EFAAAD /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				ADD44E861ADAD00B00EFAAAD /* GTL.framework */,
-				ADD44E881ADAD00B00EFAAAD /* libGTLTouchStaticLib.a */,
-				ADD44E8A1ADAD00B00EFAAAD /* GTLUnitTests.xctest */,
-				ADD44E8C1ADAD00B00EFAAAD /* DevelopmentTestTool */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -583,7 +519,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = TOM;
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Pearce Software Solutions";
 				TargetAttributes = {
 					AD7BEC79180E22910003187D = {
@@ -614,16 +550,12 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				English,
+				Base,
 			);
 			mainGroup = AD7BEC71180E22910003187D;
 			productRefGroup = AD7BEC7B180E22910003187D /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = ADD44E7F1ADAD00A00EFAAAD /* Products */;
-					ProjectRef = ADD44E7E1ADAD00A00EFAAAD /* GTL.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				AD7BEC79180E22910003187D /* Trails On a Map */,
@@ -632,44 +564,11 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXReferenceProxy section */
-		ADD44E861ADAD00B00EFAAAD /* GTL.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = GTL.framework;
-			remoteRef = ADD44E851ADAD00B00EFAAAD /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		ADD44E881ADAD00B00EFAAAD /* libGTLTouchStaticLib.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libGTLTouchStaticLib.a;
-			remoteRef = ADD44E871ADAD00B00EFAAAD /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		ADD44E8A1ADAD00B00EFAAAD /* GTLUnitTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = GTLUnitTests.xctest;
-			remoteRef = ADD44E891ADAD00B00EFAAAD /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		ADD44E8C1ADAD00B00EFAAAD /* DevelopmentTestTool */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = DevelopmentTestTool;
-			remoteRef = ADD44E8B1ADAD00B00EFAAAD /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
-
 /* Begin PBXResourcesBuildPhase section */
 		AD7BEC78180E22910003187D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AD8F8FD41ADAEDAE00AFE3D8 /* GTMOAuth2ViewTouch.xib in Resources */,
-				AD03051719EB3720004AFB6B /* AviarySDKResources.bundle in Resources */,
 				ADC70DCC190048A7007CD704 /* Icon-ios7-cloud-download-outline-128.png in Resources */,
 				AD6651B4197AAC82002E84A2 /* TomCameraIcon_32x32.png in Resources */,
 				AD6F03671858A88900753144 /* TOMPhotoGroupViewController.xib in Resources */,
@@ -747,7 +646,6 @@
 				AD31BFA7182EED5800BCEE96 /* TOMViewSlider.m in Sources */,
 				ADA35AC718EC72ED00C1A099 /* TOMSpeedOMeter.m in Sources */,
 				AD8F8FDC1ADAF14400AFE3D8 /* TOMGDrive.m in Sources */,
-				AD8F8FD91ADAEE9D00AFE3D8 /* GTLDrive_Sources.m in Sources */,
 				AD72939F18D65D6E0095FE53 /* TOMImageViewController.m in Sources */,
 				AD7D63EB19647C19006D7F66 /* TOMMapAnnotation.m in Sources */,
 				AD45010C181191AE00E76DE0 /* TOMPointOnAMap.m in Sources */,
@@ -823,6 +721,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -842,7 +741,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -880,7 +779,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-all_load",
@@ -894,6 +793,7 @@
 		AD7BECAD180E22910003187D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
@@ -902,8 +802,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,
+					/Users/pearcek/Frameworks,
 					"$(PROJECT_DIR)",
-					"/Users/pearcek/Projects/AviarySDK-4.3.2/AviarySDK",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trails On a Map/Trails On a Map-Prefix.pch";
@@ -912,12 +812,12 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,
-					"$(PROJECT_DIR)/AviarySDKResources.bundle/build/Debug-iphoneos",
 				);
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pearcesoftwaresolutions.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				USER_HEADER_SEARCH_PATHS = "/Users/pearcek/Documents/Projects/GoogleDrive/google-api-objectivec-client-read-only/Source/**";
+				USER_HEADER_SEARCH_PATHS = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -925,6 +825,7 @@
 		AD7BECAE180E22910003187D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = "Trails On a Map/Trails On a Map.entitlements";
@@ -933,8 +834,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,
+					/Users/pearcek/Frameworks,
 					"$(PROJECT_DIR)",
-					"/Users/pearcek/Projects/AviarySDK-4.3.2/AviarySDK",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trails On a Map/Trails On a Map-Prefix.pch";
@@ -943,12 +844,12 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/pearcek,
-					"$(PROJECT_DIR)/AviarySDKResources.bundle/build/Debug-iphoneos",
 				);
 				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pearcesoftwaresolutions.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				USER_HEADER_SEARCH_PATHS = "/Users/pearcek/Documents/Projects/GoogleDrive/google-api-objectivec-client-read-only/Source/**";
+				USER_HEADER_SEARCH_PATHS = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -969,6 +870,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Trails On a MapTests/Trails On a MapTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pearcesoftwaresolutions.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -987,6 +889,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Trails On a Map/Trails On a Map-Prefix.pch";
 				INFOPLIST_FILE = "Trails On a MapTests/Trails On a MapTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pearcesoftwaresolutions.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
