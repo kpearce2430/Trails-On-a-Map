@@ -2,23 +2,39 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>iCloud.com.pearcesoftwaresolutions.Trails-On-a-Map</key>
+		<dict>
+			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
+			<true/>
+			<key>NSUbiquitousContainerName</key>
+			<string>Trails On A Map</string>
+			<key>NSUbiquitousContainerSupportedFolderLevels</key>
+			<string>Any</string>
+		</dict>
+	</dict>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
+		<string>iCloud.$(CFBundleIdentifier)</string>
 		<string>HV9L49AFR8.com.pearcesoftwaresolutions.Trails-On-a-Map</string>
 	</array>
 	<key>com.apple.developer.icloud-services</key>
 	<array>
 		<string>CloudDocuments</string>
+		<string>CloudKit</string>
 	</array>
 	<key>com.apple.developer.ubiquity-container-identifiers</key>
 	<array>
+		<string>iCloud.$(CFBundleIdentifier)</string>
 		<string>HV9L49AFR8.com.pearcesoftwaresolutions.Trails-On-a-Map</string>
 	</array>
 	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
 	<string>$(TeamIdentifierPrefix)$(CFBundleIdentifier)</string>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>HV9L49AFR8.com.pearcesoftwaresolutions.Trails-On-a-Map</string>
+		<string>$(AppIdentifierPrefix)HV9L49AFR8.com.pearcesoftwaresolutions.Trails-On-a-Map</string>
+		<string>$(AppIdentifierPrefix)iCloud.com.pearcesoftwaresolutions.Trails-On-a-Map</string>
 	</array>
 </dict>
 </plist>
