@@ -33,8 +33,8 @@ typedef enum  { tomDDError = -1, tomDDUnknown, tomDDMiles, tomDDKilometers, tomD
 #define KEY_ICON_IMAGE           "ptIconImage"
 #define KEY_TRAIL_ON             "ptTrailOM"            // Which trail is currently loaded on the RootViewController
 #define KEY_PHOTO_COUNT          "ptPhotoCount"         //
-#define KEY_GOOGLE_DRIVE_ENABLED "pkGDriveEnabled"      // Google Drive Enabled
-#define KEY_GOOGLE_DRIVE_PATH    "pkGDrivePath"         // Google Drive Path
+// #define KEY_GOOGLE_DRIVE_ENABLED "pkGDriveEnabled"      // Google Drive Enabled
+// #define KEY_GOOGLE_DRIVE_PATH    "pkGDrivePath"         // Google Drive Path
 
 
 // Defaults

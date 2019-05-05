@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Pearce Software Solutions. All rights reserved.
 //
 
+#ifdef __USE_GDRIVE__
+
 #import "TOM.h"
 #import "TOMGDrive.h"
 
@@ -293,3 +295,5 @@
     return;
 }
 @end
+
+#endif

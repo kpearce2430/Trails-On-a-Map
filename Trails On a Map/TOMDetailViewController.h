@@ -15,7 +15,7 @@
 #import "TOMSpeed.h"
 #import "TOMOrganizerViewCell.h"  // reuse this
 #import "TOMUIUtilities.h"
-#import "TOMGDrive.h"
+// #import "TOMGDrive.h"
 
 #ifndef GPX_SWITCH_TAG
 #define GPX_SWITCH_TAG  1
@@ -51,7 +51,8 @@ typedef enum { detailViewTagError = -2 , detailViewTagTitle, detailViewTagPhoto 
     UIDeviceOrientation orientation;
     UITableView *detailTable;
     UIBarButtonItem *editAndDoneButton;
-    TOMGDrive *gDrive;
+    // TOMGDrive *gDrive;
+    
 }
 
 @property (atomic, strong) NSMetadataQuery *query;

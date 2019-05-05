@@ -60,10 +60,13 @@
             image = [UIImage imageWithData:data];
             [self createControls];
             [self orientationPropertiesChanged:nil];
-// #if USE_AVIARY
-            editAndDoneButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
+/* 
+ #if USE_AVIARY
+/          editAndDoneButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
             self.navigationItem.rightBarButtonItem = editAndDoneButton;
-// #endif
+ #endif
+*/
+            
         }
     }
 }
@@ -238,7 +241,8 @@
 }
 
 
-// #if USE_AVIARY
+#if USE_AVIARY
+/*
 - (IBAction)editClicked:(id)sender {
     
     // kAviaryAPIKey and kAviarySecret are developer defined
@@ -272,6 +276,7 @@
     NSLog(@"Cancel Editing");
     [self dismissViewControllerAnimated:YES completion:nil];
 }
-// #endif
+ */
+#endif
 
 @end

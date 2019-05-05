@@ -33,7 +33,6 @@
 //
 // * * * * * * * * * * * * * * * * * * *
 //
-
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil title:(NSString *) t
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -43,7 +42,7 @@
 
         headerLabelFont = [UIFont fontWithName: @TOM_FONT size: 14.0 ];
         footerLabelFont = [UIFont fontWithName: @TOM_FONT size: 10.0 ];
-        
+#ifdef __USE_GDRIVE__
         //
         if ([TOMGDrive isGDriveEnabled]) {
             gDrive = [[TOMGDrive alloc] initGDrive];
@@ -51,6 +50,7 @@
                 [gDrive trailsFolderExists];
             }
         }
+#endif
     }
     return self;
 }
@@ -73,7 +73,7 @@
         [self prepareImageFiles];
     }
     
-  
+#ifdef __USE_GDRIVE__
     if ([TOMGDrive isGDriveEnabled] && ![gDrive isAuthorized])
     {
         // Not yet authorized, request authorization and push the login UI onto the navigation stack.
@@ -82,6 +82,7 @@
 #endif
         [self.navigationController pushViewController:[gDrive createAuthController] animated:YES];
     }
+#endif
     
     if (![self isActiveTrail]) {
         editAndDoneButton = [[UIBarButtonItem alloc] initWithTitle:@"Edit" style:UIBarButtonItemStylePlain target:self action:@selector(editClicked:)];
@@ -272,7 +273,7 @@
     if ([tableView isEqual:detailTable]) {
         
         // For version 1.3 store the documents on the local drive.
-        NSURL *docsdirURL = [TOMUrl urlForLocalDocuments];
+        NSURL *docsdirURL = [TOMUrl urlForICloudDocuments];
         NSString *fileName = nil; // [NSString stringWithFormat:@"%@.gpx",self.title];
         NSURL *fileFullURL = nil;
         
@@ -616,7 +617,8 @@
             [self createGPX];
         }
         else {
-            NSURL *gpxdocdirURL = [TOMUrl urlForLocalDocuments];
+            // NSURL *gpxdocdirURL = [TOMUrl urlForLocalDocuments];
+            NSURL *gpxdocdirURL = [TOMUrl urlForICloudDocuments];
             NSString *gpxName = [NSString stringWithFormat:@"%@.gpx",self.title];
             NSURL *gpxFullURL = [gpxdocdirURL URLByAppendingPathComponent:gpxName isDirectory:NO];
             [TOMUrl removeURL:gpxFullURL];
@@ -627,7 +629,7 @@
             [self createKML];
         }
         else {
-            NSURL *kmzdocdirURL = [TOMUrl urlForLocalDocuments];
+            NSURL *kmzdocdirURL = [TOMUrl urlForICloudDocuments];
             NSString *kmzName = [NSString stringWithFormat:@"%@.kmz",self.title];
             NSURL *kmzFullURL = [kmzdocdirURL URLByAppendingPathComponent:kmzName isDirectory:NO];
             [TOMUrl removeURL:kmzFullURL];
@@ -638,7 +640,7 @@
             [self createCSV];
         }
         else {
-            NSURL *csvdocdirURL = [TOMUrl urlForLocalDocuments];
+            NSURL *csvdocdirURL = [TOMUrl urlForICloudDocuments];
             NSString *csvName = [NSString stringWithFormat:@"%@.csv",self.title];
             NSURL *csvFullURL = [csvdocdirURL URLByAppendingPathComponent:csvName isDirectory:NO];
             [TOMUrl removeURL:csvFullURL];
@@ -653,12 +655,15 @@
 
 - (void) createCSV
 {
+#ifdef DEBUG
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    NSURL *docsdirURL = [TOMUrl urlForLocalDocuments];
+#endif
+    NSURL *docsdirURL = [TOMUrl urlForICloudDrive];
     NSString *csvFileName = [NSString stringWithFormat:@"%@.csv",self.title];
     NSURL *csvDocURL = [docsdirURL URLByAppendingPathComponent:csvFileName isDirectory:NO];
     [theTrail trailCSVtoURL:csvDocURL];
-    
+
+#ifdef __USE_GDRIVE__
     if ([TOMGDrive isGDriveEnabled]) {
         //
         // Write it out to the Google Drive
@@ -666,7 +671,11 @@
         NSData *csvData = [NSData dataWithContentsOfURL:csvDocURL];
         [gDrive writeToGDrive:csvFileName mimeType:@"text/csv" data: csvData];
     }
+#endif
+#ifdef DEBUG
     });
+#endif
+
 }
 
 
@@ -674,7 +683,9 @@
 
 - (void) createGPX
 {
+#ifdef DEBUG
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+#endif
     // gpx
     pssGPXRoot *gpx = [pssGPXRoot rootWithCreator:@TRAILS_ON_A_MAP];
     // gpx > trk
@@ -697,7 +708,7 @@
     
     NSString *gpxString = gpx.gpx;
     // Store locally generated files locally, not on iCloud
-    NSURL *docsdirURL = [TOMUrl urlForLocalDocuments];
+    NSURL *docsdirURL = [TOMUrl urlForICloudDrive];
     NSString *fileName = [NSString stringWithFormat:@"%@.gpx",self.title];
     NSURL *documentURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
     NSError *err;
@@ -706,7 +717,8 @@
     if (err) {
         NSLog(@"%s ERROR WRITING GPX FILE: %@",__func__,err);
     }
-    
+
+#ifdef __USE_GDRIVE__
     if ([TOMGDrive isGDriveEnabled]) {
         //
         // Write it out to the Google Drive
@@ -714,9 +726,10 @@
         NSData *gpxData = [NSData dataWithContentsOfURL:documentURL];
         [gDrive writeToGDrive:fileName mimeType:@"application/gpx+xml" data: gpxData];
     }
-
-        
+#endif
+#ifdef DEBUG
     }); // end dispatch
+#endif
     return;
 }
 
@@ -907,7 +920,7 @@
     }
     
     NSString *kmlString = kml.kml;
-    NSURL *docsdirURL = [TOMUrl urlForLocalDocuments];
+    NSURL *docsdirURL = [TOMUrl urlForICloudDocuments];
     NSString *fileName = [NSString stringWithFormat:@"%@.kml",self.title];
     NSURL *documentURL = [docsdirURL URLByAppendingPathComponent:fileName isDirectory:NO];
     NSError *err;
@@ -917,7 +930,7 @@
         NSLog(@"%s ERROR WRITE KML FILE: %@",__func__,err);
     }
 
-    NSURL *zipdirURL = [TOMUrl urlForLocalDocuments];
+    NSURL *zipdirURL = [TOMUrl urlForICloudDocuments];
     NSString *zipName = [NSString stringWithFormat:@"%@.kmz",self.title];
     NSURL *zipFullURL = [zipdirURL URLByAppendingPathComponent:zipName isDirectory:NO];
 
@@ -951,6 +964,7 @@
         }
     }
 
+#ifdef __USE_GDRIVE__
     if ([TOMGDrive isGDriveEnabled]) {
         //
         // Write it out to the Google Drive
@@ -958,6 +972,8 @@
         NSData *kmzData = [NSData dataWithContentsOfURL:zipFullURL];
         [gDrive writeToGDrive:zipName mimeType:@"application/vnd.google-earth.kmz" data: kmzData];
     }
+#endif
+    
     [activityIndicator stopAnimating];
     
     // }); // end dispatch
@@ -1407,7 +1423,7 @@
         //
         // Delete the temporary files
         //
-        NSURL *docdirURL = [TOMUrl urlForLocalDocuments];
+        NSURL *docdirURL = [TOMUrl urlForICloudDrive];
         NSString *kmzName = [NSString stringWithFormat:@"%@%s",self.title,TOM_KMZ_EXT];
         NSURL *zipFullURL = [docdirURL URLByAppendingPathComponent:kmzName isDirectory:NO];
         [TOMUrl removeURL:zipFullURL];

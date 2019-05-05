@@ -31,12 +31,15 @@
         // Custom initialization
         self.title = [titleField text];
         //
+#ifdef __USE_GDRIVE__
         if ([TOMGDrive isGDriveEnabled]) {
             gDrive = [[TOMGDrive alloc] initGDrive];
             if  ([gDrive isAuthorized]) {
                 [gDrive trailsFolderExists];
             }
         }
+#endif
+        
     }
     return self;
 }
@@ -51,7 +54,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationPropertiesChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
     // currentDeviceOrientation = UIDeviceOrientationUnknown;
     // currentInterfaceOrientation = UIDeviceOrientationUnknown;
-    
+#ifdef __USE_GDRIVE__
     if ([TOMGDrive isGDriveEnabled] && ![gDrive isAuthorized])
     {
         // Not yet authorized, request authorization and push the login UI onto the navigation stack.
@@ -60,7 +63,7 @@
 #endif
         [self.navigationController pushViewController:[gDrive createAuthController] animated:YES];
     }
-
+#endif
     
     // Set up the crontrols first, then set them by the orientation.
     [self createControls];
@@ -135,10 +138,10 @@
             [titleField resignFirstResponder]; // and hides the keyboard
             break;
             
-        case 1:
-            [[NSUserDefaults standardUserDefaults] setValue:mytext forKey:@KEY_GOOGLE_DRIVE_PATH];
-            [googleDrivePathField resignFirstResponder]; // and hides the keyboard
-            break;
+        // case 1:
+        //   [[NSUserDefaults standardUserDefaults] setValue:mytext forKey:@KEY_GOOGLE_DRIVE_PATH];
+        //   [googleDrivePathField resignFirstResponder]; // and hides the keyboard
+        //   break;
             
         case 2:
         {   // Sometime in the future I'll find a numpad with a return until then, this will have to do :(
@@ -400,6 +403,7 @@
         case 10:
             keyvalue = @KEY_PROPERTIES_SYNC;
             break;
+#ifdef __USE_GDRIVE__
         case 11:
             keyvalue = @KEY_GOOGLE_DRIVE_ENABLED;
             //
@@ -410,6 +414,7 @@
             if (yn == YES) {
                 //
                 //
+
                 [googleDrivePathField setBackgroundColor:[UIColor whiteColor]];
                 //
                 // If the drive hasn't been allocated.
@@ -432,7 +437,8 @@
             }
             
             break;
-
+#endif
+        
         default:
             NSLog(@"ERROR: %s Unknown Sender Tag for pt types",__func__);
             break;
@@ -520,8 +526,10 @@
     UIFont *myLabelFont = [UIFont fontWithName: @TOM_FONT size: 12.0 ];
     UIFont *myTitleFont = [UIFont fontWithName: @TOM_FONT size: 12.0 ];
     UIFont *myVersionFont = [UIFont fontWithName: @TOM_FONT size: 10.0 ];
-    
+
+#ifdef __USE_GDRIVE__
     BOOL googleDriveEnabledFlag = NO;
+#endif
     
     //  Am even better way to do this...
     CGRect screenRect;
@@ -878,7 +886,7 @@
     [scrollView addSubview:toggleLabel];
     
     // for (POMType pt = ptLocation; pt <= ptSound; pt++ )
-    for (NSInteger pt = 1; pt < 12  ; pt++)
+    for (NSInteger pt = 1; pt < 11  ; pt++)
     {
         if (pt == ptNote || pt == ptSound) {
             continue;
@@ -1042,12 +1050,14 @@
                 [syncLabel setTextAlignment:NSTextAlignmentRight];
                 [scrollView addSubview:syncLabel];
                 break;
-
+                
+#ifdef __USE_GDRIVE__
             case 11:
+
                 googleDriveEnabledSwitch = ptSwitch;
                 yn  = [TOMGDrive isGDriveEnabled];
                 googleDriveEnabledFlag = yn;
-                
+
                 frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
                 googleDriveEnabledLabel = [TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]];
                 [googleDriveEnabledLabel setFont:myLabelFont];
@@ -1055,6 +1065,8 @@
                 [scrollView addSubview:googleDriveEnabledLabel];
   
                 break;
+#endif
+                
             default:
                 yn = NO;  // default
                 break;
@@ -1068,6 +1080,7 @@
         // [scrollView addSubview:[TOMPropertyViewController labelWithFrame:frame title:[pebbleTypeText objectAtIndex:(pt-1)]]];
     }
  
+#ifdef __USE_GDRIVE__
     // Google Path
     yPlacement += (ptTweenMargin * ptTweenMarginMultiplier) + ptSegmentedControlHeight - 10;
     frame = CGRectMake(	ptLeftMargin + 100, yPlacement - 5 , objectWidth, ptSegmentedControlHeight);
@@ -1098,7 +1111,7 @@
     }
     [googleDrivePathField setEnabled:googleDriveEnabledFlag];
     [scrollView addSubview:googleDrivePathField];
-    
+#endif
 
     // Photo Count
     yPlacement += (ptTweenMargin * ptTweenMarginMultiplier) + ptSegmentedControlHeight - 10;

@@ -18,8 +18,10 @@
 {
     @private
     UIDeviceOrientation currentDeviceOrientation;
+#ifdef __USE_GDRIVE__
     TOMGDrive *gDrive;
     // UIInterfaceOrientation currentInterfaceOrientation;
+#endif
 }
 
 // Controller sub-views

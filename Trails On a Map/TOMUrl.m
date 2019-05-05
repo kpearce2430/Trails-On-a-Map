@@ -40,6 +40,28 @@
     return documentsFolderURLIniCloud;
 }
 
++ (NSURL *) urlForICloudDrive {
+    NSString *teamID = @TOM_ICLOUDDRIVE_ID;
+    NSString *containerID = [[NSBundle mainBundle] bundleIdentifier];
+    NSString *teamIDandContainerID = [NSString stringWithFormat:@"%@.%@",teamID,containerID];
+    NSURL *documentsFolderURLIniCloud = Nil;
+    
+#ifdef DEBUG
+    // NSLog(@"Team ID: %@",teamID);
+    // NSLog(@"Container ID: %@",containerID);
+    NSLog(@"%s Team and Container ID: %@",__PRETTY_FUNCTION__,teamIDandContainerID);
+#endif
+    
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    NSURL *theURL = [fileManager URLForUbiquityContainerIdentifier:teamIDandContainerID];
+    
+    if (theURL)
+        documentsFolderURLIniCloud = [theURL URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+    
+    return documentsFolderURLIniCloud;
+}
+
+
 + (BOOL) isIcloudAvailable {
     
     NSURL *theURL = [self urlForICloud];
@@ -291,6 +313,62 @@
         yn = NO;
     
     return yn;
+}
+
+#ifdef __SAMPLE__
+- (IBAction)btnStoreTapped:(id)sender {
+    // Let's get the root directory for storing the file on iCloud Drive
+    [self rootDirectoryForICloud:^(NSURL *ubiquityURL) {
+        NSLog(@"1. ubiquityURL = %@", ubiquityURL);
+        if (ubiquityURL) {
+            
+            // We also need the 'local' URL to the file we want to store
+            NSURL *localURL = [self localPathForResource:@"demo" ofType:@"pdf"];
+            NSLog(@"2. localURL = %@", localURL);
+            
+            // Now, append the local filename to the ubiquityURL
+            ubiquityURL = [ubiquityURL URLByAppendingPathComponent:localURL.lastPathComponent];
+            NSLog(@"3. ubiquityURL = %@", ubiquityURL);
+            
+            // And finish up the 'store' action
+            NSError *error;
+            if (![[NSFileManager defaultManager] setUbiquitous:YES itemAtURL:localURL destinationURL:ubiquityURL error:&error]) {
+                NSLog(@"Error occurred: %@", error);
+            }
+        }
+        else {
+            NSLog(@"Could not retrieve a ubiquityURL");
+        }
+    }];
+}
+#endif
+
+- (void)rootDirectoryForICloud:(void (^)(NSURL *))completionHandler {
+
+#ifdef __FFU__
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+#endif
+        NSURL *rootDirectory = [[[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil]URLByAppendingPathComponent:@"Documents"];
+        
+        if (rootDirectory) {
+            if (![[NSFileManager defaultManager] fileExistsAtPath:rootDirectory.path isDirectory:nil]) {
+                NSLog(@"Create directory");
+                [[NSFileManager defaultManager] createDirectoryAtURL:rootDirectory withIntermediateDirectories:YES attributes:nil error:nil];
+            }
+        }
+#ifdef __FFU__
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(rootDirectory);
+        });
+    });
+#endif
+    
+}
+
+- (NSURL *)localPathForResource:(NSString *)resource ofType:(NSString *)type {
+    NSString *documentsDirectory = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
+    NSString *resourcePath = [[documentsDirectory stringByAppendingPathComponent:resource] stringByAppendingPathExtension:type];
+    return [NSURL fileURLWithPath:resourcePath];
 }
 
 @end

@@ -13,6 +13,10 @@
 #define TOM_TEAM_ID "HV9L49AFR8"
 #endif
 
+#ifndef TOM_ICLOUDDRIVE_ID
+#define TOM_ICLOUDDRIVE_ID  "iCloud"
+#endif
+
 @interface TOMUrl : NSObject
 
 + (NSURL *) urlForDocumentsDirectory ;
@@ -21,6 +25,7 @@
 
 + (NSURL *) urlForICloud;
 + (NSURL *) urlForICloudDocuments;
++ (NSURL *) urlForICloudDrive;
 + (NSURL *) urlForLocalDocuments;
 + (NSURL *) urlForImageDirectory :(NSString *) title;
 + (NSURL *) urlForImageFile:(NSString *) title key:(NSString *) key;

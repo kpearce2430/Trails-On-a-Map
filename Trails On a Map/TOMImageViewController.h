@@ -12,19 +12,19 @@
 #import "TOMUIUtilities.h"
 
 // #ifdef USE_AVIARY
+//
+// #import <AviarySDK/AviarySDK.h>
 
-#import <AviarySDK/AviarySDK.h>
-
-#define kAviaryAPIKey "003c2565b9dc1470"
-#define kAviarySecret "0a77f0f9ae9cc6e4"
+// #define kAviaryAPIKey "003c2565b9dc1470"
+// #define kAviarySecret "0a77f0f9ae9cc6e4"
 
 
 // #define CLIENT_SECRET "89029c16-a5bc-486a-b4b8-1133495f9973"
 // #define CLIENT_ID_DEVELOPMENT_MODE "fd4ab65967484ac4826cb9efc5398b09"
 
-@interface TOMImageViewController : UIViewController <UITextFieldDelegate, UIScrollViewDelegate, UIActionSheetDelegate, AFPhotoEditorControllerDelegate >
+// @interface TOMImageViewController : UIViewController <UITextFieldDelegate, UIScrollViewDelegate, UIActionSheetDelegate, AFPhotoEditorControllerDelegate >
 // #else
-// @interface TOMImageViewController : UIViewController <UITextFieldDelegate, UIScrollViewDelegate, UIActionSheetDelegate >
+@interface TOMImageViewController : UIViewController <UITextFieldDelegate, UIScrollViewDelegate, UIActionSheetDelegate >
 // #endif
 
 {

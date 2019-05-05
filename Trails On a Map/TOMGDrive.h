@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Pearce Software Solutions. All rights reserved.
 //
 
+#ifdef __USE_GDRIVE__
+
 #import <Foundation/Foundation.h>
 
 #import "GTMOAuth2ViewControllerTouch.h"
@@ -48,3 +50,5 @@ static NSString *const kClientSecret = @"BQodroqzqWbiz-wq6TYo7v4A";
 - (void) trailsFolderExists;
 
 @end
+
+#endif
